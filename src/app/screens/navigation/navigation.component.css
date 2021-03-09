@@ -1,0 +1,16 @@
+.mat-button
+{
+    float: right;
+}
+
+
+.menu-spacer{flex: 1 1 auto; }
+mat-content {
+    background-color: #bc451d;
+}
+
+.main-content {padding: 20px; }
+
+:host ::ng-deep.mat-drawer-backdrop.mat-drawer-shown{
+    background-color: white;
+}

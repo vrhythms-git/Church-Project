@@ -1,0 +1,19 @@
+.container{
+   font-family: poppins;
+}
+
+h1{
+    font-family: poppins!important;
+    font-weight: bold;
+    letter-spacing: 0.18px;
+  }
+  input.mat-input-element{
+    font-family: poppins!important;
+  }
+
+  #hyperlink{
+    color:#bd34069e;
+  }
+  .forgotpwd{
+    border:none;background-color: white;cursor: pointer;
+  }

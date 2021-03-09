@@ -1,0 +1,24 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: poppins!important;}
+
+@font-face {
+    font-family: poppins;
+    src: url(assets/Poppins/Poppins-Regular.ttf);
+  }
+
+  .btn{
+    background-color: #b130059e;
+    border-color: #bd34069e;
+  }
+  .btn:hover{
+    background-color: #a82b029e;
+    border-color: #a82b029e;
+  }
+.box-shadow{
+  box-shadow:2px 2px 10px rgb(168 175 110);
+}
+.container-fluid{
+  height:100%;
+}

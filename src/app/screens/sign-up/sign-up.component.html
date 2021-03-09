@@ -1,0 +1,110 @@
+<div class="container-fluid d-flex row col align-items-center m-0 p-0">
+        <div class="container col-md-4 col-sm-4 border rounded-lg box-shadow">
+
+
+        <div class="row" style="background-color: #bd34069e;">
+            <button class="col btn btn-sm m-1" style="background-color: transparent;border-color: transparent;" (click)="goToLogin()">
+                <mat-icon>person</mat-icon>Login</button>
+            <button class="col btn btn-sm m-1" style="background-color: #bd34069e;color: white">
+                <mat-icon>person_add</mat-icon>Register</button>
+        </div>
+
+        <div class="mt-3">
+            <form [formGroup]="signUpForm" class="p-2">
+
+                <div class="row form-group">
+
+                    <mat-form-field class="form-field col-md">
+                        <input matInput formControlName="firstName" id="firstname" placeholder="First Name" maxlength="25" required>
+                        <mat-error *ngIf="signUpForm.controls.firstName.touched && signUpForm.controls.firstName.invalid">
+                            <span *ngIf="signUpForm.controls.firstName.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.firstName.errors.pattern">This field is invalid.</span>
+                        </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field class="form-field col-md">
+                        <input type="text" matInput formControlName="lastName" id="lastname" placeholder="Last Name" maxlength="25" required>
+                        <mat-error *ngIf="signUpForm.controls.lastName.touched && signUpForm.controls.lastName.invalid">
+                            <span *ngIf="signUpForm.controls.lastName.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.lastName.errors.pattern">This field is invalid.</span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group row justify-content-center">
+                    <mat-form-field class="form-field col-md">
+                        <input type="text" matInput formControlName="email" id="email" placeholder="Email" required>
+                        <mat-error *ngIf="signUpForm.controls.email.touched && signUpForm.controls.email.invalid">
+                            <span *ngIf="signUpForm.controls.email.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.email.errors.pattern">This field is invalid.</span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field class="form-field col col-md">
+                        <input matInput type="input" ng2TelInput formControlName="mobileNo" id="contact" length="10" required style="width: fit-content;"
+                        />
+                        <mat-error *ngIf="signUpForm.controls.mobileNo.touched && signUpForm.controls.mobileNo.invalid">
+                            <span *ngIf="signUpForm.controls.mobileNo.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.mobileNo.errors.pattern">Enter 10 digit number.</span>
+                        </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field class="form-field col-12 col-md-6">
+                        <input matInput [matDatepicker]="picker" formControlName="dob" id="dob" placeholder="DoB" required>
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-error *ngIf="signUpForm.controls.dob.touched && signUpForm.controls.dob.invalid">
+                            <span *ngIf="signUpForm.controls.dob.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.dob.errors.pattern">This field is invalid.</span>
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- <mat-form-field class="form-field col-12 col-md-6 row">
+                        <ngx-flag-picker class="" MatFormFieldControl [selectedCountryCode]="selectedCountryCode" [countryCodes]="countryCodes" (changedCountryCode)="changeSelectedCountryCode($event)">
+                        </ngx-flag-picker>
+                    </mat-form-field> -->
+
+
+                </div>
+
+                <div class="form-group row justify-content-center">
+                    <mat-form-field class="form-field col-md">
+                        <input type="text" matInput formControlName="username" id="username" placeholder="Username" required>
+                        <mat-error *ngIf="signUpForm.controls.username.touched && signUpForm.controls.username.invalid">
+                            <span *ngIf="signUpForm.controls.username.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.username.errors.pattern">This field is invalid.</span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row justify-content-center">
+                    <mat-form-field class="form-field col-md">
+                        <input type="password" matInput formControlName="password" id="password" placeholder="Password" minlength="8" required>
+                        <mat-error *ngIf="signUpForm.controls.password.touched && signUpForm.controls.password.invalid">
+                            <span *ngIf="signUpForm.controls.password.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.password.errors.pattern">Enter strong password.</span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="form-field col-md">
+                        <input type="password" matInput formControlName="cnfmpwd" id="cnfmpwd" placeholder="Confirm Password" required>
+                        <mat-error *ngIf="signUpForm.controls.cnfmpwd.touched && signUpForm.controls.cnfmpwd.invalid">
+                            <span *ngIf="signUpForm.controls.cnfmpwd.errors.required">This field is mandatory.</span>
+                            <span *ngIf="signUpForm.controls.cnfmpwd.errors.pattern">This field is invalid.</span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group row justify-content-center">
+                    <mat-form-field class="form-field col-md">
+                        <textarea type="text" matInput formControlName="abtyrslf" id="abtyrslf" placeholder="About Yourself"></textarea>
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group text-right">
+                    <button type="submit" routerLinkActive="active" class="btn btn-md mr-1" (click)="cancel()">Cancel</button>
+                    <button id="signInBtn" type="submit" routerLinkActive="active" class="btn btn-md" (click)="signUp()">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

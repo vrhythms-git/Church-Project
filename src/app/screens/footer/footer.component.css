@@ -1,0 +1,25 @@
+/*
+footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    text-align: center;
+}
+*/
+
+.footer-bar{
+    position:fixed;
+    bottom: 0;
+    width: 100%;
+    
+    background-color: #bd34069e;
+    box-shadow: 0px -1px 2px gray !important;
+    z-index: 10;
+}
+
+.center-align {
+    text-align: center;
+    color: #f4fcfd;
+}
