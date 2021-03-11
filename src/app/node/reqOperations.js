@@ -81,7 +81,6 @@ async function processGetUserMetaDataRequest(firebaseToken) {
                         permissions.push(row.perm_name)
 
                     }
-
                     metaData.permissions = permissions;
                     metaData.menus = menus;
 
