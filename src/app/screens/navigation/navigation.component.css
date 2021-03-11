@@ -3,7 +3,6 @@
     float: right;
 }
 
-
 .menu-spacer{flex: 1 1 auto; }
 mat-content {
     background-color: #bc451d;
@@ -14,3 +13,23 @@ mat-content {
 :host ::ng-deep.mat-drawer-backdrop.mat-drawer-shown{
     background-color: white;
 }
+mat-sidenav-container{
+    height: 100%;
+}
+.mat-sidenav-container .navbar-nav li > a:hover,
+.mat-sidenav-container .navbar-nav li > a:focus{
+    background-color: #bd34069e; 
+            color: #fff; 
+}
+
+
+mat-sidenav,mat-sidenav-content{
+    padding: 15px;
+}
+
+.mat-list-item{
+    color: black;
+}
+
+
+/* mat-list-item:hover > mat-icon{ display: block; } */

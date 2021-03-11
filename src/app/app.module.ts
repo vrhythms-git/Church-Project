@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
+import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { SignUpComponent } from './screens/sign-up/sign-up.component';
@@ -23,7 +23,7 @@ import { NavigationComponent } from './screens/navigation/navigation.component';
 import { HomePageComponent } from './screens/home-page/home-page.component';
 import { LandingPageComponent } from './screens/landing-page/landing-page.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { UserProfileComponent } from './screens/user-profile/user-profile.component';
+//import { UserProfileComponent } from './screens/user-profile/user-profile.component';
 
 import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
@@ -36,8 +36,12 @@ import { AuthService } from "./services/auth.service";
 
 import { MatButtonModule} from '@angular/material/button';
 import { NavbarModule, WavesModule, ButtonsModule } from 'ng-uikit-pro-standard';
+//import { OvbsRegistrationComponent } from './screens/ovbs-registration/ovbs-registration.component';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
-
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 
 
@@ -50,7 +54,9 @@ import { NavbarModule, WavesModule, ButtonsModule } from 'ng-uikit-pro-standard'
     NavigationComponent,
     HomePageComponent,
     LandingPageComponent,
-    UserProfileComponent
+    routingComponents
+    //UserProfileComponent,
+    //OvbsRegistrationComponent
   ],
   imports: [
 
@@ -81,7 +87,12 @@ import { NavbarModule, WavesModule, ButtonsModule } from 'ng-uikit-pro-standard'
     MatButtonModule,
     NavbarModule, 
     WavesModule, 
-    ButtonsModule
+    ButtonsModule,
+    MatCardModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatCheckboxModule,
+    
 
   ],
   providers: [AuthService],

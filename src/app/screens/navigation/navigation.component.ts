@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class NavigationComponent implements OnInit {
 
   constructor() { }
-
+  opened = true;
   userMetaData:any;
   ngOnInit(): void {
 
