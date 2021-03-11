@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth.service'
 export class SignUpComponent implements OnInit {
   signUpForm: any;
   contactNo: any;
+  max_date!: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -32,6 +33,11 @@ export class SignUpComponent implements OnInit {
       mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
       abtyrslf: new FormControl('')
     });
+
+    this.max_date = new Date;
+
+  // this.today = date.getFullYear()+ "-" + ("0" + (date.getMonth() + 1)).slice(-2)+ "-" +("0" + date.getDate()).slice(-2)
+  // console.log("Today:",this.today);
   }
 
   signUp() {
@@ -46,10 +52,10 @@ export class SignUpComponent implements OnInit {
         return
       }
       else {
-        this.signUpForm.value.contact = this.contactNo;
-        this.AuthService.SignUp(this.signUpForm.value).then((data)=>{
+        this.signUpForm.value.mobileNo = this.contactNo;
+        // this.AuthService.SignUp(this.signUpForm.value).then((data)=>{
          // console.log(JSON.stringify(data));
-        })
+        // })
       }
     // this.signUpForm.reset();
   }
@@ -66,6 +72,14 @@ export class SignUpComponent implements OnInit {
   getNumber(event: any) {
     console.log(event);
     this.contactNo = event;
+  }
+
+  validateDOB(event:any){
+    let year = new Date(event).getFullYear();
+    let today = new Date().getFullYear();
+if(year > today){
+  alert("Select Date in Past");
+}
   }
 
 }

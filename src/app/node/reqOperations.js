@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+const { Client, Pool } = require('pg');
 const errorHandling = require('./ErrorHandling/commonDBError');
 const dbConnections = require(`${__dirname}/dbConnection`);
 
@@ -41,34 +41,259 @@ async function processSignInRequest(userInfo) {
     });
 }
 
-module.exports = {
-    processSignInRequest,
-    getuserRecords
+
+async function processGetUserMetaDataRequest(firebaseToken) {
+
+    return new Promise((resolve, reject) => {
+
+        let query = `select user_id,first_name,last_name,email_id,mobile_no, role_name,menu_name,perm_name 
+                    from v_user
+                    where firebase_id = '${firebaseToken}';`
+
+        let client = dbConnections.getConnection();
+        try {
+            client.connect();
+            client.query(query, (err, res) => {
+                if (err) {
+                    console.error(`reqOperations.js::processGetUserMetaDataRequest() --> error while fetching results : ${err}`)
+                    reject(errorHandling.handleDBError('queryExecutionError'));
+                    return;
+                }
+
+                client.end()
+                if (res) {
+
+                    let metaData = {}
+                    let permissions = [];
+                    let menus = [];
+
+                    metaData.firstName = res.rows[0].first_name;
+                    metaData.userId = res.rows[0].user_id;
+                    metaData.lastName = res.rows[0].last_name;
+                    metaData.emailId = res.rows[0].email_id;
+                    metaData.mobile_no = res.rows[0].mobile_no;
+                    metaData.userRole = res.rows[0].role_name;
+
+                    for (let row of res.rows) {
+
+                        if (menus.indexOf(row.menu_name) < 0)
+                            menus.push(row.menu_name)
+                        permissions.push(row.perm_name)
+
+                    }
+
+                    metaData.permissions = permissions;
+                    metaData.menus = menus;
+
+
+                    resolve({
+                        data: {
+                            status: 'success',
+                            metaData: metaData
+                        }
+                    })
+                }
+            });
+        } catch (error) {
+            console.error(`reqOperations.js::processGetUserMetaDataRequest() --> error executing query as : ${error}`);
+            reject(errorHandling.handleDBError('connectionError'));
+        }
+    });
 }
+
 
 async function getuserRecords(userInfo) {
 
     return new Promise((resolve, reject) => {
         let getuserRecords = `Select distinct first_name,middle_name,last_name,dob,email_id from v_user;`
-        let client = dbConnections.getConnection();     
-      
+        let client = dbConnections.getConnection();
+
         try {
             client.connect();
             client.query(getuserRecords, (err, res) => {
-                if (err){
-                  console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
-                  reject(errorHandling.handleDBError('queryExecutionError')); 
-                  return;
+                if (err) {
+                    console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
+                    reject(errorHandling.handleDBError('queryExecutionError'));
+                    return;
                 }
                 client.end()
                 if (res)
                     resolve(res.rows)
-                    currStateData = JSON.parse(JSON.stringify(res.rows));
+                currStateData = JSON.parse(JSON.stringify(res.rows));
             });
         } catch (error) {
             console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError')); 
+            reject(errorHandling.handleDBError('connectionError'));
         }
     });
 }
 
+async function processUpdateUserRoles(userData) {
+
+    return new Promise((resolve, reject) => {
+        let client = dbConnections.getConnection();
+       
+            client.connect(); 
+        //      dbConnections.getCoonectionPool().connect().catch(err => {
+        //     console.log("\nclient.connect():", err.name);
+        //     for (item in err) {
+        //         if (err[item] != undefined)
+        //             console.error(`reqOperations.js::processUpdateUserRoles() --> error while fetching results : ${JSON.stringify(err)}`)
+        //         reject(errorHandling.handleDBError('queryExecutionError'));
+        //         return;
+        //     }
+        // }).then((client)=>{
+            try {
+                 client.query("BEGIN");
+                try {
+                 
+            /********************** t_user************************* */
+                    const updateUserTbl = `UPDATE public.t_user
+                  SET first_name=$1,
+                      middle_name=$2, 
+                      last_name=$3,
+                      mobile_no=$4, 
+                      updated_by=$5,
+                      updated_date=$6, 
+                      address_line1=$7,
+                      address_line2=$8, 
+                      city=$9, 
+                      state=$10, 
+                      postal_code=$11, 
+                      country=$12,
+                      dob=$13
+                  WHERE user_id= $14;`;
+                    const updateUserTbl_values = [
+                        userData.firstName,
+                        userData.middleName,
+                        userData.lastName,
+                        userData.mobileNo,
+                        userData.updatedBy,
+                        new Date().toISOString(),
+                        userData.addressLine1,
+                        userData.addressLine2,
+                        userData.city,
+                        userData.state,
+                        userData.postalCode,
+                        userData.country,
+                        userData.dob,
+                        userData.userId,
+                    ];
+                    
+                     client.query(updateUserTbl, updateUserTbl_values, function (err, result) {
+                        if (err) {
+                            client.query("ROLLBACK");
+                            console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while updating data into t_user table: ${JSON.stringify(err)}`)
+                            console.log("Transaction ROLLBACK called");
+                            reject(errorHandling.handleDBError('transactionError'))
+                        } else {
+                            client.query("COMMIT");
+                            console.log("reqOperations.js::t_user: Transaction COMMIT row count:", result.rowCount);
+                        }
+                    });
+
+                 /**********************Delete -> t_user_role_mapping ************************* */
+                   const deleteFromRoleMapping = `DELETE FROM public.t_user_role_mapping WHERE user_id='${ userData.userId}';` 
+                   client.query(deleteFromRoleMapping, function (err, result) {
+                    if (err) {
+                        client.query("ROLLBACK");
+                        console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while deleting datafrom t_user_role_mapping table: ${JSON.stringify(err)}`)
+                        console.log("Transaction ROLLBACK called");
+                        reject(errorHandling.handleDBError('transactionError'))
+                    } else {
+                        client.query("COMMIT");
+                        console.log("reqOperations.js::t_user_role_mapping: Transaction COMMIT row count:", result.rowCount);
+                    }
+                });
+
+                   /**********************Delete -> t_user_role_context ************************* */
+                   const deleteFromRoleContext = `DELETE FROM public.t_user_role_context WHERE user_id='${ userData.userId}';` 
+                   client.query(deleteFromRoleContext, function (err, result) {
+                    if (err) {
+                        client.query("ROLLBACK");
+                        console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while deleting datafrom t_user_role_mapping table: ${JSON.stringify(err)}`)
+                        console.log("Transaction ROLLBACK called");
+                        reject(errorHandling.handleDBError('transactionError'))
+                    } else {
+                        client.query("COMMIT");
+                        console.log("reqOperations.js::t_user_role_context Transaction COMMIT row count:", result.rowCount);
+                    }
+                });
+
+                   /**********************Insert -> t_user_role_mapping ************************* */
+
+                   const insertRoleMapping = `INSERT INTO public.t_user_role_mapping(
+                    role_id, user_id, is_deleted)
+                    VALUES ($1, $2, $3);` 
+
+                  const insertRoleContext = `INSERT INTO public.t_user_role_context(
+                                                        role_id,
+                                                        user_id,
+                                                        org_id, 
+                                                        is_deleted,
+                                                        created_by,
+                                                        created_date,
+                                                        updated_by, 
+                                                        updated_date)
+                                                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`
+
+                   for(let role of userData.roles){
+                       //t_user_role_context 
+                    console.log(`Inserting role ${JSON.stringify(role)} into t_user_role_mapping t_user_role_context and t_user_role_context table.`)
+                    insertRoleMapping_value = [role.roleId, role.role, false]  
+                    client.query(insertRoleMapping, insertRoleMapping_value, function (err, result) {
+                        if (err) {
+                            client.query("ROLLBACK");
+                            console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while inserting data in t_user_role_context table: ${JSON.stringify(err)}`)
+                            console.log("Transaction ROLLBACK called");
+                            reject(errorHandling.handleDBError('transactionError'))
+                            return;
+                        } else {
+                            client.query("COMMIT");
+                            console.log("reqOperations.js::processUpdateUserRoles() t_user_role_context Transaction COMMIT row count:", result.rowCount);
+                        }
+                    });
+
+                    //t_user_role_context
+                    insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString() ,userData.updatedBy,new Date().toISOString()]
+                    client.query(insertRoleContext, insertRoleContext_value, function (err, result) {
+                        if (err) {
+                            client.query("ROLLBACK");
+                            console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while Inserting data in t_user_role_context table: ${err}`)
+                            console.log("Transaction ROLLBACK called");
+                            reject(errorHandling.handleDBError('transactionError'))
+                            return;
+                        } else {
+                            client.query("COMMIT");
+                            console.log("reqOperations.js::processUpdateUserRoles() t_user_role_context Transaction COMMIT row count:", result.rowCount);
+                        }
+                    });
+                   }
+                                        
+                resolve({
+                    data: {
+                        status: 'success'
+                    }
+                })
+
+                } catch (err) {
+                    client.query("ROLLBACK");
+                    console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${JSON.stringify(err)}`)
+                    console.log("Transaction ROLLBACK called");
+                    reject(errorHandling.handleDBError('transactionError'))
+                }
+                
+            } catch (error) {
+                console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${JSON.stringify(err)}`)
+                reject(errorHandling.handleDBError('transactionError'))
+            }
+        });
+  //  });
+}
+
+module.exports = {
+    processSignInRequest,
+    processGetUserMetaDataRequest,
+    getuserRecords,
+    processUpdateUserRoles
+}

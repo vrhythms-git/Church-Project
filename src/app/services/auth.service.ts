@@ -46,24 +46,24 @@ export class AuthService {
   }
 
   // Sign in with email/password for church project
-  SignIn(data: any){
+  SignIn(data: any) {
     console.log(`Attempting to sign in with email: ${data.data.username} and password: ${data.data.password}`)
-     this.afAuth.auth.signInWithEmailAndPassword(data.data.username, data.data.password)
+    this.afAuth.auth.signInWithEmailAndPassword(data.data.username, data.data.password)
       .then((result: any) => {
         if (result.user?.emailVerified == false) {
           this.uiCommonUtils.showSnackBar('Please verify your email.', 'Dismiss', 3000)
           return;
         } else {
-          this.router.navigate(['/landingpage']);
-          //this.uiCommonUtils.showSnackBar('Please Check your inbox for verification email.', 'Dismiss', 3000)
-          //console.log('result.user : ' + JSON.stringify(result.user))
           this.signedInUser = result.user;
-          // this.ngZone.run(() => {
-          //   result.user?.getIdToken().then(token: => {
-          //     localStorage.setItem('cormUserTokenId', token)
-          //   })
-          // this.router.navigate(['default']);
-          // });
+          this.ngZone.run(() => {
+            result.user?.getIdToken().then((token: string) => {
+              localStorage.setItem('chUserToken', token)
+            })
+            this.apiService.callGetService(`getUserMetaData?fbuid=${result.user?.uid}`).subscribe((data)=>{
+              localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
+              this.router.navigate(['/landingpage']);
+            })
+          });
         }
         this.SetUserData(result.user);
       }).catch((error: any) => {
@@ -89,21 +89,12 @@ export class AuthService {
             }).then((res: any) => {
               result.user?.sendEmailVerification();
             })
-             this.router.navigate(['/signin']);
+            this.router.navigate(['/signin']);
             this.uiCommonUtils.showSnackBar('Sign up complete, Please check your inbox to verify your email address', 'Dismiss', 5000);
           } else {
             this.uiCommonUtils.showSnackBar(`Something went wrong(${data.data.errorCode} : ${data.data.errorMessage})`, 'Dismiss', 5000);
           }
         });
-        // result.user?.sendEmailVerification();
-        // result.user?.updateProfile({
-        //   displayName: data.fname + " " + data.lname,
-        //   photoURL: 'http://www.fake.com/image'
-        // }).catch((error:any) => {
-        //   console.log(`Error while updating the username as : ${error}`);
-        // }).then((res:any) => {
-        //   result.user?.sendEmailVerification();
-        // })
         this.SetUserData(result.user);
         // this.router.navigate(['signin']);
       }).catch((error: any) => {

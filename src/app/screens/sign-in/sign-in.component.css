@@ -13,6 +13,7 @@ h1{
 
   #hyperlink{
     color:#bd34069e;
+    text-decoration: underline;
   }
   .forgotpwd{
     border:none;background-color: white;cursor: pointer;

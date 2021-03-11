@@ -5,21 +5,23 @@
       <button mat-icon-button>
         <mat-icon (click)="sidenav.toggle()">menu</mat-icon>
       </button>
-      <h2>Application Name</h2>
+      <h1>Application Name</h1>
       <span class="menu-spacer"></span>
       <div >
         <!-- <a mat-button [routerLink]="'/accounts'"> Accounts </a>-->
  
         
         <a [matMenuTriggerFor]="menu" mat-button [routerLink]="'/my-profile'"> 
-            <mat-icon>account_circle</mat-icon>  Profile </a>
+            <mat-icon>account_circle</mat-icon>  {{userMetaData.firstName}}&nbsp;{{userMetaData.lastName}} </a>
         
             <mat-menu #menu="matMenu"  xPosition="after">
                 <button mat-menu-item>
                     <mat-icon>account_box</mat-icon>    
-                    Edit Profile
+                   Profile
                 </button>
-               
+                <button mat-menu-item>
+                    <mat-icon>settings</mat-icon>
+                    Settings</button>
                 <button mat-menu-item>
                     <mat-icon>exit_to_app</mat-icon>
                     Logout</button>

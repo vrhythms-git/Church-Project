@@ -18,7 +18,14 @@ function handleDBError(errorType) {
                 }
             }
         }
-
+        case 'transactionError': {
+            return {
+                data: {
+                    errorCode: 'CH503',
+                    errorMessage: 'Internal Error Occured'
+                }
+            }
+        }
 
     }
 }

@@ -23,6 +23,7 @@ import { NavigationComponent } from './screens/navigation/navigation.component';
 import { HomePageComponent } from './screens/home-page/home-page.component';
 import { LandingPageComponent } from './screens/landing-page/landing-page.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { UserProfileComponent } from './screens/user-profile/user-profile.component';
 
 import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
@@ -48,8 +49,8 @@ import { NavbarModule, WavesModule, ButtonsModule } from 'ng-uikit-pro-standard'
     FooterComponent,
     NavigationComponent,
     HomePageComponent,
-    LandingPageComponent
-   
+    LandingPageComponent,
+    UserProfileComponent
   ],
   imports: [
 
@@ -69,6 +70,7 @@ import { NavbarModule, WavesModule, ButtonsModule } from 'ng-uikit-pro-standard'
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
+    MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
     Ng2TelInputModule,

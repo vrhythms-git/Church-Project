@@ -7,9 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LandingPageComponent implements OnInit {
 
-  constructor() { }
+  constructor() { 
+  }
 
+  userMetaData = {}
   ngOnInit(): void {
+
+    this.userMetaData = JSON.parse(localStorage.getItem('chUserMetaData') || '{}');
+    //console.log('userMetaData is :' + JSON.stringify(this.userMetaData))
   }
 
 }

@@ -50,9 +50,6 @@ app.post('/api/signUp', function (req, res) {
   }
 });
 
-// firebaseAdminUtils.varifyUserToken(req.header('Authorization')).then(idToken => {});
-
-
 
 app.get('/api/getuserRecords', function (req, res) {
   console.log("signUp called with : " + JSON.stringify(req.body));
@@ -60,6 +57,42 @@ app.get('/api/getuserRecords', function (req, res) {
   //console.log(`Header info : ${JSON.stringify(req.header('user-agent'))}`)
   try {
     processRequest.getuserRecords(req.body)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in signUp as : ' + error)
+  }
+});
+
+app.get('/api/getUserMetaData', function (req, res) {
+  console.log("signUp called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processRequest.processGetUserMetaDataRequest(req.query.fbuid)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in signUp as : ' + error)
+  }
+});
+
+app.post('/api/updateUserRoles', function (req, res) {
+  console.log("updateUserRoles called with : " + JSON.stringify(req.body));
+  try {
+    processRequest.processUpdateUserRoles(req.body.data)
       .then((data) => {
         console.log(`Returning with resonse : ${data}`)
         res.send(data);
@@ -73,6 +106,12 @@ app.get('/api/getuserRecords', function (req, res) {
     console.error('Error in signUp as : ' + error)
   }
 });
+
+
+// firebaseAdminUtils.varifyUserToken(req.header('Authorization')).then(idToken => {});
+
+
+
 
 
 

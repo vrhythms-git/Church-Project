@@ -28,13 +28,14 @@ export class ApiService {
     // return this.http.post(`${this._baseUrl}/signUp`, searchString, { headers: headerObj });
   }
 
-  getBrowseCategoeries() {
-    console.log(`calling getBrowseCategoeries()`)
+
+  callGetService(endPoint:string):Observable<any> {
+    console.log(`callGetService called..`)
     let headerObj = new HttpHeaders({
-                                      'Authorization': localStorage.getItem('cormUserTokenId')!,
+                                      'Authorization': localStorage.getItem('chUserToken')!,
                                       'Content-Type' : 'application/json'
                                     });
-    return this.http.get(`${this._baseUrl}/browseCategories`, { headers: headerObj });
+    console.log('headers set to ' + JSON.stringify(headerObj))
+    return this.http.get(`${this._baseUrl}/${endPoint}`,{ headers: headerObj });
   }
-
 }
