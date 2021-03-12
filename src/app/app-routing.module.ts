@@ -6,20 +6,21 @@ import { HomePageComponent } from './screens/home-page/home-page.component';
 import { LandingPageComponent } from './screens/landing-page/landing-page.component';
 import { UserProfileComponent } from './screens/user-profile/user-profile.component';
 import { OvbsRegistrationComponent } from './screens/ovbs-registration/ovbs-registration.component';
+import { AppComponent } from './app.component';
 
 
 const routes: Routes = [
   { path: 'signup', component: SignUpComponent },
   { path: 'signin', component: SignInComponent},
   { path: '', component:HomePageComponent},
-  { path: 'landingpage', component:LandingPageComponent,
+  { path: 'landingpage', component:LandingPageComponent},
+  { path: 'dashboard', component:UserProfileComponent,
   children: [
     { path: 'ovbsregistration', component: OvbsRegistrationComponent },
-    { path: 'users',component:SignInComponent},
-    { path: 'testEvent',component:UserProfileComponent},
+    { path: 'users',component:LandingPageComponent},
+    // { path: 'testEvent',component:UserProfileComponent},
   ]
-  },
-  { path: 'userprofile', component:UserProfileComponent},
+},
   //{ path: 'landingpage/ovbsregistration', component:OvbsRegistrationComponent},
   
   

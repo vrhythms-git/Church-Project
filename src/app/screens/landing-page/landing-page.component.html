@@ -1,2 +1,166 @@
-<app-navigation></app-navigation>
-<app-footer></app-footer>
+
+<div class="container mt-3" style="overflow: hidden;">
+
+        <div class="form-group form-inline row m-0 p-0">
+                <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
+                <button mat-button class="col-2 ml-auto mbutton">Delete</button>
+        </div>
+
+        <ag-grid-angular style="width: auto; height: 500px;" class="ag-theme-alpine mt-3" [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
+                [pagination]="true" rowSelection='multiple' [checkboxSelection]="true" [gridOptions]="gridOptions" (rowClicked)='onRowClicked($event)'>
+        </ag-grid-angular>
+</div>
+<div class="col-md-12">
+<div class="modal" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" >
+        <div class="modal-dialog modal-dialog-scrollable modal-lg" >
+                <div class="modal-content">
+                        <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel">Edit User Profile</h4>
+                                <button mat-button class="ml-auto" data-dismiss="modal"><mat-icon>clear</mat-icon></button>
+                        </div>
+                        <div class="modal-body p-4">
+                                <form [formGroup]="updateuserinfo">
+                                        <div class="row">
+                                                <div class="col-md-6">
+                                                        <img src="./assets/userprof.png" height="60%" width="60%">
+                                                </div>
+                                                <div class="col-md-6">
+                                                        <mat-form-field class="col-md-12">
+                                                                <mat-label>First Name</mat-label>
+                                                                <input id="firstName" matInput formControlName="firstName" />
+                                                        </mat-form-field>
+                                                        <mat-form-field class="col-md-12">
+                                                                <mat-label>Middle Name</mat-label>
+                                                                <input id="middleName" matInput formControlName="middleName" required/>
+                                                        </mat-form-field>
+                                                        <mat-form-field class="col-md-12">
+                                                                <mat-label>Last Name</mat-label>
+                                                                <input id="lastName" matInput formControlName="lastName" required/>
+                                                        </mat-form-field>
+                                                </div>
+                                        </div>
+                                        <div class="row">
+                                                <mat-form-field class="col-md-4">
+                                                        <mat-label>Date of Birth</mat-label>
+                                                        <input matInput type="date" required  id="dateofBirth" formControlName="dateofBirth" placeholder="mm/dd/yyyy">
+                                                        <!-- <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                                        <mat-datepicker #picker></mat-datepicker> -->
+                                                </mat-form-field>
+                                                <mat-form-field class="col-md-4">
+                                                        <mat-label>Mobile Number</mat-label>
+                                                        <input id="mobilenumber" matInput formControlName="mobilenumber" placeholder="Enter Mobile Number" />
+                                                </mat-form-field>
+
+                                                <mat-form-field class="col-md-4">
+                                                        <mat-label>Email Address</mat-label>
+                                                        <input id="emailAddress" matInput formControlName="emailAddress" placeholder="Enter Email Address" readonly/>
+                                                </mat-form-field>
+                                        </div>
+                                        <div class="row">
+                                        <mat-form-field class="col-md-12">
+                                                <mat-label>Address Line 1</mat-label>
+                                                <input required id="addressLine1" matInput formControlName="addressLine1" placeholder="Enter Address" />
+                                        </mat-form-field></div>
+                                        <div class="row">
+                                        <mat-form-field class="col-md-12">
+                                                <mat-label>Address Line 2</mat-label>
+                                                <input required id="addressLine2" matInput formControlName="addressLine2" placeholder="Enter Address" />
+                                        </mat-form-field></div>
+                                        <div class="row">
+                                                <mat-form-field class="col-md-4">
+                                                        <mat-label>City</mat-label>
+                                                        <input required id="city" matInput formControlName="city" placeholder="Enter Address" />
+                                                </mat-form-field>
+
+                                                <mat-form-field class="col-md-4">
+                                                        <mat-label>Postal Code</mat-label>
+                                                        <input required id="postalCode" matInput formControlName="postalCode" placeholder="Enter Address" />
+                                                </mat-form-field>
+
+                                                <mat-form-field class="col-md-4">
+                                                        <mat-label>Country</mat-label>
+                                                        <select matNativeControl required id="country" formControlName="country" placeholder="Enter Country">
+                                                                <option value="USA">USA</option>
+                                                                <option value="India">India</option>
+                                                        </select>
+                                                </mat-form-field>
+                                        </div>
+                                        <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+                                        </mat-divider>
+                                        <div class="row" style="padding-top: 1%;">
+                                                <div class="col-md-6">
+                                                        <h2>Role Assignment</h2>
+                                                </div>
+                                                <div class="col-md-6 col text-right">
+                                                        <button mat-button (click)="onaddbtnclick()">
+                                                                <mat-icon>add</mat-icon>
+                                                                <span style="padding-top: 2%;font-size: 16px;">Add</span>
+                                                        </button>
+                                                </div>
+                                        </div>
+
+                                        <fieldset>
+                                                        <div class="row" formArrayName="rolefields" *ngFor="let item of updateuserinfo.get('rolefields')['controls']; let i = index;">
+                                                            <div class="row" style="padding-left: 2%;" [formGroupName]="i">
+                                                            
+                                                            <mat-form-field class="col-md-3">
+                                                                <mat-label>Role</mat-label>
+                                                                <select matNativeControl required formControlName="role">
+                                                                    <option value="option1">Option 1</option>
+                                                                    <option value="option2" disabled>Option 2 (disabled)</option>
+                                                                    <option value="option3">Option 3</option>
+                                                                  </select>
+                                                              </mat-form-field>
+                                            
+                                            
+                                                              <mat-form-field class="col-md-3">
+                                                                <mat-label>Access Level Type</mat-label>
+                                                                <select matNativeControl required formControlName="accesslvltype">
+                                                                    <option value="option1">Option 1</option>
+                                                                    <option value="option2" disabled>Option 2 (disabled)</option>
+                                                                    <option value="option3">Option 3</option>
+                                                                  </select>
+                                                              </mat-form-field>
+                                            
+                                                              <mat-form-field class="col-md-3">
+                                                                <mat-label>Access Level ID</mat-label>
+                                                                <select matNativeControl required formControlName="accesslvlid">
+                                                                    <option value="option1">Option 1</option>
+                                                                    <option value="option2" disabled>Option 2 (disabled)</option>
+                                                                    <option value="option3">Option 3</option>
+                                                                  </select>
+                                                              </mat-form-field>
+                                            
+                                        
+                                                              <div class="col-md-3 col text-center">
+                                                              <button (click)="onremovebtnclick(i)" mat-button >
+                                                                <mat-icon>delete</mat-icon><span>Delete</span></button>
+                                                            </div>
+                                        
+                                                            </div>
+                                            
+                                                        </div>
+                                            
+                                                    </fieldset> 
+
+                                        <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+                                        </mat-divider>
+
+                                        <div class="row" style="padding-top: 1%;">
+                                                <div class="col text-center">
+
+                                                        <button mat-button type="submit" mat-button class="mbutton" (click)="updateUserProfile()">
+                                                                Update</button>
+                                                </div>
+                                        </div>
+                        </form>
+                </div>
+                <!-- <div class="modal-footer">
+                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+
+                </div> -->
+        </div>
+</div>
+</div>
+</div>
+
