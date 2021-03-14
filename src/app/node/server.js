@@ -56,7 +56,7 @@ app.get('/api/getuserRecords', function (req, res) {
 
   //console.log(`Header info : ${JSON.stringify(req.header('user-agent'))}`)
   try {
-    processRequest.getuserRecords(req.body)
+    processRequest.getuserRecords()
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
