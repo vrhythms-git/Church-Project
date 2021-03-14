@@ -71,6 +71,27 @@ app.get('/api/getuserRecords', function (req, res) {
   }
 });
 
+app.get('/api/getRoleMetadata', function (req, res) {
+  console.log("Role Metadata with : " + JSON.stringify(req.body));
+
+  //console.log(`Header info : ${JSON.stringify(req.header('user-agent'))}`)
+  try {
+    processRequest.getRoleMetadata()
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in Role Metadata as : ' + error)
+  }
+});
+
+
 app.get('/api/getUserMetaData', function (req, res) {
   console.log("signUp called with : " + JSON.stringify(req.query.fbuid));
   try {

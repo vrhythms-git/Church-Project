@@ -106,7 +106,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 }
 
 
-async function getuserRecords(userInfo) {
+async function getuserRecords() {
 
     return new Promise((resolve, reject) => {
         let getuserRecords = `select distinct user_id,first_name,middle_name,last_name,dob,mobile_no,email_id,address_line1,address_line2,city,postal_code,country,role_id,org_type,org_id from v_user order by user_id;`
@@ -135,7 +135,6 @@ async function getuserRecords(userInfo) {
                     for (let row of res.rows) {
                         console.log("Datbase User id" + row.user_id);
                         console.log("User id" + userid);
-
                         if (userid != row.user_id && userid != 0)
                         {
                             console.log("In Pushing user to users" + row.user_id);
@@ -145,7 +144,6 @@ async function getuserRecords(userInfo) {
                             roles =[]
                              //   userid = row.user_id;
                         }
-
                         if(userid != row.user_id){
                          console.log("User id In IF Condition" + row.user_id);
 
@@ -167,9 +165,6 @@ async function getuserRecords(userInfo) {
                             userid = row.user_id;
                         }
                         //console.log("In for" + JSON.stringify(user));
-
-
-
                         let role = {}
                         role.roleId = row.role_id;
                         role.orgType = row.org_type;
@@ -184,13 +179,8 @@ async function getuserRecords(userInfo) {
                         }
                         
                     }
-
                     user.roles = roles;
                     users.push(user);
-
-                    
-
-
                     console.log("Before Resolve" + res);
                     resolve({
                         data: {
@@ -206,6 +196,99 @@ async function getuserRecords(userInfo) {
         }
     });
 }
+
+async function getRoleMetadata() {
+
+    return new Promise((resolve, reject) => {
+        let getRoles = `select id, name from t_role where is_deleted = 'no' order by name;`
+        let getorgs = `select org_type, id, name, level from t_organization where is_deleted = 'no' order by level, org_type, name;`
+        let client = dbConnections.getConnection();
+        let metadata = {};
+        let roles = [];
+        let org = {};
+        orgs = [];
+        details = [];
+
+        try {
+            client.connect();
+            client.query(getRoles, (err, res) => {
+                if (err) {
+                    console.log("Inside Error" + res);
+                    console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
+                    reject(errorHandling.handleDBError('queryExecutionError'));
+                    return;
+                }
+                //client.end();
+                if (res){
+                    for (let row of res.rows) {
+                        let role = {}
+                        role.id = row.id;
+                        role.name = row.name;
+                        roles.push(role);
+                    }
+                    metadata.roles = roles;
+                }
+                // resolve({
+                //     data: {
+                //         status: 'success',
+                //         metadata: metadata
+                //     }
+                // })
+
+            });
+
+           // client.connect();
+            client.query(getorgs, (err, res) => {
+                if (err) {
+                    console.log("Inside Error" + res);
+                    console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
+                    reject(errorHandling.handleDBError('queryExecutionError'));
+                    return;
+                }
+                client.end();
+                if (res){
+
+                    orgtype = null;
+
+                    for (let row of res.rows) {
+
+                        if (orgtype != row.org_type && orgtype != null){
+                            org.details = details;
+                            orgs.push(org);
+                            org = {};
+                            details = [];
+                        }
+                        if(orgtype != row.org_type){
+                            org.orgtype = row.org_type;
+                            orgtype = row.org_type;
+                        }
+                        let detail = {};
+                        detail.id = row.id;
+                        detail.name = row.name;
+                        details.push(detail);
+                    }
+                    org.details = details;
+                    orgs.push(org);
+                    metadata.orgs = orgs;
+                    //metadata.roles = roles;
+                }
+                resolve({
+                    data: {
+                        status: 'success',
+                        metadata: metadata
+                    }
+                })
+            });
+
+        } catch (error) {
+            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
+            reject(errorHandling.handleDBError('connectionError'));
+        }
+    });
+}
+
+
+
 
 async function processUpdateUserRoles(userData) {
 
@@ -374,5 +457,6 @@ module.exports = {
     processSignInRequest,
     processGetUserMetaDataRequest,
     getuserRecords,
-    processUpdateUserRoles
+    processUpdateUserRoles,
+    getRoleMetadata
 }
