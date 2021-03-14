@@ -61,7 +61,7 @@ export class AuthService {
             })
             this.apiService.callGetService(`getUserMetaData?fbuid=${result.user?.uid}`).subscribe((data)=>{
               localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
-              this.router.navigate(['/landingpage']);
+              this.router.navigate(['/dashboard']);
             })
           });
         }

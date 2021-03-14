@@ -27,13 +27,13 @@ export class SignInComponent implements OnInit {
     })
   }
 
-  signIn() {
+  logIn() {
     if (this.signInForm.invalid) {
       return
     }
     else {
       this.authService.SignIn({ data: this.signInForm.value })
-      //this.signInForm.reset();
+      // this.router.navigate(['/dashboard']);
     }
    
 

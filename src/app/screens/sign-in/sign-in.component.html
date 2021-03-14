@@ -35,7 +35,7 @@
 
 
                 <div class="form-group text-center">
-                    <button mat-button id="signInBtn" type="submit" routerLinkActive="active" class="mbutton" (click)="signIn()">LOG IN</button>
+                    <button mat-button id="signInBtn" type="submit" class="mbutton" (click)="logIn()">LOG IN</button>
                 </div>
 
 
@@ -45,9 +45,7 @@
                         <a routerLink="/signup" id="hyperlink">Sign Up</a>
                     </h4>
                     <button type="button" class="forgotpwd mb-3" id="hyperlink" data-toggle="modal" data-target="#myModal">Forgot Password?</button>
-                    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-                        Open modal
-                      </button> -->
+                   
                 </div>
             </form>
         </div>
@@ -67,8 +65,7 @@
                         <div class="row col-md-12 h6">
                             <b>Enter your email to reset password.</b>
                         </div>
-                        <!-- </div>
-                <div>
+                       
      -->
                         <form [formGroup]="forgotPwdForm" class="">
 
@@ -85,7 +82,6 @@
 
                     </div>
 
-                    <!-- Modal footer -->
                     <div class="modal-footer">
                         <button mat-button type="button" class="mbutton" data-dismiss="modal">Close</button>
                     </div>

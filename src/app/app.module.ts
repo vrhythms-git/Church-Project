@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
@@ -30,10 +30,11 @@ import { AngularFireAuthModule } from "@angular/fire/auth";
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment.prod';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 // Auth service
 import { AuthService } from "./services/auth.service";
-
+import { AgGridModule } from "ag-grid-angular";
 import { MatButtonModule} from '@angular/material/button';
 import { NavbarModule, WavesModule, ButtonsModule } from 'ng-uikit-pro-standard';
 //import { OvbsRegistrationComponent } from './screens/ovbs-registration/ovbs-registration.component';
@@ -92,10 +93,12 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     MatSelectModule,
     MatFormFieldModule,
     MatCheckboxModule,
-    
+    Ng2SearchPipeModule,
+    AgGridModule.withComponents([])  
 
   ],
   providers: [AuthService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas:[CUSTOM_ELEMENTS_SCHEMA ]
 })
 export class AppModule { }
