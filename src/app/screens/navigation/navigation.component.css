@@ -1,3 +1,7 @@
+h1{
+font-family: poppins;
+}
+
 .mat-button
 {
     float: right;
@@ -29,6 +33,7 @@ mat-sidenav,mat-sidenav-content{
 
 .mat-list-item{
     color: black;
+    font-family: poppins;
 }
 
 

@@ -27,7 +27,6 @@ export class SignUpComponent implements OnInit {
       lastName: new FormControl('', Validators.required),
       email: new FormControl('', [Validators.required, Validators.email]),
       dob: new FormControl('', Validators.required),
-      username: new FormControl('', Validators.required),
       password: new FormControl('', [Validators.required, Validators.pattern('((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,30})')]),
       cnfmpwd: new FormControl('', Validators.required),
       mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
@@ -53,11 +52,12 @@ export class SignUpComponent implements OnInit {
       }
       else {
         this.signUpForm.value.mobileNo = this.contactNo;
-        // this.AuthService.SignUp(this.signUpForm.value).then((data)=>{
-         // console.log(JSON.stringify(data));
-        // })
+         this.AuthService.SignUp(this.signUpForm.value).then((data)=>{
+          console.log(JSON.stringify(data));
+         })
+        console.log("user registered");
       }
-    // this.signUpForm.reset();
+     this.signUpForm.reset();
   }
 
 

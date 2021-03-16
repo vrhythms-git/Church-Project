@@ -435,7 +435,6 @@ async function processUpdateUserRoles(userData) {
                 const insertRoleMapping = `INSERT INTO public.t_user_role_mapping(
                     role_id, user_id, is_deleted)
                     VALUES ($1, $2, $3);`
-
                 const insertRoleContext = `INSERT INTO public.t_user_role_context(
                                                         role_id,
                                                         user_id,
@@ -450,11 +449,11 @@ async function processUpdateUserRoles(userData) {
                 for (let role of userData.roles) {
                     //t_user_role_context 
                     console.log(`Inserting role ${JSON.stringify(role)} into t_user_role_mapping t_user_role_context and t_user_role_context table.`)
-                    insertRoleMapping_value = [role.roleId, role.role, false]
+                    insertRoleMapping_value = [role.roleId, userData.userId, false]
                     client.query(insertRoleMapping, insertRoleMapping_value, function (err, result) {
                         if (err) {
                             client.query("ROLLBACK");
-                            console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while inserting data in t_user_role_context table: ${JSON.stringify(err)}`)
+                            console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while inserting data in t_user_role_mapping table: ${JSON.stringify(err)}`)
                             console.log("Transaction ROLLBACK called");
                             reject(errorHandling.handleDBError('transactionError'))
                             return;
@@ -465,7 +464,9 @@ async function processUpdateUserRoles(userData) {
                     });
 
                     //t_user_role_context
+                    console.log("RoleData");
                     insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString()]
+                   console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
                     client.query(insertRoleContext, insertRoleContext_value, function (err, result) {
                         if (err) {
                             client.query("ROLLBACK");
