@@ -288,58 +288,13 @@ async function getRoleMetadata() {
 }
 
 
-async function getEventCategory() {
-
-    return new Promise((resolve, reject) => {
-        let getEventCategory = `select id,name from t_event_category;`
-        let client = dbConnections.getConnection();
-
-        try {
-            client.connect();
-            client.query(getEventCategory, (err, res) => {
-                if (err) {
-                    console.log("Inside Error" + res);
-                    console.error(`reqOperations.js::getEventCategory() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
-                    return;
-                }
-                client.end()
-                if (res){
-                    console.log("In response" + res);   
-                    let metadata = {}; 
-                    let event = [];   
-                    for (let row of res.rows) { 
-                        let events ={};             
-                        events.id = row.id;
-                        events.name = row.name; 
-                        event.push(events);                           
-                    }
-                    metadata.event = event;
-                    //user.roles = roles;
-                    //users.push(user);
-                    resolve({
-                        data: {
-                            status: 'success',
-                            metaData: metadata
-                        }
-                    })
-                }
-            });
-        } catch (error) {
-            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
-        }
-    });
-}
-
-
 
 
 async function processUpdateUserRoles(userData) {
 
     return new Promise((resolve, reject) => {
         let client = dbConnections.getConnection();
-        console.log("User Data" + JSON.stringify(userData));
+
         client.connect();
         //      dbConnections.getCoonectionPool().connect().catch(err => {
         //     console.log("\nclient.connect():", err.name);
@@ -353,7 +308,7 @@ async function processUpdateUserRoles(userData) {
         try {
             client.query("BEGIN");
             try {
-                console.log("1");
+
                 /********************** t_user************************* */
                 const updateUserTbl = `UPDATE public.t_user
                   SET first_name=$1,
@@ -370,7 +325,6 @@ async function processUpdateUserRoles(userData) {
                       country=$12,
                       dob=$13
                   WHERE user_id= $14;`;
-                  console.log("2");
                 const updateUserTbl_values = [
                     userData.firstName,
                     userData.middleName,
@@ -387,8 +341,6 @@ async function processUpdateUserRoles(userData) {
                     userData.dob,
                     userData.userId,
                 ];
-
-               
 
                 client.query(updateUserTbl, updateUserTbl_values, function (err, result) {
                     if (err) {
@@ -506,6 +458,5 @@ module.exports = {
     processGetUserMetaDataRequest,
     getuserRecords,
     processUpdateUserRoles,
-    getRoleMetadata,
-    getEventCategory
+    getRoleMetadata
 }

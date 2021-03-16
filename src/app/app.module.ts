@@ -43,7 +43,12 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import { EventsComponent } from './screens/events/events.component';
+import { EventCreationComponent } from './screens/event-creation/event-creation.component';
 
+import {MatAccordion} from '@angular/material/expansion';
+import { MatMenuItem } from '@angular/material/menu';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 
 @NgModule({
@@ -55,7 +60,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     NavigationComponent,
     HomePageComponent,
     LandingPageComponent,
-    routingComponents
+    routingComponents,
+    EventsComponent,
+    EventCreationComponent,
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],
@@ -94,6 +101,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     MatFormFieldModule,
     MatCheckboxModule,
     Ng2SearchPipeModule,
+    //MatAccordion,
+    //MatMenuItem,
+    MatExpansionModule,
     AgGridModule.withComponents([])  
 
   ],
