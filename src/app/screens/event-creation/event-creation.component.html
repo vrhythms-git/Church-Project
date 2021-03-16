@@ -1,0 +1,341 @@
+<!--
+<div class="container">
+    <mat-card style="box-shadow: 7px 7px 22px grey;">
+        <form [formGroup]="eventCreationForm">
+            <div class="form-container">
+                     
+                    <div class="row justify-content-center">
+                        <h2 style="text-align: center; color: rgb(79, 115, 235);font-weight: bold;">Create Event</h2>
+                    </div>
+
+                    <div class="row" style="margin-top: 3%;">
+                        <div class="col-md-6">
+                            <mat-form-field class="col-md-12">
+                       
+                                <input required id="eventName"
+                                       matInput
+                                       formControlName="eventName"
+                                      
+                                       placeholder="Event Name" />
+                              </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="col-md-12">
+                
+                                <mat-select required id="parishName" formControlName="parishName"  placeholder="Pasish Name">
+                                    <mat-option value="Parish 1"> Parish 1 </mat-option>
+                                    <mat-option value="Parish 2"> Parish 2 </mat-option>
+                                    <mat-option value="Parish 3"> Parish 3 </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                        
+                            <mat-form-field class="col-md-12">
+                
+                                <mat-select required id="event_type" formControlName="event_type"  placeholder="Event Type">
+                                    <mat-option value="CWC"> CWC </mat-option>
+                                    <mat-option value="option2" >Option2</mat-option>
+                                    <mat-option value="option3">Option 3</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    <div class="col-md-6">
+                       
+                    </div>
+                </div>
+
+                
+                    
+                <div class="row">
+                    <div class="col-md-6">
+                    
+                        <mat-form-field class="col-md-12">
+            
+                           <input matInput type="date" required  id="start_date" formControlName="start_date" placeholder="Start Date">
+                           
+                        </mat-form-field>
+                    </div>
+                <div class="col-md-6">
+                    
+                    <mat-form-field class="col-md-12">
+            
+                        <input matInput type="date" required  id="end_date" formControlName="end_date" placeholder="End Date">
+                        
+                    </mat-form-field>
+                    
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                
+                    <mat-form-field class="col-md-12">
+        
+                       <input matInput type="date" required  id="registration_start_date" formControlName="registration_start_date" placeholder="Start Date">
+                       
+                    </mat-form-field>
+                </div>
+            <div class="col-md-6">
+                
+                <mat-form-field class="col-md-12">
+        
+                    <input matInput type="date" required  id="registration_end_date" formControlName="registration_end_date" placeholder="End Date">
+                    
+                </mat-form-field>
+                
+            </div>
+        </div>
+
+            <div class="row">
+                <mat-form-field class="col-md-12">
+                  
+                  <textarea required id="description"
+                            matInput 
+                            formControlName="description"
+                              
+                            placeholder="Event Description"></textarea>
+                </mat-form-field>
+          </div>
+
+
+         
+
+
+            </div>
+        </form>
+    </mat-card>
+</div>
+-->
+<div class="container">
+    <mat-accordion multi="true">
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Event Information
+                </mat-panel-title>
+                <mat-panel-description>
+                    
+                    <mat-icon style="margin-left:95%;">event</mat-icon>
+                  </mat-panel-description>
+            </mat-expansion-panel-header>
+    
+            <!--Expansion pannel content goes here-->
+            <div class="container">
+                
+                    <form [formGroup]="eventCreationForm">
+                        <div class="form-container">
+                                 <!-- Header Name -->
+                                 <!--
+                                <div class="row justify-content-center">
+                                    <h2 style="text-align: center; color: rgb(79, 115, 235);font-weight: bold;">Create Event</h2>
+                                </div>
+                                -->
+                                <div class="row" style="margin-top: 3%;">
+                                    <div class="col-md-6">
+                                        <mat-form-field class="col-md-12">
+                                   
+                                            <input required id="eventName"
+                                                   matInput
+                                                   formControlName="eventName"
+                                                  
+                                                   placeholder="Event Name" />
+                                          </mat-form-field>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <mat-form-field class="col-md-12">
+                            
+                                            <mat-select required id="parishName" formControlName="parishName"  placeholder="Pasish Name">
+                                                <mat-option value="Parish 1"> Parish 1 </mat-option>
+                                                <mat-option value="Parish 2"> Parish 2 </mat-option>
+                                                <mat-option value="Parish 3"> Parish 3 </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                    
+                                        <mat-form-field class="col-md-12">
+                            
+                                            <mat-select required id="eventType" formControlName="eventType"  placeholder="Event Type">
+                                                <mat-option value="CWC"> CWC </mat-option>
+                                                <mat-option value="option2" >Option2</mat-option>
+                                                <mat-option value="option3">Option 3</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                <div class="col-md-6">
+                                   
+                                </div>
+                            </div>
+            
+                            
+                                
+                            <div class="row">
+                                <div class="col-md-6">
+                                
+                                    <mat-form-field class="col-md-12">
+                        
+                                       <!-- <input matInput type="date" required  id="start_date" formControlName="start_date" placeholder="Event Start Date">-->
+                                       <mat-label>Event Start Date</mat-label>
+                                        <input matInput id="startDate" formControlName="startDate"
+                                               [matDatepicker]="picker">
+                                        <mat-datepicker-toggle matSuffix [for]="picker">
+                                            <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                       
+                                    </mat-form-field>
+                                </div>
+                            <div class="col-md-6">
+                                
+                                <mat-form-field class="col-md-12">
+                        
+                                    <!-- <input matInput type="date" required  id="end_date" formControlName="end_date" placeholder="Event End Date">-->
+                                        <mat-label>Event End Date</mat-label>
+                                        <input matInput id="endDate" formControlName="endDate"
+                                               [matDatepicker]="picker">
+                                        <mat-datepicker-toggle matSuffix [for]="picker">
+                                            <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                    
+                                </mat-form-field>
+                                
+                            </div>
+                        </div>
+            
+                        <div class="row">
+                            <div class="col-md-6">
+                            
+                                <mat-form-field class="col-md-12">
+                    
+                                   <!-- <input matInput type="date" required  id="registration_start_date" formControlName="registration_start_date" placeholder="Regisrtation Start Date">-->
+                                   <mat-label>Regisrtation Start Date</mat-label>
+                                   <input matInput id="registrationStartDate" formControlName="registrationStartDate"
+                                          [matDatepicker]="picker">
+                                   <mat-datepicker-toggle matSuffix [for]="picker">
+                                       <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+                                   </mat-datepicker-toggle>
+                                   <mat-datepicker #picker></mat-datepicker>
+                                   
+                                </mat-form-field>
+                            </div>
+                        <div class="col-md-6">
+                            
+                            <mat-form-field class="col-md-12">
+                    
+                                <!-- <input matInput type="date" required  id="registration_end_date" formControlName="registration_end_date" placeholder="Regisrtation End Date"> -->
+                                <mat-label>Regisrtation End Date</mat-label>
+                                   <input matInput id="registrationEndDate" formControlName="registrationEndDate"
+                                          [matDatepicker]="picker">
+                                   <mat-datepicker-toggle matSuffix [for]="picker">
+                                       <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+                                   </mat-datepicker-toggle>
+                                   <mat-datepicker #picker></mat-datepicker>
+                                
+                            </mat-form-field>
+                            
+                        </div>
+                    </div>
+            
+                        <div class="row">
+                            <mat-form-field class="col-md-12">
+                              
+                              <textarea required id="description"
+                                        matInput 
+                                        formControlName="description"
+                                          
+                                        placeholder="Event Description"></textarea>
+                            </mat-form-field>
+                      </div>
+            
+            
+            
+                        </div>
+                    </form>
+                
+            </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Venu And Procter
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon style="margin-left: 95%;">location_on</mat-icon>
+                  </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="container">
+                
+                <form [formGroup]="eventCreationForm">
+                    <div class="form-container">
+                        <!--
+                        <div class="row justify-content-center">
+                            <h2 style="text-align: center; color: rgb(79, 115, 235);font-weight: bold;">Venu Procter</h2>
+                        </div>
+                        -->
+                        <div class="row">
+                            <mat-form-field class="col-md-12">
+                                    <mat-label>Venu Name</mat-label>
+                                    <input required id="venuName" matInput formControlName="venuName" placeholder="Enter Venu Name" />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="row">
+                            <mat-form-field class="col-md-12">
+                                    <mat-label>Address Line 1</mat-label>
+                                    <input required id="addressLine1" matInput formControlName="addressLine1" placeholder="Enter Address" />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="row">
+                            <mat-form-field class="col-md-12">
+                                    <mat-label>Address Line 2</mat-label>
+                                    <input id="addressLine2" matInput formControlName="addressLine2" placeholder="Enter Address" />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="row">
+                            <mat-form-field class="col-md-6">
+                                    <mat-label>City</mat-label>
+                                    <input required id="city" matInput formControlName="city" placeholder="Enter City" />
+                            </mat-form-field>
+
+                            <mat-form-field class="col-md-6">
+                                <mat-label>State</mat-label>
+                                <input required id="state" matInput formControlName="state" placeholder="Enter State" />
+                            </mat-form-field>   
+
+                        </div>
+                        
+                        <div class="row">
+                            <mat-form-field class="col-md-6">
+                                <mat-label>Postal Code</mat-label>
+                                <input required id="postalCode" matInput formControlName="postalCode" placeholder="Enter Postal code" />
+                        </mat-form-field>
+
+                            <mat-form-field class="col-md-6">
+                                <mat-label>Country</mat-label>
+                                <mat-select matNativeControl required id="country" formControlName="country" placeholder="Enter Country">
+                                        <mat-option value="USA">USA</mat-option>
+                                        <mat-option value="India">India</mat-option>
+                                </mat-select>
+                        </mat-form-field>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            
+
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

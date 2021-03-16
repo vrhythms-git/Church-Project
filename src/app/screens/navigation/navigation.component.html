@@ -46,12 +46,28 @@
     <mat-sidenav #sidenav [(opened)]="opened" mode="side">
       <mat-nav-list >
   
-        <ul class="nav navbar-nav">
-          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'">Users</a></li>
-          <!-- <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/testEvent'">Events</a></li> -->
-          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/ovbsregistration'">Registration</a></li>
+        <ul class="nav navbar-nav" >
+
+          
+          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'"><mat-icon>supervised_user_circle</mat-icon>{{userMetaData.menus[1]}}</a></li>
+          <!--<li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/ovbsregistration'"><mat-icon>calendar_today</mat-icon>{{userMetaData.menus[0]}}</a></li> -->
+          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/events'"><mat-icon>calendar_today</mat-icon>{{userMetaData.menus[0]}}</a></li>
+          
+          <!--
+          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/testEvent'">Events</a></li> 
+           <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/ovbsregistration'">Registration</a></li> 
+           <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'">{{userMetaData.menus[1]}}</a></li>
+        -->
+        
+        <!--
+            <li *ngFor="let menu of userMetaData.menus">
+                <a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'"> {{menu}}</a>
+            </li>
+        -->
 
         </ul>
+
+
         
 
   

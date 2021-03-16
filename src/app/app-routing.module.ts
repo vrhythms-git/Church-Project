@@ -7,6 +7,8 @@ import { LandingPageComponent } from './screens/landing-page/landing-page.compon
 import { UserProfileComponent } from './screens/user-profile/user-profile.component';
 import { OvbsRegistrationComponent } from './screens/ovbs-registration/ovbs-registration.component';
 import { AppComponent } from './app.component';
+import { EventsComponent } from './screens/events/events.component';
+import { EventCreationComponent } from './screens/event-creation/event-creation.component';
 
 
 const routes: Routes = [
@@ -18,12 +20,11 @@ const routes: Routes = [
   children: [
     { path: 'ovbsregistration', component: OvbsRegistrationComponent },
     { path: 'users',component:LandingPageComponent},
+    { path: 'events', component: EventsComponent}
     // { path: 'testEvent',component:UserProfileComponent},
   ]
 },
   //{ path: 'landingpage/ovbsregistration', component:OvbsRegistrationComponent},
-  
-  
 ];
 
 @NgModule({
