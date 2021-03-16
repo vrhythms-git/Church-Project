@@ -47,4 +47,25 @@ export class ApiService {
     console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords`),userData);
     return this.http.get(`${this._baseUrl}/getuserRecords`, userData );   
 }
+getUserRoleData():Observable<any>{
+  console.log(`calling the usersRoleData()`);
+  let headerObj = new HttpHeaders({
+                  'Authorization': localStorage.getItem('chUserToken')!,
+                  'Content-Type' : 'application/json'
+                });
+  console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
+  return this.http.get(`${this._baseUrl}/getRoleMetaData` );   
 }
+
+updateUserProfile(userData  : any){
+console.log("update User Profile Called..")
+let headerObj = new HttpHeaders({
+                                    'Authorization': localStorage.getItem('chUserToken')!,
+                                    'Content-Type' : 'application/json'
+                                  });
+ console.log('headers set to ' + JSON.stringify(headerObj))
+ console.log(JSON.stringify(userData));
+return this.http.post(`${this._baseUrl}/updateUserRoles`, JSON.stringify(userData),{ headers: headerObj } );
+}
+}
+

@@ -3,10 +3,10 @@
 
         <div class="form-group form-inline row m-0 p-0">
                 <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
-                <button mat-button class="col-2 ml-auto mbutton">Delete</button>
+                <button mat-button class="col-2 ml-auto border"><mat-icon>delete</mat-icon><span>Delete</span></button>
         </div>
 
-        <ag-grid-angular style="width: auto; height: 500px;" class="ag-theme-alpine mt-3" [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
+        <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
                 [pagination]="true" rowSelection='multiple' [checkboxSelection]="true" [gridOptions]="gridOptions" (rowClicked)='onRowClicked($event)'>
         </ag-grid-angular>
 </div>
@@ -42,13 +42,13 @@
                                         <div class="row">
                                                 <mat-form-field class="col-md-4">
                                                         <mat-label>Date of Birth</mat-label>
-                                                        <input matInput type="date" required  id="dateofBirth" formControlName="dateofBirth" placeholder="mm/dd/yyyy">
+                                                        <input matInput type="date" required  id="dob" formControlName="dob" placeholder="mm/dd/yyyy">
                                                         <!-- <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                                         <mat-datepicker #picker></mat-datepicker> -->
                                                 </mat-form-field>
                                                 <mat-form-field class="col-md-4">
                                                         <mat-label>Mobile Number</mat-label>
-                                                        <input id="mobilenumber" matInput formControlName="mobilenumber" placeholder="Enter Mobile Number" />
+                                                        <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile Number" />
                                                 </mat-form-field>
 
                                                 <mat-form-field class="col-md-4">
@@ -67,17 +67,22 @@
                                                 <input required id="addressLine2" matInput formControlName="addressLine2" placeholder="Enter Address" />
                                         </mat-form-field></div>
                                         <div class="row">
-                                                <mat-form-field class="col-md-4">
+                                                <mat-form-field class="col-md-6">
                                                         <mat-label>City</mat-label>
                                                         <input required id="city" matInput formControlName="city" placeholder="Enter Address" />
                                                 </mat-form-field>
 
-                                                <mat-form-field class="col-md-4">
+                                                <mat-form-field class="col-md-6">
                                                         <mat-label>Postal Code</mat-label>
                                                         <input required id="postalCode" matInput formControlName="postalCode" placeholder="Enter Address" />
                                                 </mat-form-field>
-
-                                                <mat-form-field class="col-md-4">
+                                        </div>
+                                        <div class="row">
+                                                        <mat-form-field class="col-md-6">
+                                                                        <mat-label>State</mat-label>
+                                                                        <input required id="state" matInput formControlName="state" placeholder="Enter State" />
+                                                                </mat-form-field>
+                                                <mat-form-field class="col-md-6">
                                                         <mat-label>Country</mat-label>
                                                         <select matNativeControl required id="country" formControlName="country" placeholder="Enter Country">
                                                                 <option value="USA">USA</option>
@@ -100,35 +105,27 @@
                                         </div>
 
                                         <fieldset>
-                                                        <div class="row" formArrayName="rolefields" *ngFor="let item of updateuserinfo.get('rolefields')['controls']; let i = index;">
+                                                        <div class="row" formArrayName="roles" *ngFor="let item of updateuserinfo.get('roles')['controls']; let i = index;">
                                                             <div class="row" style="padding-left: 2%;" [formGroupName]="i">
                                                             
                                                             <mat-form-field class="col-md-3">
                                                                 <mat-label>Role</mat-label>
-                                                                <select matNativeControl required formControlName="role">
-                                                                    <option value="option1">Option 1</option>
-                                                                    <option value="option2" disabled>Option 2 (disabled)</option>
-                                                                    <option value="option3">Option 3</option>
+                                                                <select matNativeControl required formControlName="roleId">                                   
+                                                                    <option *ngFor = "let role of roledata" [value]=role.id>{{role.name}} </option>
                                                                   </select>
                                                               </mat-form-field>
-                                            
-                                            
                                                               <mat-form-field class="col-md-3">
                                                                 <mat-label>Access Level Type</mat-label>
-                                                                <select matNativeControl required formControlName="accesslvltype">
-                                                                    <option value="option1">Option 1</option>
-                                                                    <option value="option2" disabled>Option 2 (disabled)</option>
-                                                                    <option value="option3">Option 3</option>
+                                                                <select matNativeControl id="selectedOrg" required formControlName="role" (change)=onOrgTypeChange($event) >
+                                                                    <option *ngFor = "let org of orgs" [value]=org.orgtype>{{org.orgtype}}</option>
                                                                   </select>
                                                               </mat-form-field>
                                             
                                                               <mat-form-field class="col-md-3">
                                                                 <mat-label>Access Level ID</mat-label>
-                                                                <select matNativeControl required formControlName="accesslvlid">
-                                                                    <option value="option1">Option 1</option>
-                                                                    <option value="option2" disabled>Option 2 (disabled)</option>
-                                                                    <option value="option3">Option 3</option>
-                                                                  </select>
+                                                                <select matNativeControl required formControlName="orgId">
+                                                                        <option *ngFor = "let orgDetail of orgDetails" [value]=orgDetail.id>{{orgDetail.name}}</option>
+                                                                </select>
                                                               </mat-form-field>
                                             
                                         

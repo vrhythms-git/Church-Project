@@ -33,5 +33,8 @@ body { margin: 0; font-family: poppins!important;}
   font-family: poppins!important;
 }
 .ag-theme-alpine .ag-root-wrapper{
-  border-radius: 8px;
+  border-radius: 8px; 
+}
+.mat-button{
+  font-family: poppins;
 }

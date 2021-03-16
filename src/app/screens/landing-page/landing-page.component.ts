@@ -23,11 +23,15 @@ export class LandingPageComponent implements OnInit {
   node: any;
   data: any;
   params: any;
-  updateuserinfo:any;
-  rolefields:any;
+  updateuserinfo: any;
+  roles: any;
+  roledata!: any[];
+  orgs!: any[];
+  orgDetails!: any[];
+  userId: any;
 
   constructor(private apiService: ApiService,
-    private http: HttpClient, private formBuilder:FormBuilder) { }
+    private http: HttpClient, private formBuilder: FormBuilder) { }
   // this.gridOptions = <GridOptions>{};
 
   agInit(params: any) {
@@ -36,18 +40,19 @@ export class LandingPageComponent implements OnInit {
   }
   ngOnInit(): void {
     this.updateuserinfo = this.formBuilder.group({
-      firstName : new FormControl('', Validators.required),
-      middleName : new FormControl('', Validators.required),
-      lastName : new FormControl('', Validators.required),
-      dateofBirth : new FormControl('', [Validators.required]), 
-      mobilenumber: new FormControl('', [Validators.required]),
-      emailAddress : new FormControl(''),
-      addressLine1 : new FormControl('', Validators.required),
-      addressLine2 : new FormControl('', Validators.required),
-      city : new FormControl('', Validators.required),
-      postalCode : new FormControl('', Validators.required),
-      country : new FormControl('', Validators.required),
-      rolefields:this.formBuilder.array([this.adduserroles()]),
+      firstName: new FormControl('', Validators.required),
+      middleName: new FormControl('', Validators.required),
+      lastName: new FormControl('', Validators.required),
+      dob: new FormControl('', [Validators.required]),
+      mobileNo: new FormControl('', [Validators.required]),
+      emailAddress: new FormControl(''),
+      addressLine1: new FormControl('', Validators.required),
+      addressLine2: new FormControl('', Validators.required),
+      city: new FormControl('', Validators.required),
+      postalCode: new FormControl('', Validators.required),
+      state : new FormControl('',Validators.required),
+      country: new FormControl('', Validators.required),
+      roles: this.formBuilder.array([this.adduserroles()]),
     });
 
     this.columnDefs = [
@@ -55,31 +60,40 @@ export class LandingPageComponent implements OnInit {
       { headerName: 'Middle Name', field: 'middleNmae', sortable: true, filter: true, width: 170 },
       { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
       { headerName: 'Email Id', field: 'emailId', sortable: true, filter: true, width: 220 },
-      { headerName: 'Mobile Number', field: 'mobileNo', sortable: true, filter: true }
+      { headerName: 'Mobile Number', field: 'mobileNo', sortable: true, filter: true },
     ];
 
     this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
       console.log('These are users from database : ');
       console.log(res.data.metaData);
       this.rowData = res.data.metaData;
-      
     });
+
+    // this.orgs=
+
+
+    this.apiService.getUserRoleData().subscribe(res => {
+      console.log("User Role Data : ", res.data.metadata);
+      this.roledata = res.data.metadata.roles;
+      this.orgs = res.data.metadata.orgs;
+
+      this.orgDetails = res.data.metadata.orgs[2].details;
+      console.log("Roles Data:", this.orgs);
+    })
+
     this.gridOptions = {
       columnDefs: this.columnDefs,
       rowData: this.rowData,
       treeData: true,
-      // autoGroupColumnDef: this.autoGroupColumnDef,
-      // getDataPath: this.getDataPath,
       enableFilter: true,
       enableColResize: true,
       defaultColDef: {
-        // make every column editable
         editable: false,
-        // make every column use 'text' filter by default
         filter: 'agTextColumnFilter'
       }
     };
   }
+
   onRowClicked(event: any) {
     $("#imagemodal").modal("show");
 
@@ -87,47 +101,63 @@ export class LandingPageComponent implements OnInit {
     let selectedUserData = event.data;
     console.log(selectedUserData);
     let i = rowData.rowIndex;
+    this.userId = selectedUserData.userId;
+
 
     //this.updateuserinfo.controls.country.patchValue("AAAAAAA");
     this.updateuserinfo.patchValue({
-      firstName : selectedUserData.firstName,
-      middleName : selectedUserData.middleNmae,
-      lastName : selectedUserData.lastName,
-      dateofBirth : selectedUserData.dob,
-      mobilenumber : selectedUserData.mobileNo,
-      emailAddress : selectedUserData.emailId,
-      addressLine1 : selectedUserData.addressLine1,
-      addressLine2 : selectedUserData.addressLine2,
-       city : selectedUserData.city,
-       postalCode : selectedUserData.postalCode,
-       country : selectedUserData.country,
-       
+      firstName: selectedUserData.firstName,
+      middleName: selectedUserData.middleNmae,
+      lastName: selectedUserData.lastName,
+      dob: selectedUserData.dob,
+      mobileNo: selectedUserData.mobileNo,
+      emailAddress: selectedUserData.emailId,
+      addressLine1: selectedUserData.addressLine1,
+      addressLine2: selectedUserData.addressLine2,
+      city: selectedUserData.city,
+      postalCode: selectedUserData.postalCode,
+      state : selectedUserData.state,
+      country: selectedUserData.country,
+      //  role : selectedUserData.roles[0].roleId,
+      //  accesslvltype : selectedUserData.roles[0].orgType,
+      //  accesslvlid : selectedUserData.roles[0].orgId  
+      roles: selectedUserData.roles
     })
   }
+  onOrgTypeChange(event: any) {
 
-  onaddbtnclick(){
-    this.rolefields = this.updateuserinfo.get('rolefields') as FormArray;
-    this.rolefields.push(this. adduserroles());
+  }
+
+  onaddbtnclick() {
+    this.roles = this.updateuserinfo.get('roles') as FormArray;
+    this.roles.push(this.adduserroles());
   }
 
   adduserroles(): FormGroup {
     return this.formBuilder.group({
+      roleId: '',
       role: '',
-      accesslvltype: '',
-      accesslvlid: ''
+      orgId: ''
     });
   }
 
-  onremovebtnclick(index: any)
-  {
-    (<FormArray>this.updateuserinfo.get('rolefields').removeAt(index));
+  onremovebtnclick(index: any) {
+    (<FormArray>this.updateuserinfo.get('roles').removeAt(index));
   }
 
-  updateUserProfile(){
+  updateUserProfile() {
     if (this.updateuserinfo.invalid) {
       return
     }
     else {
-      console.log("FormValues:",JSON.stringify(this.updateuserinfo.value));
-    }  }
+      this.updateuserinfo.value.userId = this.userId;
+      this.updateuserinfo.value.updatedBy = this.userId;
+      let dob = this.updateuserinfo.value.dob;
+      console.log(dob);
+      this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe(res=>{
+        console.log("User Profile Updated.")
+      });
+      // console.log("FormValues:", JSON.stringify(this.updateuserinfo.value));
+    }
+  }
 }

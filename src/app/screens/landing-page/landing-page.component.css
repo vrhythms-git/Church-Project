@@ -2,3 +2,15 @@
     font-family: poppins;
     letter-spacing: 0.18px;
 }
+.modal-title{
+    font-weight: bold;
+    font-family: poppins;
+    letter-spacing: 0.18px;
+}
+mat-form-field{
+    font-family: poppins;
+    letter-spacing: 0.18px;
+}
+h2{
+    font-family: poppins;
+}
