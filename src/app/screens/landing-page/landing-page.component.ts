@@ -103,6 +103,7 @@ export class LandingPageComponent implements OnInit {
     let selectedUserData = event.data;
     console.log(selectedUserData);
     let i = rowData.rowIndex;
+    this.userId = selectedUserData.userId;
     
     this.updateuserinfo.patchValue({
       firstName: selectedUserData.firstName,
