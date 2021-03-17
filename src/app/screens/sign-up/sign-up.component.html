@@ -86,11 +86,25 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
+                <div class="form-group row">
+                        <mat-form-field class="form-field col-md" >
+                                <mat-select id="orgId" formControlName = "orgId" placeholder="Select Parish" required>
+                                  <mat-option *ngFor = "let parish of parishList" [value]=parish.id>{{parish.name}} </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                </div>
 
-                <div class="form-group row justify-content-center">
+                <div class="form-group row">
                     <mat-form-field class="form-field col-md">
                         <textarea type="text" matInput formControlName="abtyrslf" id="abtyrslf" placeholder="About Yourself"></textarea>
                     </mat-form-field>
+                </div>
+                <div class="form-group row justify-content-center">
+                        <label id="example-radio-group-label">Are you registering as Family Head? </label>
+                        <mat-radio-group  aria-label="Select an option" formControlName="isFamilyHead">
+                                <mat-radio-button class="ml-1" value="true">Yes</mat-radio-button>
+                                <mat-radio-button class="ml-1" value="false" [checked]=true>No</mat-radio-button>
+                              </mat-radio-group>
                 </div>
 
                 <div class="form-group text-right">

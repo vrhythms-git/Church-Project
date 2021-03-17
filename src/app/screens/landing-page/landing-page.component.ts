@@ -78,8 +78,6 @@ export class LandingPageComponent implements OnInit {
       console.log("User Role Data : ", res.data.metadata);
       this.roledata = res.data.metadata.roles;
       this.orgs = res.data.metadata.orgs;
-
-      // this.orgDetails = res.data.metadata.orgs[2].details;
       console.log("Roles Data:", this.orgs);
     })
 

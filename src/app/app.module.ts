@@ -18,6 +18,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatMenuModule} from '@angular/material/menu';
+import {MatRadioModule} from '@angular/material/radio';
 import { FooterComponent } from './screens/footer/footer.component';
 import { NavigationComponent } from './screens/navigation/navigation.component';
 import { HomePageComponent } from './screens/home-page/home-page.component';
@@ -87,6 +88,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatRadioModule,
     Ng2TelInputModule,
     NgxFlagPickerModule ,
     FlexLayoutModule,

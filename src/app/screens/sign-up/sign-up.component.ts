@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service'
-
+import { ApiService} from '../../services/api.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -13,11 +13,14 @@ export class SignUpComponent implements OnInit {
   signUpForm: any;
   contactNo: any;
   max_date!: any;
+  parishList!: any[];
+  // isFamilyHead : boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private AuthService : AuthService 
+    private AuthService : AuthService,
+    private apiService :ApiService 
     ) { }
 
 
@@ -30,13 +33,23 @@ export class SignUpComponent implements OnInit {
       password: new FormControl('', [Validators.required, Validators.pattern('((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,30})')]),
       cnfmpwd: new FormControl('', Validators.required),
       mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
+      isFamilyHead :new FormControl('false'),
+      orgId: new FormControl('',Validators.required),
       abtyrslf: new FormControl('')
     });
 
     this.max_date = new Date;
-
-  // this.today = date.getFullYear()+ "-" + ("0" + (date.getMonth() + 1)).slice(-2)+ "-" +("0" + date.getDate()).slice(-2)
-  // console.log("Today:",this.today);
+    this.apiService.getParishListData().subscribe(res => {
+      // console.log("User Role Data : ", res.data.metadata);
+      // for (let i=0;i<res.data.metadata.orgs[2].details.length;i++){
+      //   this.parishList[i].push(res.data.metadata.orgs[2].details[i].name) ;
+     // }
+     for(let i=0;i<res.data.metaData.Parish.length;i++){
+       this.parishList = res.data.metaData.Parish;
+     }
+      console.log(this.parishList);
+    })
+ 
   }
 
   signUp() {
@@ -56,8 +69,8 @@ export class SignUpComponent implements OnInit {
           console.log(JSON.stringify(data));
          })
         console.log("user registered");
+        this.signUpForm.reset();
       }
-     this.signUpForm.reset();
   }
 
 
