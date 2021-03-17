@@ -50,7 +50,6 @@ app.post('/api/signUp', function (req, res) {
   }
 });
 
-
 app.get('/api/getuserRecords', function (req, res) {
   console.log("signUp called with : " + JSON.stringify(req.body));
 
@@ -91,11 +90,28 @@ app.get('/api/getRoleMetadata', function (req, res) {
   }
 });
 
-
 app.get('/api/getUserMetaData', function (req, res) {
   console.log("signUp called with : " + JSON.stringify(req.query.fbuid));
   try {
     processRequest.processGetUserMetaDataRequest(req.query.fbuid)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in signUp as : ' + error)
+  }
+});
+
+app.get('/api/getEventCategory', function (req, res) {
+  console.log("getEventCategory called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processRequest.getEventCategory()
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
