@@ -29,7 +29,8 @@ export class LandingPageComponent implements OnInit {
   orgs!: any[];
   orgDetails!: any[];
   userId: any;
-
+  selectedOrg:any;
+  max_date!: Date;
   constructor(private apiService: ApiService,
     private http: HttpClient, private formBuilder: FormBuilder) { }
   // this.gridOptions = <GridOptions>{};
@@ -69,7 +70,8 @@ export class LandingPageComponent implements OnInit {
       this.rowData = res.data.metaData;
     });
 
-    // this.orgs=
+    this.max_date = new Date;
+
 
 
     this.apiService.getUserRoleData().subscribe(res => {
@@ -77,7 +79,7 @@ export class LandingPageComponent implements OnInit {
       this.roledata = res.data.metadata.roles;
       this.orgs = res.data.metadata.orgs;
 
-      this.orgDetails = res.data.metadata.orgs[2].details;
+      // this.orgDetails = res.data.metadata.orgs[2].details;
       console.log("Roles Data:", this.orgs);
     })
 
@@ -102,7 +104,6 @@ export class LandingPageComponent implements OnInit {
     console.log(selectedUserData);
     let i = rowData.rowIndex;
     
-    //this.updateuserinfo.controls.country.patchValue("AAAAAAA");
     this.updateuserinfo.patchValue({
       firstName: selectedUserData.firstName,
       middleName: selectedUserData.middleNmae,
@@ -122,9 +123,16 @@ export class LandingPageComponent implements OnInit {
       roles: selectedUserData.roles
     })
   }
-  onOrgTypeChange(event: any) {
-
+  onOrgSelect(){
+  console.log("Org Name",this.selectedOrg);
+  for(let i=0;i<this.orgs.length; i++){
+    if(this.orgs[i].orgtype == this.selectedOrg){
+      console.log(this.orgs[i].details);
+      this.orgDetails = this.orgs[i].details;
+    }
   }
+  }
+  
 
   onaddbtnclick() {
     this.roles = this.updateuserinfo.get('roles') as FormArray;
