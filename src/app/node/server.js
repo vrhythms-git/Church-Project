@@ -122,9 +122,49 @@ app.get('/api/getEventCategory', function (req, res) {
         res.end();
       })
   } catch (error) {
-    console.error('Error in signUp as : ' + error)
+    console.error('Error in getEventCategory as : ' + error)
   }
 });
+
+app.get('/api/getParishData', function (req, res) {
+  console.log("getParishData called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processRequest.getParishData()
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getParishData as : ' + error)
+  }
+});
+
+
+
+app.post('/api/insertEvents', function (req, res) {
+  console.log("insertevents called with : " + JSON.stringify(req.body));
+  try {
+    processRequest.insertEvents(req.body.data)
+      .then((data) => {
+        console.log(`Returning with resonse : ${data}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in insertevents as : ' + error)
+  }
+});
+
+
 
 app.post('/api/updateUserRoles', function (req, res) {
   console.log("updateUserRoles called with : " + JSON.stringify(req.body));
@@ -143,6 +183,8 @@ app.post('/api/updateUserRoles', function (req, res) {
     console.error('Error in signUp as : ' + error)
   }
 });
+
+
 
 
 // firebaseAdminUtils.varifyUserToken(req.header('Authorization')).then(idToken => {});
