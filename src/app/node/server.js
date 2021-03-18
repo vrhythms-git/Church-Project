@@ -184,6 +184,24 @@ app.post('/api/updateUserRoles', function (req, res) {
   }
 });
 
+app.get('/api/getParishData', function (req, res) {
+  console.log("getParishData called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processRequest.getParishData()
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getParishData as : ' + error)
+  }
+});
+
 
 
 

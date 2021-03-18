@@ -8,15 +8,17 @@ const dbConnections = require(`${__dirname}/dbConnection`);
 async function processSignInRequest(userInfo) {
 
     return new Promise((resolve, reject) => {
-
+console.log("User Info",userInfo);
         let newUserInsStmt = `INSERT INTO public.t_user(
-        first_name, last_name, middle_name, email_id, mobile_no, firebase_id)
+        first_name, last_name, middle_name, email_id, mobile_no, org_id, is_family_head, firebase_id)
        VALUES (
               '${userInfo.data.firstName}', 
               '${userInfo.data.lastName}',
               '${userInfo.data.middleName}',
               '${userInfo.data.email}',
               '${userInfo.data.mobileNo}',
+              '${userInfo.data.orgId}',
+              '${userInfo.data.isFamilyHead}',
               '${userInfo.data.fbId}'
        );`
         let client = dbConnections.getConnection();
@@ -674,6 +676,48 @@ async function processUpdateUserRoles(userData) {
     //  });
 }
 
+async function getParishData() {
+
+    return new Promise((resolve, reject) => {
+        let getParishData = `select id, name from t_organization where org_type = 'Parish'`
+        let client = dbConnections.getConnection();
+
+        try {
+            client.connect();
+            client.query(getParishData, (err, res) => {
+                if (err) {
+                    console.log("Inside Error" + res);
+                    console.error(`reqOperations.js::getParishData() --> error while fetching results : ${err}`)
+                    reject(errorHandling.handleDBError('queryExecutionError'));
+                    return;
+                }
+                client.end()
+                if (res){
+                    console.log("In response" + res);   
+                    let metadata = {}; 
+                    let Parish = [];   
+                    for (let row of res.rows) { 
+                        let data ={};             
+                        data.id = row.id;
+                        data.name = row.name; 
+                        Parish.push(data);                           
+                    }
+                    metadata.Parish = Parish;
+                    resolve({
+                        data: {
+                            status: 'success',
+                            metaData: metadata
+                        }
+                    })
+                }
+            });
+        } catch (error) {
+            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
+            reject(errorHandling.handleDBError('connectionError'));
+        }
+    });
+}
+
 module.exports = {
     processSignInRequest,
     processGetUserMetaDataRequest,
@@ -681,6 +725,10 @@ module.exports = {
     processUpdateUserRoles,
     getRoleMetadata,
     getEventCategory,
+<<<<<<< HEAD
     getParishData,
     insertEvents
+=======
+    getParishData
+>>>>>>> 904f45ea26265509e89f7040afe18f498e7159d5
 }
