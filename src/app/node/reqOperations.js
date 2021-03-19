@@ -7,44 +7,90 @@ const dbConnections = require(`${__dirname}/dbConnection`);
 
 async function processSignInRequest(userInfo) {
 
-    return new Promise((resolve, reject) => {
-console.log("User Info",userInfo);
-        let newUserInsStmt = `INSERT INTO public.t_user(
-        first_name, last_name, middle_name, email_id, mobile_no, org_id, is_family_head, firebase_id)
-       VALUES (
-              '${userInfo.data.firstName}', 
-              '${userInfo.data.lastName}',
-              '${userInfo.data.middleName}',
-              '${userInfo.data.email}',
-              '${userInfo.data.mobileNo}',
-              '${userInfo.data.orgId}',
-              '${userInfo.data.isFamilyHead}',
-              '${userInfo.data.fbId}'
-       );`
-        let client = dbConnections.getConnection();
+    let client = dbConnections.getConnection();
+    console.log("User Data" + JSON.stringify(userInfo));
         try {
-            client.connect();
-            client.query(newUserInsStmt, (err, res) => {
-                if (err) {
-                    console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
-                    return;
-                }
+            await client.connect();
+            await client.query("BEGIN");
+            let userId;
+            let isFamilyHead;
+            console.log("1");
+            let newUserInsStmt = `INSERT INTO t_user(
+                 email_id, org_id, firebase_id)
+               VALUES (          
+                      '${userInfo.data.email}',
+                      '${userInfo.data.orgId}',
+                      '${userInfo.data.fbId}'
+               ) returning user_id;`
 
-                client.end()
-                if (res)
-                    resolve({
-                        data: {
-                            status: 'success'
-                        }
-                    })
-            });
-        } catch (error) {
-            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
+            let result = await client.query(newUserInsStmt);
+
+            console.log("2",this.userId);
+            this.userId = result.rows[0].user_id;
+            console.log("2",this.userId);
+            this.isFamilyHead = userInfo.data.isFamilyHead;
+            console.log("3", this.isFamilyHead);
+
+            /****************************************** t_person******************************************************************************/
+            console.log("2");
+            let insertPerson = `INSERT INTO t_person(
+                user_id, title, first_name, middle_name, last_name, mobile_no)
+              VALUES ($1, $2, $3, $4, $5, $6);`
+
+            console.log("2",this.userId);
+            insertPersonValues =
+                [
+                    this.userId,
+                    userInfo.data.title,
+                    userInfo.data.firstName,
+                    userInfo.data.middleName,
+                    userInfo.data.lastName,
+                    userInfo.data.mobileNo
+                ]
+
+                console.log(insertPersonValues);
+                console.log("4");
+
+            await client.query(insertPerson, insertPersonValues);
+
+            /**********************************************t_user_role_mapping*********************************************************************************** */
+
+            console.log("3");
+            console.log("isfamily head ", this.isFamilyHead);
+            if (this.isFamilyHead) {
+                console.log("6");
+                console.log("this.userId", this.userId);
+                let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
+                select ${this.userId}, id from t_role where name = 'Family Head';`
+                await client.query(insertRoleMapping);
+            }
+            if (!this.isFamilyHead) {
+                console.log("7");
+                let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+                select ${this.userId}, id from t_role where name = 'Member';`
+                await client.query(insertRoleMappingmember);
+            }
+
+            console.log("Before commit");
+            await client.query("COMMIT");
+            console.log("After commit");
+            //client.end()
+
+            return({
+                data: {
+                    status: 'success'
+                }
+            })
+
+        } 
+        catch (error) {
+            await client.query("ROLLBACK");
+            console.error(`reqOperations.js::processSignInRequest() --> error : ${JSON.stringify(error)}`)
+            console.log("Transaction ROLLBACK called");
+            return (errorHandling.handleDBError('transactionError'));
         }
-    });
-}
+    }
+
 
 
 async function processGetUserMetaDataRequest(firebaseToken) {
@@ -126,28 +172,27 @@ async function getuserRecords() {
                 console.log("Before Client end" + res);
                 client.end()
                 console.log("After Client end" + res);
-                if (res){
+                if (res) {
 
                     console.log("In response" + res);
-                    let user ={}
+                    let user = {}
                     let users = [];
                     let roles = [];
-                    let userid = 0;            
+                    let userid = 0;
 
                     for (let row of res.rows) {
                         console.log("Datbase User id" + row.user_id);
                         console.log("User id" + userid);
-                        if (userid != row.user_id && userid != 0)
-                        {
+                        if (userid != row.user_id && userid != 0) {
                             console.log("In Pushing user to users" + row.user_id);
                             user.roles = roles;
                             users.push(user);
                             user = {}
-                            roles =[]
-                             //   userid = row.user_id;
+                            roles = []
+                            //   userid = row.user_id;
                         }
-                        if(userid != row.user_id){
-                         console.log("User id In IF Condition" + row.user_id);
+                        if (userid != row.user_id) {
+                            console.log("User id In IF Condition" + row.user_id);
 
                             user.userId = row.user_id;
                             user.firstName = row.first_name;
@@ -175,11 +220,11 @@ async function getuserRecords() {
                         console.log("In role" + JSON.stringify(role));
                         console.log("In roles" + JSON.stringify(roles));
 
-                        if (_.findWhere(roles,role) == null){
+                        if (_.findWhere(roles, role) == null) {
                             console.log("role" + JSON.stringify(role));
                             roles.push(role);
                         }
-                        
+
                     }
                     user.roles = roles;
                     users.push(user);
@@ -221,7 +266,7 @@ async function getRoleMetadata() {
                     return;
                 }
                 //client.end();
-                if (res){
+                if (res) {
                     for (let row of res.rows) {
                         let role = {}
                         role.id = row.id;
@@ -239,7 +284,7 @@ async function getRoleMetadata() {
 
             });
 
-           // client.connect();
+            // client.connect();
             client.query(getorgs, (err, res) => {
                 if (err) {
                     console.log("Inside Error" + res);
@@ -248,19 +293,19 @@ async function getRoleMetadata() {
                     return;
                 }
                 client.end();
-                if (res){
+                if (res) {
 
                     orgtype = null;
 
                     for (let row of res.rows) {
 
-                        if (orgtype != row.org_type && orgtype != null){
+                        if (orgtype != row.org_type && orgtype != null) {
                             org.details = details;
                             orgs.push(org);
                             org = {};
                             details = [];
                         }
-                        if(orgtype != row.org_type){
+                        if (orgtype != row.org_type) {
                             org.orgtype = row.org_type;
                             orgtype = row.org_type;
                         }
@@ -306,18 +351,18 @@ async function getEventCategory() {
                     return;
                 }
                 client.end()
-                if (res){
-                    console.log("In response" + res);   
-                    let metadata = {}; 
-                    let eventCategory = [];   
-                    for (let row of res.rows) { 
-                        let events ={};             
+                if (res) {
+                    console.log("In response" + res);
+                    let metadata = {};
+                    let eventCategory = [];
+                    for (let row of res.rows) {
+                        let events = {};
                         events.id = row.id;
-                        events.name = row.name; 
+                        events.name = row.name;
                         events.description = row.description;
                         events.schoolGradeFrom = row.school_grade_from;
                         events.schoolGradeTo = row.school_grade_to;
-                        eventCategory.push(events);                           
+                        eventCategory.push(events);
                     }
                     metadata.eventCategory = eventCategory;
                     resolve({
@@ -351,15 +396,15 @@ async function getParishData() {
                     return;
                 }
                 client.end()
-                if (res){
-                    console.log("In response" + res);   
-                    let metadata = {}; 
-                    let Parish = [];   
-                    for (let row of res.rows) { 
-                        let data ={};             
+                if (res) {
+                    console.log("In response" + res);
+                    let metadata = {};
+                    let Parish = [];
+                    for (let row of res.rows) {
+                        let data = {};
                         data.id = row.id;
-                        data.name = row.name; 
-                        Parish.push(data);                           
+                        data.name = row.name;
+                        Parish.push(data);
                     }
                     metadata.Parish = Parish;
                     resolve({
@@ -380,126 +425,126 @@ async function getParishData() {
 
 async function insertEvents(eventsData) {
 
-    
-        let client = dbConnections.getConnection();
-        console.log("User Data" + JSON.stringify(eventsData));
-        await client.connect();
-        try {
-            await client.query("BEGIN");  
-            try {
-                let eventId = 0;
-                console.log("1");
-                /********************** t_event*******************************************************************************************/
-                const insertevent = `INSERT INTO public.t_event(name, event_type, description, org_id, start_date, end_date, registration_start_date, registration_end_date) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning id;`            
-                const insertevent_values = [
-                    eventsData.name,
-                    eventsData.eventType,
-                    eventsData.description,
-                    eventsData.orgId,
-                    eventsData.startDate,
-                    eventsData.endDate,
-                    eventsData.registrationStartDate,
-                    eventsData.registrationEndDate,
-                ];
-                let result = await client.query(insertevent, insertevent_values);
-                this.eventId = result.rows[0].id;
-                console.log("event id" + this.eventId);
-             
 
-                  /********************** t_event_venue************************************************************************************/
-                  console.log("2");
-                const insertVenue = `INSERT INTO t_event_venue(event_id, name, description, address_line1, address_line2, city, state, postal_code, country, proctor_id)
+    let client = dbConnections.getConnection();
+    console.log("User Data" + JSON.stringify(eventsData));
+    await client.connect();
+    try {
+        await client.query("BEGIN");
+        try {
+            let eventId = 0;
+            console.log("1");
+            /********************** t_event*******************************************************************************************/
+            const insertevent = `INSERT INTO public.t_event(name, event_type, description, org_id, start_date, end_date, registration_start_date, registration_end_date) 
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning id;`
+            const insertevent_values = [
+                eventsData.name,
+                eventsData.eventType,
+                eventsData.description,
+                eventsData.orgId,
+                eventsData.startDate,
+                eventsData.endDate,
+                eventsData.registrationStartDate,
+                eventsData.registrationEndDate,
+            ];
+            let result = await client.query(insertevent, insertevent_values);
+            this.eventId = result.rows[0].id;
+            console.log("event id" + this.eventId);
+
+
+            /********************** t_event_venue************************************************************************************/
+            console.log("2");
+            const insertVenue = `INSERT INTO t_event_venue(event_id, name, description, address_line1, address_line2, city, state, postal_code, country, proctor_id)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`
 
-                for (let venue of eventsData.venues) {
-                    //t_event_venue 
-                    console.log(`Inserting venue ${JSON.stringify(venue)}`)
-                    insertVenue_value = 
-                    [   
-                        this.eventId, 
-                        venue.name, 
-                        venue.description, 
-                        venue.addressLine1, 
-                        venue.addressLine2, 
-                        venue.city, 
-                        venue.state, 
-                        venue.postalCode, 
-                        venue.country, 
+            for (let venue of eventsData.venues) {
+                //t_event_venue 
+                console.log(`Inserting venue ${JSON.stringify(venue)}`)
+                insertVenue_value =
+                    [
+                        this.eventId,
+                        venue.name,
+                        venue.description,
+                        venue.addressLine1,
+                        venue.addressLine2,
+                        venue.city,
+                        venue.state,
+                        venue.postalCode,
+                        venue.country,
                         venue.proctorId
                     ]
-                    await client.query(insertVenue, insertVenue_value)                        
-                }      
-                
-                
+                await client.query(insertVenue, insertVenue_value)
+            }
 
-                    /********************** t_event_category_map,  t_event_cat_user_map*******************************************************************************/
-                console.log("3");
-                const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id)
+
+
+            /********************** t_event_category_map,  t_event_cat_user_map*******************************************************************************/
+            console.log("3");
+            const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id)
                     VALUES ($1, $2);`
 
-                for (let category of eventsData.categories) {
-                    //t_event_venue 
-                    console.log(`Inserting category ${JSON.stringify(category)}`);
-                    insertCategory_value = 
-                    [   
-                        this.eventId, 
+            for (let category of eventsData.categories) {
+                //t_event_venue 
+                console.log(`Inserting category ${JSON.stringify(category)}`);
+                insertCategory_value =
+                    [
+                        this.eventId,
                         category.eventCategoryID
                     ]
-                    await client.query(insertCategory, insertCategory_value);    
-                    
-                    const insertCatUserMap = `INSERT INTO t_event_cat_user_map(event_id, event_category_id, user_id, role_type)
+                await client.query(insertCategory, insertCategory_value);
+
+                const insertCatUserMap = `INSERT INTO t_event_cat_user_map(event_id, event_category_id, user_id, role_type)
                     VALUES ($1, $2, $4, $3),($1, $2, $5, $3),($1, $2, $6, $3);`
 
-                    insertCatUserMap_values=[
-                        this.eventId, 
-                        category.eventCategoryID,
-                        'Judge',
-                        category.judge1,
-                        category.judge2,
-                        category.judge3
-                    ]
-                    await client.query(insertCatUserMap, insertCatUserMap_values);
-                }    
+                insertCatUserMap_values = [
+                    this.eventId,
+                    category.eventCategoryID,
+                    'Judge',
+                    category.judge1,
+                    category.judge2,
+                    category.judge3
+                ]
+                await client.query(insertCatUserMap, insertCatUserMap_values);
+            }
 
-                console.log("4");
+            console.log("4");
 
-                const insertQuestionare = `INSERT INTO t_event_questionnaire(event_id, question, answer_type)
+            const insertQuestionare = `INSERT INTO t_event_questionnaire(event_id, question, answer_type)
                     VALUES ($1, $2, $3);`
 
-                    for (let question of eventsData.questionnaire) {
-                        //t_event_venue 
-                        console.log(`Inserting category ${JSON.stringify(question)}`);
-                        insertQuestionareValue = 
-                        [   
-                            this.eventId, 
-                            question.question, 
-                            question.responseType
-                        ]
-                        await client.query(insertQuestionare, insertQuestionareValue);    
-                    }
-
-
-                console.log("Before commit");
-                await client.query("COMMIT");
-        
-                return({
-                    data: {
-                        status: 'success'
-                    }
-                })
-
-            } 
-            catch (err) {
-                await client.query("ROLLBACK");
-                console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`)
-                console.log("Transaction ROLLBACK called");
-                return(errorHandling.handleDBError('transactionError'));
+            for (let question of eventsData.questionnaire) {
+                //t_event_venue 
+                console.log(`Inserting category ${JSON.stringify(question)}`);
+                insertQuestionareValue =
+                    [
+                        this.eventId,
+                        question.question,
+                        question.responseType
+                    ]
+                await client.query(insertQuestionare, insertQuestionareValue);
             }
-        } 
-        catch (error) {
-            console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`);
-            return(errorHandling.handleDBError('transactionError'));
+
+
+            console.log("Before commit");
+            await client.query("COMMIT");
+
+            return ({
+                data: {
+                    status: 'success'
+                }
+            })
+
+        }
+        catch (err) {
+            await client.query("ROLLBACK");
+            console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`)
+            console.log("Transaction ROLLBACK called");
+            return (errorHandling.handleDBError('transactionError'));
+        }
+    }
+    catch (error) {
+        console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`);
+        return (errorHandling.handleDBError('transactionError'));
     }
 }
 
@@ -544,7 +589,7 @@ async function processUpdateUserRoles(userData) {
                       country=$12,
                       dob=$13
                   WHERE user_id= $14;`;
-                  console.log("2");
+                console.log("2");
                 const updateUserTbl_values = [
                     userData.firstName,
                     userData.middleName,
@@ -562,7 +607,7 @@ async function processUpdateUserRoles(userData) {
                     userData.userId,
                 ];
 
-               
+
 
                 client.query(updateUserTbl, updateUserTbl_values, function (err, result) {
                     if (err) {
@@ -640,7 +685,7 @@ async function processUpdateUserRoles(userData) {
                     //t_user_role_context
                     console.log("RoleData");
                     insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString()]
-                   console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
+                    console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
                     client.query(insertRoleContext, insertRoleContext_value, function (err, result) {
                         if (err) {
                             client.query("ROLLBACK");
@@ -692,15 +737,15 @@ async function getParishData() {
                     return;
                 }
                 client.end()
-                if (res){
-                    console.log("In response" + res);   
-                    let metadata = {}; 
-                    let Parish = [];   
-                    for (let row of res.rows) { 
-                        let data ={};             
+                if (res) {
+                    console.log("In response" + res);
+                    let metadata = {};
+                    let Parish = [];
+                    for (let row of res.rows) {
+                        let data = {};
                         data.id = row.id;
-                        data.name = row.name; 
-                        Parish.push(data);                           
+                        data.name = row.name;
+                        Parish.push(data);
                     }
                     metadata.Parish = Parish;
                     resolve({
@@ -725,10 +770,6 @@ module.exports = {
     processUpdateUserRoles,
     getRoleMetadata,
     getEventCategory,
-<<<<<<< HEAD
     getParishData,
     insertEvents
-=======
-    getParishData
->>>>>>> 904f45ea26265509e89f7040afe18f498e7159d5
 }
