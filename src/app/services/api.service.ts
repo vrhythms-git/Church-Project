@@ -57,6 +57,16 @@ getUserRoleData():Observable<any>{
   return this.http.get(`${this._baseUrl}/getRoleMetaData` );   
 }
 
+getParishListData():Observable<any>{
+  console.log(`calling the ParishListData()`);
+  // let headerObj = new HttpHeaders({
+  //                 'Authorization': localStorage.getItem('chUserToken')!,
+  //                 'Content-Type' : 'application/json'
+  //               });
+  // console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
+  return this.http.get(`${this._baseUrl}/getParishData` );   
+}
+
 updateUserProfile(userData  : any){
 console.log("update User Profile Called..")
 let headerObj = new HttpHeaders({
@@ -66,6 +76,16 @@ let headerObj = new HttpHeaders({
  console.log('headers set to ' + JSON.stringify(headerObj))
  console.log(JSON.stringify(userData));
 return this.http.post(`${this._baseUrl}/updateUserRoles`, JSON.stringify(userData),{ headers: headerObj } );
+}
+
+getEventCategoryData():Observable<any>{
+  console.log(`calling the getEventCategory()`);
+  let headerObj = new HttpHeaders({
+                  'Authorization': localStorage.getItem('chUserToken')!,
+                  'Content-Type' : 'application/json'
+                });
+  console.log( 'Event Category data is : ' + this.http.get(`${this._baseUrl}/getEventCategory`));
+  return this.http.get(`${this._baseUrl}/getEventCategory` );   
 }
 }
 
