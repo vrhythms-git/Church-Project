@@ -32,6 +32,10 @@ h2{
     
   }
  
+  mat-form-field{
+    font-family: poppins;
+    letter-spacing: 0.18px;
+}
 
   /* Accordin panel CSS */
 

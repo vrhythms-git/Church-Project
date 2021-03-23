@@ -1,118 +1,6 @@
-<!--
-<div class="container">
-    <mat-card style="box-shadow: 7px 7px 22px grey;">
-        <form [formGroup]="eventCreationForm">
-            <div class="form-container">
-                     
-                    <div class="row justify-content-center">
-                        <h2 style="text-align: center; color: rgb(79, 115, 235);font-weight: bold;">Create Event</h2>
-                    </div>
-
-                    <div class="row" style="margin-top: 3%;">
-                        <div class="col-md-6">
-                            <mat-form-field class="col-md-12">
-                       
-                                <input required id="eventName"
-                                       matInput
-                                       formControlName="eventName"
-                                      
-                                       placeholder="Event Name" />
-                              </mat-form-field>
-                        </div>
-                        <div class="col-md-6">
-                            <mat-form-field class="col-md-12">
-                
-                                <mat-select required id="parishName" formControlName="parishName"  placeholder="Pasish Name">
-                                    <mat-option value="Parish 1"> Parish 1 </mat-option>
-                                    <mat-option value="Parish 2"> Parish 2 </mat-option>
-                                    <mat-option value="Parish 3"> Parish 3 </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                        
-                            <mat-form-field class="col-md-12">
-                
-                                <mat-select required id="event_type" formControlName="event_type"  placeholder="Event Type">
-                                    <mat-option value="CWC"> CWC </mat-option>
-                                    <mat-option value="option2" >Option2</mat-option>
-                                    <mat-option value="option3">Option 3</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    <div class="col-md-6">
-                       
-                    </div>
-                </div>
-
-                
-                    
-                <div class="row">
-                    <div class="col-md-6">
-                    
-                        <mat-form-field class="col-md-12">
-            
-                           <input matInput type="date" required  id="start_date" formControlName="start_date" placeholder="Start Date">
-                           
-                        </mat-form-field>
-                    </div>
-                <div class="col-md-6">
-                    
-                    <mat-form-field class="col-md-12">
-            
-                        <input matInput type="date" required  id="end_date" formControlName="end_date" placeholder="End Date">
-                        
-                    </mat-form-field>
-                    
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                
-                    <mat-form-field class="col-md-12">
-        
-                       <input matInput type="date" required  id="registration_start_date" formControlName="registration_start_date" placeholder="Start Date">
-                       
-                    </mat-form-field>
-                </div>
-            <div class="col-md-6">
-                
-                <mat-form-field class="col-md-12">
-        
-                    <input matInput type="date" required  id="registration_end_date" formControlName="registration_end_date" placeholder="End Date">
-                    
-                </mat-form-field>
-                
-            </div>
-        </div>
-
-            <div class="row">
-                <mat-form-field class="col-md-12">
-                  
-                  <textarea required id="description"
-                            matInput 
-                            formControlName="description"
-                              
-                            placeholder="Event Description"></textarea>
-                </mat-form-field>
-          </div>
-
-
-         
-
-
-            </div>
-        </form>
-    </mat-card>
-</div>
--->
 <div class="container">
     <mat-accordion multi="true">
-        <mat-expansion-panel>
+        <mat-expansion-panel *ngFor="let item of [1]; first as isFirst" [expanded]="isFirst">
             <mat-expansion-panel-header>
                 <mat-panel-title>
                     Event Information
@@ -245,17 +133,17 @@
                     </div>
             
                         <div class="row">
-                            <mat-form-field class="col-md-12">
+                            <div class="col-md-12">
+                                <mat-form-field class="col-md-12">
                               
-                              <textarea required id="description"
-                                        matInput 
-                                        formControlName="description"
-                                          
-                                        placeholder="Event Description"></textarea>
-                            </mat-form-field>
+                                    <textarea required id="description"
+                                              matInput 
+                                              formControlName="description"
+                                                
+                                              placeholder="Event Description"></textarea>
+                                  </mat-form-field>
+                            </div>
                       </div>
-            
-            
             
                         </div>
                     </form>
@@ -266,8 +154,9 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Venu And Procter
+                    Venue And Procter
                 </mat-panel-title>
+
                 <mat-panel-description>
                     <mat-icon style="margin-left: 95%;">location_on</mat-icon>
                   </mat-panel-description>
@@ -277,65 +166,277 @@
                 
                 <form [formGroup]="eventCreationForm">
                     <div class="form-container">
-                        <!--
-                        <div class="row justify-content-center">
-                            <h2 style="text-align: center; color: rgb(79, 115, 235);font-weight: bold;">Venu Procter</h2>
+
+                        <div class=" row col-md-3 col text-left" >
+                            <button mat-button (click)="onaddbtnclick()">
+                                <mat-icon>add</mat-icon>
+                                <span >Add</span>
+                            </button>
                         </div>
-                        -->
-                        <div class="row">
-                            <mat-form-field class="col-md-12">
-                                    <mat-label>Venu Name</mat-label>
-                                    <input required id="venuName" matInput formControlName="venuName" placeholder="Enter Venu Name" />
-                            </mat-form-field>
-                        </div>
+                        <fieldset>
 
-                        <div class="row">
-                            <mat-form-field class="col-md-12">
-                                    <mat-label>Address Line 1</mat-label>
-                                    <input required id="addressLine1" matInput formControlName="addressLine1" placeholder="Enter Address" />
-                            </mat-form-field>
-                        </div>
+                            <div class="row" formArrayName="VenuAndProcterfields"
+                                    *ngFor="let item of eventCreationForm.get('VenuAndProcterfields')['controls']; let i = index;">
+                                    
+                                   <div class="container" style="padding-left: 2%;" [formGroupName]="i">
+                                        <div class="row">
+                                            <mat-form-field class="col-md-12">
+                                                    <mat-label>Venu Name</mat-label>
+                                                    <input matNativeControl required id="venuName" 
+                                                            matInput formControlName="venuName"
+                                                                placeholder="Enter Venu Name" />
+                                            </mat-form-field>     
+                                        </div>
+                                        <div class="row">
+                                             <mat-form-field class="col-md-12">
+                                                     <mat-label>Address Line 1</mat-label>
+                                                    <input matNativeControl required id="addressLine1" matInput formControlName="addressLine1"
+                                                                    placeholder="Enter Address" />
+                                            </mat-form-field>  
+                                                    </div>
+    
+                                         <div class="row">
+                                                <mat-form-field class="col-md-12">
+                                                        <mat-label>Address Line 2</mat-label>
+                                                         <input matNativeControl id="addressLine2" 
+                                                                matInput formControlName="addressLine2"
+                                                                 placeholder="Enter Address" />
+                                                 </mat-form-field>  
+                                          </div>           
+        
+                                         <div class="row">
+                                                                
+                                                 <mat-form-field class="col-md-6">
+                                                            <mat-label>City</mat-label>
+                                                             <input matNativeControl required id="city" 
+                                                             matInput formControlName="city" 
+                                                             placeholder="Enter City" />
+                                               </mat-form-field>
+                                                                
+                                                                
+                                                <mat-form-field class="col-md-6">
+                                                             <mat-label>State</mat-label>
+                                                           <input matNativeControl required id="state" 
+                                                               matInput formControlName="state" 
+                                                               placeholder="Enter State" />
+                                                </mat-form-field>
+                                                                    
+                                          </div>
 
-                        <div class="row">
-                            <mat-form-field class="col-md-12">
-                                    <mat-label>Address Line 2</mat-label>
-                                    <input id="addressLine2" matInput formControlName="addressLine2" placeholder="Enter Address" />
-                            </mat-form-field>
-                        </div>
+                                          <div class="row">
+                                                                    
+                                                <mat-form-field class="col-md-6">
+                                                         <mat-label>Postal Code</mat-label>
+                                                        <input matNativeControl required id="postalCode"
+                                                                             matInput formControlName="postalCode"
+                                                                            placeholder="Enter Postal code" />
+                                                </mat-form-field>
+                                                                    
+                                                                    
+                                                 <mat-form-field class="col-md-6">
+                                                            <mat-label>Country</mat-label>
+                                                             <mat-select matNativeControl required id="country" 
+                                                                         formControlName="country"
+                                                                        placeholder="Enter Country">
+                                                                 <mat-option value="USA">USA</mat-option>
+                                                               <mat-option value="India">India</mat-option>
+                                                             </mat-select>
+                                                  </mat-form-field>
+                                                                        
+                                           </div>
+    
+                                        <div class=" row col-md-3 col text-left">
+                                            <button (click)="onremovebtnclickVenu(i)" mat-button>
+                                                <mat-icon>delete</mat-icon><span>Delete</span>
+                                            </button>
+                                        </div>
+    
+                                    </div>
+                                </div>
 
-                        <div class="row">
-                            <mat-form-field class="col-md-6">
-                                    <mat-label>City</mat-label>
-                                    <input required id="city" matInput formControlName="city" placeholder="Enter City" />
-                            </mat-form-field>
+                            </fieldset>
 
-                            <mat-form-field class="col-md-6">
-                                <mat-label>State</mat-label>
-                                <input required id="state" matInput formControlName="state" placeholder="Enter State" />
-                            </mat-form-field>   
-
-                        </div>
-                        
-                        <div class="row">
-                            <mat-form-field class="col-md-6">
-                                <mat-label>Postal Code</mat-label>
-                                <input required id="postalCode" matInput formControlName="postalCode" placeholder="Enter Postal code" />
-                        </mat-form-field>
-
-                            <mat-form-field class="col-md-6">
-                                <mat-label>Country</mat-label>
-                                <mat-select matNativeControl required id="country" formControlName="country" placeholder="Enter Country">
-                                        <mat-option value="USA">USA</mat-option>
-                                        <mat-option value="India">India</mat-option>
-                                </mat-select>
-                        </mat-form-field>
-                        </div>
-
+                            <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+                                </mat-divider>
                     </div>
                 </form>
             </div>
-            
 
         </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                        Categories
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon style="margin-left: 95%;">category</mat-icon>
+                </mat-panel-description>
+        </mat-expansion-panel-header>
+            <!--Expansion pannel content for categories goes here-->
+            <div class="container">
+                
+                <form [formGroup]="eventCreationForm">
+                    <div class="form-container">
+                        
+                        <fieldset>
+                            <div class="row" formArrayName="categoryData" 
+                            *ngFor="let item of eventCreationForm.get('categoryData')['controls']; let i = index;">
+
+                                <div class="container" style="padding-left: 2%;" [formGroupName]="i">
+                                
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                             <mat-form-field class="col-md-12">
+                                                    <input matInput id="name" 
+                                                    matInput formControlName="name" placeholder="Name">
+                                              </mat-form-field>  
+                                         </div>  
+                                         
+                                         <div class="col-md-4">
+                                              <mat-form-field class="col-md-12">
+                                                <input matInput id="schoolGradeFrom" 
+                                                matInput formControlName="schoolGradeFrom" placeholder="School Grade From">
+                                          </mat-form-field> 
+                                         </div>  
+                                         
+                                         <div class="col-md-4">
+                                             <mat-form-field class="col-md-12">
+                                                    <input matInput id="schoolGradeTo" 
+                                                    matInput formControlName="schoolGradeTo" placeholder="School Grade To">
+                                              </mat-form-field>   
+                                         </div>  
+                                       
+                                     </div>
+
+                                     <div class="row">
+                                        <div class="col-md-4">
+                                            <mat-form-field class="col-md-12">
+                                
+                                                <mat-select required id="eventCategoryJudgeOne" formControlName="eventCategoryJudgeOne"  placeholder="Judge One">
+                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
+                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
+                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field class="col-md-12">
+                                
+                                                <mat-select required id="eventCategoryJudgeTwo" formControlName="eventCategoryJudgeTwo"  placeholder="Judge Two">
+                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
+                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
+                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <mat-form-field class="col-md-12">
+                                
+                                                <mat-select required id="eventCategoryJudgeThree" formControlName="eventCategoryJudgeThree"  placeholder="Judge Three">
+                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
+                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
+                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <mat-form-field class="col-md-12">
+                                          
+                                                <mat-select required id="eventCategoryVenue" formControlName="eventCategoryVenue"  placeholder="Event Category Venue">
+                                                    <mat-option value="Venue 1"> Venue 1 </mat-option>
+                                                    <mat-option value="Venue 2"> Venue 2 </mat-option>
+                                                    <mat-option value="Venue 3"> Venue 3 </mat-option>
+                                                </mat-select>
+                                              </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-left: 89%;">
+                                        <button (click)="removeEventCategory(i)" mat-button>
+                                            <mat-icon>delete</mat-icon><span>Delete</span>
+                                        </button>
+                                    </div>     
+                                         
+                                    <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+                                    </mat-divider>
+
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        
+
+                    </div>
+            
+                </form>
+            </div>
+       
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                        Questionaries
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon style="margin-left: 95%;">question_answer</mat-icon>
+                </mat-panel-description>
+        </mat-expansion-panel-header>
+            <!--Expansion pannel content for Questionaries goes here-->
+            <div class="container">
+                <form [formGroup]="eventCreationForm">
+                    <div class="form-container">
+                        <fieldset>
+                            <div class="row" formArrayName="questionaryfields"
+                                *ngFor="let item of eventCreationForm.get('questionaryfields')['controls']; let i = index;">
+                            
+                                <div class="container" style="padding-left: 2%;" [formGroupName]="i">
+                                    <div class="row">
+                                        <button mat-button (click)="onaddbtnclick1()"> 
+                                            <mat-icon>add</mat-icon>
+                                            <span>Add</span>s
+                                        </button>
+                                    </div>
+
+                                    <div class="row">
+                                        <mat-form-field class="col-md-7">
+                                            <input matNativeControl required id="question" matInput
+                                                    formControlName="question" 
+                                                    placeholder="Enter Question" />
+                                        </mat-form-field>
+                                        <mat-form-field class="col-md-3">
+                                                    
+                                            <mat-select matNativeControl required id="responseType" 
+                                                        formControlName="responseType"
+                                                        placeholder="Select response Type">
+                                                <mat-option value="Yes/No">Yes/No</mat-option>
+                                                <mat-option value="Text">Text</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+
+                                        <div class="col-md-2">
+                                            <button (click)="onremovebtnclickQuestion(i)" mat-button>
+                                                <mat-icon>delete</mat-icon><span>Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                   
+                                    <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 4%;margin-bottom: 3%;">
+                                    </mat-divider>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </form>
+            </div>
+        </mat-expansion-panel>
+
+
     </mat-accordion>
 </div>
