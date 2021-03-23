@@ -9,13 +9,13 @@ async function processSignInRequest(userInfo) {
 
     let client = dbConnections.getConnection();
     console.log("User Data" + JSON.stringify(userInfo));
-        try {
-            await client.connect();
-            await client.query("BEGIN");
-            let userId;
-            let isFamilyHead;
-            console.log("1");
-            let newUserInsStmt = `INSERT INTO t_user(
+    try {
+        await client.connect();
+        await client.query("BEGIN");
+        let userId;
+        let isFamilyHead;
+        console.log("1");
+        let newUserInsStmt = `INSERT INTO t_user(
                  email_id, org_id, firebase_id)
                VALUES (          
                       '${userInfo.data.email}',
@@ -23,73 +23,73 @@ async function processSignInRequest(userInfo) {
                       '${userInfo.data.fbId}'
                ) returning user_id;`
 
-            let result = await client.query(newUserInsStmt);
+        let result = await client.query(newUserInsStmt);
 
-            console.log("2",this.userId);
-            this.userId = result.rows[0].user_id;
-            console.log("2",this.userId);
-            this.isFamilyHead = userInfo.data.isFamilyHead;
-            console.log("3", this.isFamilyHead);
+        console.log("2", this.userId);
+        this.userId = result.rows[0].user_id;
+        console.log("2", this.userId);
+        this.isFamilyHead = userInfo.data.isFamilyHead;
+        console.log("3", this.isFamilyHead);
 
-            /****************************************** t_person******************************************************************************/
-            console.log("2");
-            let insertPerson = `INSERT INTO t_person(
+        /****************************************** t_person******************************************************************************/
+        console.log("2");
+        let insertPerson = `INSERT INTO t_person(
                 user_id, title, first_name, middle_name, last_name, mobile_no)
               VALUES ($1, $2, $3, $4, $5, $6);`
 
-            console.log("2",this.userId);
-            insertPersonValues =
-                [
-                    this.userId,
-                    userInfo.data.title,
-                    userInfo.data.firstName,
-                    userInfo.data.middleName,
-                    userInfo.data.lastName,
-                    userInfo.data.mobileNo
-                ]
+        console.log("2", this.userId);
+        insertPersonValues =
+            [
+                this.userId,
+                userInfo.data.title,
+                userInfo.data.firstName,
+                userInfo.data.middleName,
+                userInfo.data.lastName,
+                userInfo.data.mobileNo
+            ]
 
-                console.log(insertPersonValues);
-                console.log("4");
+        console.log(insertPersonValues);
+        console.log("4");
 
-            await client.query(insertPerson, insertPersonValues);
+        await client.query(insertPerson, insertPersonValues);
 
-            /**********************************************t_user_role_mapping*********************************************************************************** */
+        /**********************************************t_user_role_mapping*********************************************************************************** */
 
-            console.log("3");
-            console.log("isfamily head ", this.isFamilyHead);
-            if (this.isFamilyHead) {
-                console.log("6");
-                console.log("this.userId", this.userId);
-                let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
+        console.log("3");
+        console.log("isfamily head ", this.isFamilyHead);
+        if (this.isFamilyHead) {
+            console.log("6");
+            console.log("this.userId", this.userId);
+            let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
                 select ${this.userId}, id from t_role where name = 'Family Head';`
-                await client.query(insertRoleMapping);
-            }
-            if (!this.isFamilyHead) {
-                console.log("7");
-                let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
-                select ${this.userId}, id from t_role where name = 'Member';`
-                await client.query(insertRoleMappingmember);
-            }
-
-            console.log("Before commit");
-            await client.query("COMMIT");
-            console.log("After commit");
-            //client.end()
-
-            return({
-                data: {
-                    status: 'success'
-                }
-            })
-
-        } 
-        catch (error) {
-            await client.query("ROLLBACK");
-            console.error(`reqOperations.js::processSignInRequest() --> error : ${JSON.stringify(error)}`)
-            console.log("Transaction ROLLBACK called");
-            return (errorHandling.handleDBError('transactionError'));
+            await client.query(insertRoleMapping);
         }
+        if (!this.isFamilyHead) {
+            console.log("7");
+            let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+                select ${this.userId}, id from t_role where name = 'Member';`
+            await client.query(insertRoleMappingmember);
+        }
+
+        console.log("Before commit");
+        await client.query("COMMIT");
+        console.log("After commit");
+        //client.end()
+
+        return ({
+            data: {
+                status: 'success'
+            }
+        })
+
     }
+    catch (error) {
+        await client.query("ROLLBACK");
+        console.error(`reqOperations.js::processSignInRequest() --> error : ${JSON.stringify(error)}`)
+        console.log("Transaction ROLLBACK called");
+        return (errorHandling.handleDBError('transactionError'));
+    }
+}
 
 
 
@@ -555,106 +555,261 @@ async function insertEvents(eventsData) {
 
 
 async function processUpdateUserRoles(userData) {
+    let client = dbConnections.getConnection();
+    console.log("User Data" + JSON.stringify(userData));
+    try {
+        await client.connect();
+        await client.query("BEGIN");
+        console.log("1");
+        /********************** t_user************************* */
+        const updateUserTbl = `UPDATE t_user SET
+                      updated_by=$1,
+                      updated_date=$2, 
+                      org_id=$3,
+                      is_family_head=$4
+                  WHERE user_id= $5;`;
+        console.log("2");
 
-    return new Promise((resolve, reject) => {
-        let client = dbConnections.getConnection();
-        console.log("User Data" + JSON.stringify(userData));
-        client.connect();
-        //      dbConnections.getCoonectionPool().connect().catch(err => {
-        //     console.log("\nclient.connect():", err.name);
-        //     for (item in err) {
-        //         if (err[item] != undefined)
-        //             console.error(`reqOperations.js::processUpdateUserRoles() --> error while fetching results : ${JSON.stringify(err)}`)
-        //         reject(errorHandling.handleDBError('queryExecutionError'));
-        //         return;
-        //     }
-        // }).then((client)=>{
-        try {
-            client.query("BEGIN");
-            try {
-                console.log("1");
-                /********************** t_user************************* */
-                const updateUserTbl = `UPDATE public.t_user
-                  SET first_name=$1,
-                      middle_name=$2, 
-                      last_name=$3,
-                      mobile_no=$4, 
-                      updated_by=$5,
-                      updated_date=$6, 
-                      address_line1=$7,
-                      address_line2=$8, 
-                      city=$9, 
-                      state=$10, 
-                      postal_code=$11, 
-                      country=$12,
-                      dob=$13
-                  WHERE user_id= $14;`;
-                console.log("2");
-                const updateUserTbl_values = [
-                    userData.firstName,
-                    userData.middleName,
-                    userData.lastName,
-                    userData.mobileNo,
-                    userData.updatedBy,
-                    new Date().toISOString(),
-                    userData.addressLine1,
-                    userData.addressLine2,
-                    userData.city,
-                    userData.state,
-                    userData.postalCode,
-                    userData.country,
-                    userData.dob,
-                    userData.userId,
-                ];
+        const updateUserTbl_values = [
+            userData.updatedBy,
+            new Date().toISOString(),
+            userData.roles.orgId,
+            userData.isFamilyHead,
+            userData.userId,
+        ];
+        console.log(updateUserTbl_values);
+        await client.query(updateUserTbl, updateUserTbl_values);
+
+        console.log("3");
+        /*************************** t_person********************************************* */
+        const updatePersonTbl = `UPDATE t_person SET
+                title=$1,
+                first_name=$2, 
+                middle_name=$3,
+                last_name=$4,
+                nick_name=$5,
+                dob=$6,
+                address_line1=$7,
+                address_line2=$8,
+                address_line3=$9,
+                city=$10,
+                state=$11,
+                postal_code=$12,
+                country=$13,
+                mobile_no=$14,
+                home_phone_no=$15,
+                baptismal_name=$16,
+                marital_status=$17,
+                date_of_marriage=$18,
+                about_yourself=$19,
+                updated_by=$20,
+                updated_date=$21
+            WHERE user_id= $22;`;
+
+        console.log("4");
+        const updatePersonTblValues = [
+            userData.title,
+            userData.firstName,
+            userData.middleName,
+            userData.lastName,
+            userData.nickName,
+            userData.dob,
+            userData.addressLine1,
+            userData.addressLine2,
+            userData.addressLine3,
+            userData.city,
+            userData.state,
+            userData.postalCode,
+            userData.country,
+            userData.mobileNo,
+            userData.homePhoneNo,
+            userData.batismalName,
+            userData.maritalStatus,
+            userData.dateofMarriage,
+            userData.aboutYourself,
+            userData.updatedBy,
+            new Date().toISOString(),
+            userData.userId,
+        ];
+        console.log("updatePersonTblValues", updatePersonTblValues);
+        console.log("5");
+        await client.query(updatePersonTbl, updatePersonTblValues);
+
+        /***************************** Family Member Data Insertion**************************************************** */
+
+        console.log("6");
+
+        if (userData.isFamilyHead) {
+
+            
+            // let selectEmail = `select email_id from t_user;`
+            // let emailResults = await client.query(selectEmail);
+
+            // let allEmails = [];
+            // for (let email of emailResults.rows) {
+            //     let emails = {};
+            //     emails = email.email_id;
+            //     allEmails.push(emails);
+            // }
+            // console.log("All emails", allEmails);
+            // console.log("Userdata emailid", userData.emailId);
 
 
+            // let findIfEmailExist = allEmails.indexOf(userData.emailId);
+            // console.log("findIfEmailExist", findIfEmailExist);
+            
 
-                client.query(updateUserTbl, updateUserTbl_values, function (err, result) {
-                    if (err) {
-                        client.query("ROLLBACK");
-                        console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while updating data into t_user table: ${JSON.stringify(err)}`)
-                        console.log("Transaction ROLLBACK called");
-                        reject(errorHandling.handleDBError('transactionError'))
-                    } else {
-                        client.query("COMMIT");
-                        console.log("reqOperations.js::t_user: Transaction COMMIT row count:", result.rowCount);
-                    }
-                });
 
-                /**********************Delete -> t_user_role_mapping ************************* */
-                const deleteFromRoleMapping = `DELETE FROM public.t_user_role_mapping WHERE user_id='${userData.userId}';`
-                client.query(deleteFromRoleMapping, function (err, result) {
-                    if (err) {
-                        client.query("ROLLBACK");
-                        console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while deleting datafrom t_user_role_mapping table: ${JSON.stringify(err)}`)
-                        console.log("Transaction ROLLBACK called");
-                        reject(errorHandling.handleDBError('transactionError'))
-                    } else {
-                        client.query("COMMIT");
-                        console.log("reqOperations.js::t_user_role_mapping: Transaction COMMIT row count:", result.rowCount);
-                    }
-                });
+            // if (this.findIfEmailExist == -1) {
+            //     console.log("EmailId does not exist");
 
-                /**********************Delete -> t_user_role_context ************************* */
-                const deleteFromRoleContext = `DELETE FROM public.t_user_role_context WHERE user_id='${userData.userId}';`
-                client.query(deleteFromRoleContext, function (err, result) {
-                    if (err) {
-                        client.query("ROLLBACK");
-                        console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while deleting datafrom t_user_role_mapping table: ${JSON.stringify(err)}`)
-                        console.log("Transaction ROLLBACK called");
-                        reject(errorHandling.handleDBError('transactionError'))
-                    } else {
-                        client.query("COMMIT");
-                        console.log("reqOperations.js::t_user_role_context Transaction COMMIT row count:", result.rowCount);
-                    }
-                });
+                for (let details of userData.memberDetails) {
 
-                /**********************Insert -> t_user_role_mapping ************************* */
+                 console.log("details", details);
 
-                const insertRoleMapping = `INSERT INTO public.t_user_role_mapping(
+                 let selectEmail = `select user_id from t_user where email_id = '${userData.emailId}';`
+                 console.log("selectEmail", selectEmail);
+                 let emailResults = await client.query(selectEmail);
+
+                 console.log("emailResults", emailResults);
+
+                 console.log("emailResults.rows.count", emailResults.rowCount);
+
+                 let userId;
+
+
+                 if(emailResults.rowCount == 0){
+
+
+                    /////////////////////////////////////////    t_user    /////////////////////////////////////////////////////////////////////////////////////
+                    const insertuserTbl = `INSERT INTO t_user(
+                    email_id, org_id, firebase_id)
+                    VALUES (                  
+                      '${userData.emailId}',
+                      '${userData.orgId}',
+                      '${userData.fbId}'
+                    ) returning user_id;`;
+
+                    this.userId = result.rows[0].user_id;
+                    let result = await client.query(newUserInsStmt);
+                    this.userId = result.rows[0].user_id;
+                    console.log("userid",this.userId)
+
+                    ////////////////////////////////////////////////   t_person  /////////////////////////////////////////////////////////////////////////////
+
+                    let insertPerson = `INSERT INTO t_person(
+                    user_id, title, first_name, middle_name, last_name, dob, mobile_no)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7);`
+
+                    insertPersonValues =
+                        [
+                            this.userId,
+                            details.title,
+                            details.firstName,
+                            details.middleName,
+                            details.lastName,
+                            details.dob,
+                            details.mobileNo
+                        ]
+
+                    console.log(insertPersonValues);
+                    await client.query(insertPerson, insertPersonValues);
+
+
+                    ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
+
+                    console.log("details", details);
+                    let insertPersonRelationship = `INSERT INTO t_person_relationship(
+                family_head_id, family_member_id, relationship, updated_by, updated_date)
+                  VALUES ($1, $2, $3, $4, $5);`
+
+                    console.log("2");
+
+                    insertPersonRelationshipValues = [
+                        this.userId,
+                        1234,
+                        details.relationship,
+                        userData.updatedBy,
+                        new Date().toISOString()
+                    ]
+
+                    console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+
+                    await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                 }
+                else{
+
+                            console.log("details", details);
+                            let insertPersonRelationship = `INSERT INTO t_person_relationship(
+                        family_head_id, family_member_id, relationship, updated_by, updated_date)
+                          VALUES ($1, $2, $3, $4, $5);`
+        
+                            console.log("2");
+        
+                            insertPersonRelationshipValues = [
+                                userData.userId,
+                                1234,
+                                details.relationship,
+                                userData.updatedBy,
+                                new Date().toISOString()
+                            ]
+        
+                            console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+        
+                            await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+        
+                         
+
+                        }
+
+                }
+
+            // }
+            // else {
+            //     console.log("EmailId Already exist");
+
+            //     for (let details of userData.memberDetails) {
+
+            //         /////////////////////////////////////////////// t_person_relationship //////////////////////////////////////////////////////////////////////////////
+
+            //         console.log("details", details);
+            //         let insertPersonRelationship = `INSERT INTO t_person_relationship(
+            //     family_head_id, family_member_id, relationship, updated_by, updated_date)   
+            //       VALUES ($1, $2, $3, $4, $5);`
+
+            //         //  family_head_id, family_member_id,
+
+            //         insertPersonRelationshipValues = [
+            //             this.userId,
+            //             1234,
+            //             userData.relationship,
+            //             userData.updatedBy,
+            //             new Date().toISOString()
+            //         ]
+
+            //         await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+            //     }
+            // }
+        }
+
+
+        /**********************Delete -> t_user_role_mapping ************************* */
+        const deleteFromRoleMapping = `DELETE FROM public.t_user_role_mapping WHERE user_id='${userData.userId}';`
+        await client.query(deleteFromRoleMapping);
+
+        /**********************Delete -> t_user_role_context ************************* */
+        const deleteFromRoleContext = `DELETE FROM public.t_user_role_context WHERE user_id='${userData.userId}';`
+        client.query(deleteFromRoleContext);
+
+        /**********************Insert -> t_user_role_mapping ************************* */
+
+        const insertRoleMapping = `INSERT INTO public.t_user_role_mapping(
                     role_id, user_id, is_deleted)
                     VALUES ($1, $2, $3);`
-                const insertRoleContext = `INSERT INTO public.t_user_role_context(
+
+        const insertRoleContext = `INSERT INTO public.t_user_role_context(
                                                         role_id,
                                                         user_id,
                                                         org_id, 
@@ -665,60 +820,37 @@ async function processUpdateUserRoles(userData) {
                                                         updated_date)
                                                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`
 
-                for (let role of userData.roles) {
-                    //t_user_role_context 
-                    console.log(`Inserting role ${JSON.stringify(role)} into t_user_role_mapping t_user_role_context and t_user_role_context table.`)
-                    insertRoleMapping_value = [role.roleId, userData.userId, false]
-                    client.query(insertRoleMapping, insertRoleMapping_value, function (err, result) {
-                        if (err) {
-                            client.query("ROLLBACK");
-                            console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while inserting data in t_user_role_mapping table: ${JSON.stringify(err)}`)
-                            console.log("Transaction ROLLBACK called");
-                            reject(errorHandling.handleDBError('transactionError'))
-                            return;
-                        } else {
-                            client.query("COMMIT");
-                            console.log("reqOperations.js::processUpdateUserRoles() t_user_role_context Transaction COMMIT row count:", result.rowCount);
-                        }
-                    });
+        for (let role of userData.roles) {
+            //t_user_role_context 
+            console.log(`Inserting role ${JSON.stringify(role)} into t_user_role_mapping t_user_role_context and t_user_role_context table.`)
+            insertRoleMapping_value = [role.roleId, userData.userId, false];
+            await client.query(insertRoleMapping, insertRoleMapping_value);
 
-                    //t_user_role_context
-                    console.log("RoleData");
-                    insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString()]
-                    console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
-                    client.query(insertRoleContext, insertRoleContext_value, function (err, result) {
-                        if (err) {
-                            client.query("ROLLBACK");
-                            console.error(`reqOperations.js::processUpdateUserRoles() --> Error occurred while Inserting data in t_user_role_context table: ${err}`)
-                            console.log("Transaction ROLLBACK called");
-                            reject(errorHandling.handleDBError('transactionError'))
-                            return;
-                        } else {
-                            client.query("COMMIT");
-                            console.log("reqOperations.js::processUpdateUserRoles() t_user_role_context Transaction COMMIT row count:", result.rowCount);
-                        }
-                    });
-                }
 
-                resolve({
-                    data: {
-                        status: 'success'
-                    }
-                })
+            //t_user_role_context
+            console.log("RoleData");
+            insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString()]
+            console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
+            await client.query(insertRoleContext, insertRoleContext_value);
 
-            } catch (err) {
-                client.query("ROLLBACK");
-                console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${JSON.stringify(err)}`)
-                console.log("Transaction ROLLBACK called");
-                reject(errorHandling.handleDBError('transactionError'))
-            }
-
-        } catch (error) {
-            console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${JSON.stringify(err)}`)
-            reject(errorHandling.handleDBError('transactionError'))
         }
-    });
-    //  });
+
+        console.log("Before commit");
+        await client.query("COMMIT");
+        console.log("After commit");
+
+        return ({
+            data: {
+                status: 'success'
+            }
+        })
+
+    } catch (err) {
+        client.query("ROLLBACK");
+        console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${JSON.stringify(err)}`);
+        console.log("Transaction ROLLBACK called");
+        return (errorHandling.handleDBError('transactionError'));
+    }
 }
 
 async function getParishData() {
