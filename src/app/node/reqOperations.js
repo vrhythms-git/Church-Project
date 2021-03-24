@@ -106,84 +106,150 @@ async function processSignInRequest(userInfo) {
 
 async function processGetUserMetaDataRequest(firebaseToken) {
 
-    return new Promise((resolve, reject) => {
+    let client = dbConnections.getConnection();
+    await client.connect();
+    console.log("1");
+    try {
+        // let query = `select user_id,first_name,last_name,email_id,mobile_no, role_name,menu_name,perm_name 
+        //             from v_user
+        //             where firebase_id = '${firebaseToken}';`
 
-            let query = `select user_id,first_name,last_name,email_id,mobile_no, role_name,menu_name,perm_name 
-                        from v_user
-                        where firebase_id = '${firebaseToken}';`
+        console.log("2");
+        let query = `select distinct vu.user_id, vu.email_id,
+         vu.title, vu.first_name, vu.middle_name, vu.last_name,
+				vu.nick_name, vu.dob,
+                 vu.mobile_no,
+				vu.address_line1, vu.address_line2,
+                 vu.address_line3, vu.city, vu.state,
+                  vu.postal_code, vu.country
+				,vu.home_phone_no, vu.baptismal_name, 
+                vu.marital_status, vu.date_of_marriage,
+                 vu.about_yourself,
+				vu.role_name, vu.menu_name,
+                 vu.perm_name, 
+                 vu.name org_name, 
+                 vu.org_id  
+                from v_user vu where firebase_id = '${firebaseToken}';`
 
-        let client = dbConnections.getConnection();
-        try {
-            client.connect();
-            client.query(query, (err, res) => {
-                if (err) {
-                    console.error(`reqOperations.js::processGetUserMetaDataRequest() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
-                    return;
+
+                console.log("3");
+        let res = await client.query(query);
+
+
+        console.log("4", res.rowCount);
+
+
+        if (res && res.rowCount > 0) {
+
+            console.log("5");
+
+            let metaData = {};
+            let permissions = [];
+            let memberDetails = [];
+            let menus = [];
+
+            metaData.userId = res.rows[0].user_id;
+            metaData.emailId = res.rows[0].email_id;
+            metaData.title = res.rows[0].title;
+            metaData.firstName = res.rows[0].first_name;
+            metaData.middleName = res.rows[0].middle_name;
+            metaData.lastName = res.rows[0].last_name;
+            metaData.nickName = res.rows[0].nick_name;
+            metaData.dob = res.rows[0].dob;
+            metaData.mobile_no = res.rows[0].mobile_no;
+            metaData.addressLine1 = res.rows[0].address_line1;
+            metaData.addressLine2 = res.rows[0].address_line2;
+            metaData.addressLine3 = res.rows[0].address_line3;
+            metaData.city = res.rows[0].city;
+            metaData.state = res.rows[0].state;
+            metaData.postalCode = res.rows[0].postal_code;
+            metaData.country = res.rows[0].country;
+            metaData.homePhoneNo = res.rows[0].home_phone_no;
+            metaData.baptismalName = res.rows[0].baptismal_name;
+            metaData.maritalStatus = res.rows[0].marital_status;
+            metaData.dateOfMarriage = res.rows[0].date_of_marriage;
+            metaData.aboutYourself = res.rows[0].about_yourself;
+            metaData.userRole = res.rows[0].role_name;
+            metaData.orgName = res.rows[0].org_name;
+            metaData.orgId = res.rows[0].org_id;
+
+            for (let row of res.rows) {
+
+                if (menus.indexOf(row.menu_name) < 0)
+                    menus.push(row.menu_name)
+                if (permissions.indexOf(row.perm_name) < 0) {
+                    permissions.push(row.perm_name)
                 }
 
-                client.end()
-                if (res) {
+            }
+            metaData.permissions = permissions;
+            metaData.menus = menus;
 
-                    let metaData = {}
-                    let permissions = [];
-                    let menus = [];
+            let query1 = `select distinct vu.user_id, vu.email_id, vu.title,
+                    vu.first_name, vu.middle_name, vu.last_name,
+			    	vu.dob, vu.mobile_no, tpr.relationship,
+                    tpr.id relationship_id
+                    from v_user vu, t_person_relationship tpr 
+                    where tpr.family_head_id = '${metaData.userId}' 
+                    and vu.user_id = tpr.family_member_id;`
 
-                    metaData.firstName = res.rows[0].first_name;
-                    metaData.userId = res.rows[0].user_id;
-                    metaData.lastName = res.rows[0].last_name;
-                    metaData.emailId = res.rows[0].email_id;
-                    metaData.mobile_no = res.rows[0].mobile_no;
-                    metaData.userRole = res.rows[0].role_name;
+            let res1 = await client.query(query);
 
-                    for (let row of res.rows) {
+            for(row of res1.rows){
+                let member= {};
+                member.userId = row.user_id;
+                member.emailId = row.email_id;
+                member.title = row.title;
+                member.firstName = row.first_name;
+                member.middleName = row.middle_name;
+                member.lastName = row.last_name;
+                member.dob = row.dob;
+                member.mobileNo = row.mobile_no;
+                member.relationship = row.relationship;
+                member.relationshipId = row.relationship_id;
+                memberDetails.push(member);          
+            }
 
-                        if (menus.indexOf(row.menu_name) < 0)
-                            menus.push(row.menu_name)
-                        if (permissions.indexOf(row.perm_name) < 0) {
-                            permissions.push(row.perm_name)
-                        }
+            metaData.memberDetails = memberDetails;
 
-                    }
-                    metaData.permissions = permissions;
-                    metaData.menus = menus;
-
-
-                    resolve({
-                        data: {
-                            status: 'success',
-                            metaData: metaData
-                        }
-                    })
+            return ({
+                data: {
+                    status: 'success',
+                    metaData: metaData
                 }
-            });
-        } catch (error) {
-            console.error(`reqOperations.js::processGetUserMetaDataRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
+            })
         }
-    });
+
+    } catch (error) {
+        console.error(`reqOperations.js::processGetUserMetaDataRequest() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    }
+
 }
 
 
 async function getuserRecords() {
 
-    return new Promise((resolve, reject) => {
-        let getuserRecords = `select distinct user_id,first_name,middle_name,last_name,dob,mobile_no,email_id,address_line1,address_line2,city,postal_code,country,role_id,org_type,org_id from v_user order by user_id;`
-        let client = dbConnections.getConnection();
-
+    let client = dbConnections.getConnection();
+    await client.connect();
         try {
-            client.connect();
-            client.query(getuserRecords, (err, res) => {
-                if (err) {
-                    console.log("Inside Error" + res);
-                    console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
-                    return;
-                }
-                console.log("Before Client end" + res);
-                client.end()
-                console.log("After Client end" + res);
-                if (res) {
+            let getuserRecords = `select distinct vu.user_id, vu.email_id,
+            vu.title, vu.first_name, vu.middle_name, vu.last_name,
+                   vu.nick_name, vu.dob,
+                    vu.mobile_no,
+                   vu.address_line1, vu.address_line2,
+                    vu.address_line3, vu.city, vu.state,
+                     vu.postal_code, vu.country
+                   ,vu.home_phone_no, vu.baptismal_name, 
+                   vu.marital_status, vu.date_of_marriage,
+                    vu.about_yourself,
+                   vu.role_id, vu.org_id, vu.org_type
+                   from v_user vu order by vu.user_id;`
+
+
+            let res = await client.query(getuserRecords);
+              
+                if (res && res.rowCount > 0) {
 
                     console.log("In response" + res);
                     let user = {}
@@ -206,17 +272,29 @@ async function getuserRecords() {
                             console.log("User id In IF Condition" + row.user_id);
 
                             user.userId = row.user_id;
+                            user.emailId = row.email_id;
+                            user.title = row.title;
                             user.firstName = row.first_name;
                             user.middleNmae = row.middle_name;
                             user.lastName = row.last_name;
+                            user.nickName = row.nick_name;
                             user.dob = row.dob;
                             user.mobileNo = row.mobile_no;
-                            user.emailId = row.email_id;
                             user.addressLine1 = row.address_line1;
                             user.addressLine2 = row.address_line2;
+                            user.addressLine3 = row.address_line3;
                             user.city = row.city;
+                            user.state = row.state;
                             user.postalCode = row.postal_code;
                             user.country = row.country;
+                            user.homePhoneNo = row.home_phone_no;
+                            user.baptismalNname = row.baptismal_name;
+                            user.maritalStatus = row.marital_status;
+                            user.dateofMarriage = row.date_of_marriage;
+                            user.aboutYourself = row.about_yourself;
+                            user.roleId = row.role_id;
+                            user.orgId = row.org_id;
+                            user.orgType = row.org_type;
                             // if(userid == 0){
                             //     userid = row.user_id;
                             // }
@@ -240,19 +318,18 @@ async function getuserRecords() {
                     user.roles = roles;
                     users.push(user);
                     console.log("Before Resolve" + res);
-                    resolve({
+                    
+                    return ({
                         data: {
                             status: 'success',
                             metaData: users
                         }
                     })
-                }
-            });
+                }         
         } catch (error) {
-            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
+            console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
+            return(errorHandling.handleDBError('connectionError'));
         }
-    });
 }
 
 async function getRoleMetadata() {
@@ -805,7 +882,6 @@ async function processUpdateUserRoles(userData) {
                     console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
 
                     await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-
 
 
                 }
