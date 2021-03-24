@@ -212,6 +212,8 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 
             metaData.memberDetails = memberDetails;
 
+            client.end();
+            
             return ({
                 data: {
                     status: 'success',
@@ -221,6 +223,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
         }
 
     } catch (error) {
+        client.end();
         console.error(`reqOperations.js::processGetUserMetaDataRequest() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
     }
@@ -318,7 +321,7 @@ async function getuserRecords() {
                     user.roles = roles;
                     users.push(user);
                     console.log("Before Resolve" + res);
-                    
+                    client.end();
                     return ({
                         data: {
                             status: 'success',
@@ -327,6 +330,7 @@ async function getuserRecords() {
                     })
                 }         
         } catch (error) {
+            client.end();
             console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
             return(errorHandling.handleDBError('connectionError'));
         }
@@ -438,7 +442,7 @@ async function getEventCategory() {
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
-                client.end()
+                
                 if (res) {
                     console.log("In response" + res);
                     let metadata = {};
@@ -453,6 +457,7 @@ async function getEventCategory() {
                         eventCategory.push(events);
                     }
                     metadata.eventCategory = eventCategory;
+                    client.end()
                     resolve({
                         data: {
                             status: 'success',
@@ -483,7 +488,7 @@ async function getParishData() {
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
-                client.end()
+                
                 if (res) {
                     console.log("In response" + res);
                     let metadata = {};
@@ -495,6 +500,7 @@ async function getParishData() {
                         Parish.push(data);
                     }
                     metadata.Parish = Parish;
+                    client.end()
                     resolve({
                         data: {
                             status: 'success',
@@ -612,7 +618,7 @@ async function insertEvents(eventsData) {
                 await client.query(insertQuestionare, insertQuestionareValue);
             }
 
-
+            client.end()
             console.log("Before commit");
             await client.query("COMMIT");
 
@@ -960,12 +966,13 @@ async function processUpdateUserRoles(userData) {
         console.log("Before commit");
         await client.query("COMMIT");
         console.log("After commit");
-
+        client.end()
         return ({
             data: {
                 status: 'success'
             }
         })
+        
 
     } catch (err) {
         client.query("ROLLBACK");
