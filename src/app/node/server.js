@@ -180,7 +180,7 @@ app.post('/api/updateUserRoles', function (req, res) {
         res.end();
       })
   } catch (error) {
-    console.error('Error in signUp as : ' + error)
+    console.error('Error in updateUserRoles as : ' + error)
   }
 });
 

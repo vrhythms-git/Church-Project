@@ -1,8 +1,19 @@
 const { Client, Pool } = require('pg');
 const _ = require('underscore');
-
+const firebase = require('firebase');
+const firebaseConfig = require('./firebase/firebaseAdminUtils');
 const errorHandling = require('./ErrorHandling/commonDBError');
+const { result } = require('underscore');
 const dbConnections = require(`${__dirname}/dbConnection`);
+
+
+
+try {
+    firebase.initializeApp(firebaseConfig.firebaseConfig)
+    console.log('firebase successfully initilized.');
+} catch (error) {
+    console.log(`Error while initilizing firebase as : ${error}`);
+}
 
 
 async function processSignInRequest(userInfo) {
@@ -97,9 +108,9 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 
     return new Promise((resolve, reject) => {
 
-        let query = `select user_id,first_name,last_name,email_id,mobile_no, role_name,menu_name,perm_name 
-                    from v_user
-                    where firebase_id = '${firebaseToken}';`
+            let query = `select user_id,first_name,last_name,email_id,mobile_no, role_name,menu_name,perm_name 
+                        from v_user
+                        where firebase_id = '${firebaseToken}';`
 
         let client = dbConnections.getConnection();
         try {
@@ -641,7 +652,7 @@ async function processUpdateUserRoles(userData) {
 
         if (userData.isFamilyHead) {
 
-            
+
             // let selectEmail = `select email_id from t_user;`
             // let emailResults = await client.query(selectEmail);
 
@@ -657,53 +668,78 @@ async function processUpdateUserRoles(userData) {
 
             // let findIfEmailExist = allEmails.indexOf(userData.emailId);
             // console.log("findIfEmailExist", findIfEmailExist);
-            
+
 
 
             // if (this.findIfEmailExist == -1) {
             //     console.log("EmailId does not exist");
 
-                for (let details of userData.memberDetails) {
+            for (let details of userData.memberDetails) {
 
-                 console.log("details", details);
+                console.log("details", details);
 
-                 let selectEmail = `select user_id from t_user where email_id = '${userData.emailId}';`
-                 console.log("selectEmail", selectEmail);
-                 let emailResults = await client.query(selectEmail);
+                let selectEmail = `select count(user_id) from t_user where email_id = '${details.emailId}';`
+                console.log("selectEmail", selectEmail);
+                let emailResults = await client.query(selectEmail);
 
-                 console.log("emailResults", emailResults);
+                console.log("emailResults", emailResults);
 
-                 console.log("emailResults.rows.count", emailResults.rowCount);
+                console.log("emailResults.rows.count", emailResults.rows[0].count);
 
-                 let userId;
+                if (emailResults.rows[0].count == 0) {
+                    let fbuid = "";
+                    try {
 
+                      
+                        await firebase.auth().createUserWithEmailAndPassword(details.emailId, 'User#123!').then((data) => {
+                            try {
+                                fbuid = data.user?.uid;
+                            } catch (err) {
+                                console.log('Caught an error while creating member accout in firebase as :  ' + JSON.stringify(error))
+                            }
 
-                 if(emailResults.rowCount == 0){
+                        }).catch((error) => {
+                            console.log('Caught an error while creating member accout in firebase as :  ' + JSON.stringify(error))
+                        });
+
+                    } catch (error) {
+                        console.log('Creating account firebase.... error! : ' + error);
+                    }
 
 
                     /////////////////////////////////////////    t_user    /////////////////////////////////////////////////////////////////////////////////////
+                    let NewUserId;
+                    try {
+                    console.log('Inserting records into t_user ....');
+                    console.log('New member UID' + fbuid)
                     const insertuserTbl = `INSERT INTO t_user(
-                    email_id, org_id, firebase_id)
-                    VALUES (                  
-                      '${userData.emailId}',
-                      '${userData.orgId}',
-                      '${userData.fbId}'
-                    ) returning user_id;`;
+                        email_id, org_id, firebase_id)
+                        VALUES (                    
+                          '${details.emailId}',
+                           ${userData.orgId},
+                          '${fbuid}'
+                        ) returning user_id;`;
 
-                    this.userId = result.rows[0].user_id;
-                    let result = await client.query(newUserInsStmt);
-                    this.userId = result.rows[0].user_id;
-                    console.log("userid",this.userId)
+                    let result = await client.query(insertuserTbl);
+                    NewUserId = result.rows[0].user_id;
+                    
+                } catch (error) {
+                        console.error('Error while insterting record into t_user table as  : ' + NewUserId);
+                }
 
-                    ////////////////////////////////////////////////   t_person  /////////////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////   t_person  /////////////////////////////////////////////////////////////////////////////
 
+                    console.log('Inserting records into t_person ....');
+                    console.log('New user if for member is ' + details.emailId + ' is ' + this.userId)
+
+                    try {
                     let insertPerson = `INSERT INTO t_person(
-                    user_id, title, first_name, middle_name, last_name, dob, mobile_no)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7);`
+                                        user_id, title, first_name, middle_name, last_name, dob, mobile_no)
+                                        VALUES ($1, $2, $3, $4, $5, $6, $7);`
 
                     insertPersonValues =
                         [
-                            this.userId,
+                            NewUserId,
                             details.title,
                             details.firstName,
                             details.middleName,
@@ -712,21 +748,54 @@ async function processUpdateUserRoles(userData) {
                             details.mobileNo
                         ]
 
-                    console.log(insertPersonValues);
+                    console.log('insertPersonValues :' + insertPersonValues);
                     await client.query(insertPerson, insertPersonValues);
 
+                } catch (error) {
+                    console.error('Error while insterting record into t_person table as  : ' + error);
+                }
+                     ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
+                
+                     console.log('Inserting records into t_person_relationship ....');
 
-                    ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
+                     let insertPersonRelationship = `INSERT INTO t_person_relationship(
+                        family_head_id, family_member_id, relationship, updated_by, updated_date)
+                          VALUES ($1, $2, $3, $4, $5);`
+        
+                                        insertPersonRelationshipValues = [
+                                            userData.userId,
+                                            NewUserId,
+                                            details.relationship,
+                                            userData.updatedBy,
+                                            new Date().toISOString()
+                                        ]
+        
+                                        console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+        
+                                        await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+        
+                                        console.log('New member created successfully.');
+
+                    ///this.userId = result.rows[0].user_id;
+                    //console.log("userid", this.userId)
+
+
+
+
+
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                }
+                else {
 
                     console.log("details", details);
                     let insertPersonRelationship = `INSERT INTO t_person_relationship(
-                family_head_id, family_member_id, relationship, updated_by, updated_date)
-                  VALUES ($1, $2, $3, $4, $5);`
+                        family_head_id, family_member_id, relationship, updated_by, updated_date)
+                          VALUES ($1, $2, $3, $4, $5);`
 
                     console.log("2");
 
                     insertPersonRelationshipValues = [
-                        this.userId,
+                        userData.userId,
                         1234,
                         details.relationship,
                         userData.updatedBy,
@@ -737,34 +806,11 @@ async function processUpdateUserRoles(userData) {
 
                     await client.query(insertPersonRelationship, insertPersonRelationshipValues);
 
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                 }
-                else{
 
-                            console.log("details", details);
-                            let insertPersonRelationship = `INSERT INTO t_person_relationship(
-                        family_head_id, family_member_id, relationship, updated_by, updated_date)
-                          VALUES ($1, $2, $3, $4, $5);`
-        
-                            console.log("2");
-        
-                            insertPersonRelationshipValues = [
-                                userData.userId,
-                                1234,
-                                details.relationship,
-                                userData.updatedBy,
-                                new Date().toISOString()
-                            ]
-        
-                            console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
-        
-                            await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-        
-                         
-
-                        }
 
                 }
+
+            }
 
             // }
             // else {
