@@ -13,8 +13,21 @@
             <form [formGroup]="signUpForm" class="p-2">
 
                 <div class="row form-group">
-
-                    <mat-form-field class="form-field col-md">
+                    <mat-form-field class="form-field col-2">
+                            <mat-select formControlName="title" id="title" placeholder="Title">
+                                    <mat-option value="His Grace">His Grace</mat-option>
+                                    <mat-option value="Very Rev Fr. Dr">Very Rev Fr. Dr</mat-option>
+                                    <mat-option value="Very Rev">Very Rev</mat-option>
+                                    <mat-option value="Fr">Fr</mat-option>
+                                    <mat-option value="Rev Fr. Dr">Rev Fr. Dr</mat-option>
+                                    <mat-option value="Rev Fr.">Rev Fr.</mat-option>
+                                    <mat-option value="Mr">Mr</mat-option>
+                                    <mat-option value="Ms">Ms</mat-option>
+                                    <mat-option value="Mrs">Mrs</mat-option>
+                                    <mat-option value="Dr">Dr</mat-option>
+                            </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="form-field col-md-5">
                         <input matInput formControlName="firstName" id="firstname" placeholder="First Name" maxlength="25" required>
                         <mat-error *ngIf="signUpForm.controls.firstName.touched && signUpForm.controls.firstName.invalid">
                             <span *ngIf="signUpForm.controls.firstName.errors.required">This field is mandatory.</span>
@@ -22,7 +35,7 @@
                         </mat-error>
                     </mat-form-field>
 
-                    <mat-form-field class="form-field col-md">
+                    <mat-form-field class="form-field col-md-5">
                         <input type="text" matInput formControlName="lastName" id="lastname" placeholder="Last Name" maxlength="25" required>
                         <mat-error *ngIf="signUpForm.controls.lastName.touched && signUpForm.controls.lastName.invalid">
                             <span *ngIf="signUpForm.controls.lastName.errors.required">This field is mandatory.</span>
@@ -87,6 +100,13 @@
                     </mat-form-field>
                 </div>
                 <div class="form-group row">
+                        <mat-form-field class="form-field col-md">
+                                <mat-select formControlName="memberType" id="memberType" placeholder="Member Type">
+                                        <mat-option value="member">Member</mat-option>
+                                        <mat-option value="non-member">Non-member</mat-option>
+                                        <mat-option value="guest">Guest</mat-option>
+                                </mat-select>
+                        </mat-form-field>
                         <mat-form-field class="form-field col-md" >
                                 <mat-select id="orgId" formControlName = "orgId" placeholder="Select Parish" required>
                                   <mat-option *ngFor = "let parish of parishList" [value]=parish.id>{{parish.name}} </mat-option>
@@ -99,13 +119,7 @@
                         <textarea type="text" matInput formControlName="abtyrslf" id="abtyrslf" placeholder="About Yourself"></textarea>
                     </mat-form-field>
                 </div>
-                <div class="form-group row justify-content-center">
-                        <label id="example-radio-group-label">Are you registering as Family Head? </label>
-                        <mat-radio-group  aria-label="Select an option" formControlName="isFamilyHead">
-                                <mat-radio-button class="ml-1" value="true">Yes</mat-radio-button>
-                                <mat-radio-button class="ml-1" value="false" [checked]=true>No</mat-radio-button>
-                              </mat-radio-group>
-                </div>
+              
 
                 <div class="form-group text-right">
                     <button mat-button type="submit" routerLinkActive="active" class="mbutton mr-1" (click)="cancel()">Cancel</button>

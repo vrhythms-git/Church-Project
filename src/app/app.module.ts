@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-
+import { ButtonRendererComponent } from './screens/button-renderer/button-renderer.component';
 import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
@@ -18,7 +18,6 @@ import {MatListModule} from '@angular/material/list';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatMenuModule} from '@angular/material/menu';
-import {MatRadioModule} from '@angular/material/radio';
 import { FooterComponent } from './screens/footer/footer.component';
 import { NavigationComponent } from './screens/navigation/navigation.component';
 import { HomePageComponent } from './screens/home-page/home-page.component';
@@ -32,6 +31,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment.prod';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import {MatRadioModule} from '@angular/material/radio';
 
 // Auth service
 import { AuthService } from "./services/auth.service";
@@ -64,6 +64,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
     routingComponents,
     EventsComponent,
     EventCreationComponent,
+    ButtonRendererComponent,
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],
@@ -88,7 +89,6 @@ import {MatExpansionModule} from '@angular/material/expansion';
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatRadioModule,
     Ng2TelInputModule,
     NgxFlagPickerModule ,
     FlexLayoutModule,
@@ -103,10 +103,11 @@ import {MatExpansionModule} from '@angular/material/expansion';
     MatFormFieldModule,
     MatCheckboxModule,
     Ng2SearchPipeModule,
+    MatRadioModule,
     //MatAccordion,
     //MatMenuItem,
     MatExpansionModule,
-    AgGridModule.withComponents([])  
+    AgGridModule.withComponents([ButtonRendererComponent])  
 
   ],
   providers: [AuthService],

@@ -77,5 +77,15 @@ let headerObj = new HttpHeaders({
  console.log(JSON.stringify(userData));
 return this.http.post(`${this._baseUrl}/updateUserRoles`, JSON.stringify(userData),{ headers: headerObj } );
 }
+
+getEventCategoryData():Observable<any>{
+  console.log(`calling the getEventCategory()`);
+  let headerObj = new HttpHeaders({
+                  'Authorization': localStorage.getItem('chUserToken')!,
+                  'Content-Type' : 'application/json'
+                });
+  console.log( 'Event Category data is : ' + this.http.get(`${this._baseUrl}/getEventCategory`));
+  return this.http.get(`${this._baseUrl}/getEventCategory` );   
+}
 }
 

@@ -26,6 +26,7 @@ export class SignUpComponent implements OnInit {
 
   ngOnInit(): void {
     this.signUpForm = this.formBuilder.group({
+      title : new FormControl('',Validators.required),
       firstName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -33,17 +34,14 @@ export class SignUpComponent implements OnInit {
       password: new FormControl('', [Validators.required, Validators.pattern('((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,30})')]),
       cnfmpwd: new FormControl('', Validators.required),
       mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
-      isFamilyHead :new FormControl('false'),
+      memberType : new FormControl('',Validators.required),
       orgId: new FormControl('',Validators.required),
       abtyrslf: new FormControl('')
     });
 
     this.max_date = new Date;
     this.apiService.getParishListData().subscribe(res => {
-      // console.log("User Role Data : ", res.data.metadata);
-      // for (let i=0;i<res.data.metadata.orgs[2].details.length;i++){
-      //   this.parishList[i].push(res.data.metadata.orgs[2].details[i].name) ;
-     // }
+
      for(let i=0;i<res.data.metaData.Parish.length;i++){
        this.parishList = res.data.metaData.Parish;
      }
@@ -65,6 +63,7 @@ export class SignUpComponent implements OnInit {
       }
       else {
         this.signUpForm.value.mobileNo = this.contactNo;
+        this.signUpForm.value.middleName = null;
          this.AuthService.SignUp(this.signUpForm.value).then((data)=>{
           console.log(JSON.stringify(data));
          })
