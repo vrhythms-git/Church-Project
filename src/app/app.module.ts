@@ -108,7 +108,6 @@ import {MatExpansionModule} from '@angular/material/expansion';
     //MatMenuItem,
     MatExpansionModule,
     AgGridModule.withComponents([ButtonRendererComponent])  
-
   ],
   providers: [AuthService],
   bootstrap: [AppComponent],

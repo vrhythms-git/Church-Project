@@ -1,24 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ButtonRendererComponent } from './button-renderer.component';
+import { CwcRegistrationComponent } from './cwc-registration.component';
 
-describe('ButtonRendererComponent', () => {
-  let component: ButtonRendererComponent;
-  let fixture: ComponentFixture<ButtonRendererComponent>;
+describe('CwcRegistrationComponent', () => {
+  let component: CwcRegistrationComponent;
+  let fixture: ComponentFixture<CwcRegistrationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ButtonRendererComponent ]
+      declarations: [ CwcRegistrationComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ButtonRendererComponent);
+    fixture = TestBed.createComponent(CwcRegistrationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-  
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

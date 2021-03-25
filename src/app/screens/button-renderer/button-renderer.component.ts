@@ -13,8 +13,7 @@ export class ButtonRendererComponent implements OnInit {
   params: any;
   rowData : any;
   userRecords : any;
-
-
+  
   constructor(private apiService : ApiService, private router : Router) { }
 
   agInit(params:  any) {

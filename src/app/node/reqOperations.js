@@ -25,8 +25,7 @@ async function processSignInRequest(userInfo) {
         await client.query("BEGIN");
         let userId;
         let isFamilyHead;
-        console.log("1");
-       
+        console.log("1");      
         if(userInfo.data.memberType != "member"){
             console.log("Not member");
             let newUserInsStmt = `INSERT INTO t_user(

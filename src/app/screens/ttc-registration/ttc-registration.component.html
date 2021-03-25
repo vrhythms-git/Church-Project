@@ -1,0 +1,378 @@
+
+
+
+<div class="container">
+        <mat-card style="box-shadow: 7px 7px 22px grey; ">
+            <h2 style="text-align: center; color: rgb(79, 115, 235);font-weight: bold;">TTC Registration</h2>
+        <form [formGroup]="ttcRegistrationForm" (ngSubmit)="onSubmit()">
+          <div class="form-container">
+            
+<!-- <label style="color: #0a0a0a;">Parish Name</label>-->
+
+             
+            <div class="row">
+               
+               
+            <mat-form-field class="col-md-12">
+              <input required id="TtcParishName"
+                     matInput
+                     formControlName="TtcParishName"
+                     placeholder="Enter Parish Name" />
+                   
+            </mat-form-field>
+         
+           
+            </div>
+      
+      
+    
+    
+    
+         
+            <div class="row">
+               
+                <mat-form-field class="col-md-12">
+                   
+                  <input required id="TtcParishAddress"
+                         matInput
+                         formControlName="TtcParishAddress"
+                        
+                         placeholder="Enter Parish Address" />
+                </mat-form-field>
+            </div>
+      
+    
+      
+    
+    
+    
+    
+            <div class="row">
+               
+                <mat-form-field class="col-md-12">
+                   
+                  <input required id="TtcLandmark"
+                         matInput
+                         formControlName="TtcLandmark"
+                        
+                         placeholder="Enter Your Landmark" />
+                </mat-form-field>
+            </div>
+      
+      
+    
+    
+    
+    
+    
+            <div class="row">
+                <div class="col-md-6">
+                    <!--<mat-form-field class="col-md-12">--> 
+                <mat-form-field class="col-md-12">
+        <!--
+                    <input required id="TtcCity"
+                     matInput
+                     formControlName="TtcCity"
+                     placeholder="Enter Your City" />--> 
+
+                     <mat-select required id="TtcCity" formControlName="TtcCity"  placeholder="Select Your City">
+                        <mat-option value="option1">Option 1</mat-option>
+                        <mat-option value="option2" disabled>Option 2 (disabled)</mat-option>
+                        <mat-option value="option3">Option 3</mat-option>
+                      </mat-select>
+
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                     <!--<mat-form-field class="col-md-12">-->
+                  <mat-form-field class="col-md-12" >
+                   <!--
+                    <input required id="TtcState"
+                    matInput
+                    formControlName="TtcState"
+                    placeholder="Enter Your State" />-->
+                    <mat-select required id="TtcState" formControlName="TtcState"  placeholder="Select Your State">
+                        <mat-option value="option1">Option 1</mat-option>
+                        <mat-option value="option2" disabled>Option 2 (disabled)</mat-option>
+                        <mat-option value="option3">Option 3</mat-option>
+                      </mat-select>
+                 
+                  </mat-form-field>
+                </div>
+               
+            </div>
+      
+    
+    
+    
+    
+    
+    
+    
+    
+            
+            <div class="row">
+                <div class="col-md-6">
+                     <!--<mat-form-field class="col-md-12">-->
+                <mat-form-field class="col-md-12" >
+        <!--
+                    <input required id="TtcPostalCode"
+                     matInput
+                     formControlName="TtcPostalCode"
+                     placeholder="Enter Your PostalCode" />-->
+                     <mat-select required id="TtcPostalCode" formControlName="TtcPostalCode"  placeholder="Select Your PostalCode">
+                        <mat-option value="option1">Option 1</mat-option>
+                        <mat-option value="option2" disabled>Option 2 (disabled)</mat-option>
+                        <mat-option value="option3">Option 3</mat-option>
+                      </mat-select>
+            
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                      <!--<mat-form-field class="col-md-12">-->
+                  <mat-form-field class="col-md-12">
+                    <mat-select required id="TtcCountry" formControlName="TtcCountry"  placeholder="Select Country">
+                        <mat-option value="option1">Option 1</mat-option>
+                        <mat-option value="option2" disabled>Option 2 (disabled)</mat-option>
+                        <mat-option value="option3">Option 3</mat-option>
+                      </mat-select>
+                 
+                  </mat-form-field>
+                </div>
+               
+            </div>
+    
+    
+    
+    
+            
+            <div class="row">
+               
+                
+            <mat-form-field class="col-md-12">
+              <input required id="TtcPrincipalName"
+                     matInput
+                     formControlName="TtcPrincipalName"
+                     placeholder="Enter Principal's Name" />
+                   
+            </mat-form-field>
+         
+           
+            </div>
+    
+
+
+
+
+
+    
+            <div class="row">
+               
+                
+            <mat-form-field class="col-md-12">
+              <input required id="TtcVicarName"
+                     matInput
+                     formControlName="TtcVicarName"
+                     placeholder="Enter Vicar 's Name" />
+                   
+            </mat-form-field>
+         
+           
+            </div>
+      
+    
+    
+    
+    
+    
+    
+
+ 
+            <div class="row">
+               
+                <mat-form-field class="col-md-12">
+       
+                  <input id="TtcPrincipalEmail" required
+                         matInput
+                         formControlName="TtcPrincipalEmail"                    
+                         placeholder="Enter Principal's Email ID" />
+                         <mat-error *ngIf="ttcRegistrationForm.controls.TtcPrincipalEmail.touched && ttcRegistrationForm.controls.TtcPrincipalEmail.invalid">
+                            <span *ngIf="!ttcRegistrationForm.controls.TtcPrincipalEmail.errors.pattern">Please Enter Valid Email Address</span>
+                        </mat-error>
+                </mat-form-field>
+            </div>
+    
+    
+    
+    
+    
+    
+    
+      
+
+      
+            <div class="row">
+                
+      
+                <mat-form-field class="col-md-12">
+                 <!-- <ngx-intl-tel-input [cssClass]="'custom'"
+                  
+                  [enablePlaceholder]="true"
+                  
+                  [maxLength]="15"
+                  [tooltipField]="TooltipLabel.Name"
+                  [phoneValidation]="true"
+                  (ng2TelOutput)="TTCgetNumber1($event)" ng2TelInput  
+                  (intlTelInputObject)="telInputObject($event)"
+                  id="TtcPrincipalPhoneNumber"
+                  name="TtcPrincipalPhoneNumber"
+                  formControlName="TtcPrincipalPhoneNumber">
+                </ngx-intl-tel-input>-->
+                <input required id="TtcPrincipalPhoneNumber"
+                matInput (ng2TelOutput)="TTCgetNumber1($event)" 
+                ng2TelInput  (intlTelInputObject)="telInputObject($event)"
+              
+                formControlName="TtcPrincipalPhoneNumber"
+             type="text" 
+           />
+                         <mat-error *ngIf="ttcRegistrationForm.controls.TtcPrincipalPhoneNumber.touched && ttcRegistrationForm.controls.TtcPrincipalPhoneNumber.invalid">
+                            <span *ngIf="!ttcRegistrationForm.controls.TtcPrincipalPhoneNumber.errors.pattern">Please Enter Valid 10 digit Phone Number</span>
+                           
+                        </mat-error>
+                </mat-form-field>
+      
+            </div>
+    
+    
+    
+    
+    
+
+
+       
+            <div class="row">
+               
+                
+            <mat-form-field class="col-md-12">
+              <input required id="TtcTeacherName"
+                     matInput
+                     formControlName="TtcTeacherName"
+                     placeholder="Enter Teacher's Name" />
+                   
+            </mat-form-field>
+         
+           
+            </div>
+    
+    
+    
+    
+    
+    
+
+      
+            <div class="row">
+               
+                <mat-form-field class="col-md-12">
+       
+                  <input id="TtcTeacherEmail" required
+                         matInput
+                         formControlName="TtcTeacherEmail"                    
+                         placeholder="Enter Teacher's Email ID" />
+                         <mat-error *ngIf="ttcRegistrationForm.controls.TtcTeacherEmail.touched && ttcRegistrationForm.controls.TtcTeacherEmail.invalid">
+                            <span *ngIf="!ttcRegistrationForm.controls.TtcTeacherEmail.errors.pattern">Please Enter Valid Email Address</span>
+                        </mat-error>
+                </mat-form-field>
+            </div>
+    
+    
+    
+    
+    
+    
+    
+      
+
+            <div class="row">
+               
+      
+                <mat-form-field class="col-md-12">
+                   
+                  <input required id="TtcTeacherPhoneNumber"  (intlTelInputObject)="telInputObject($event)"
+                         matInput (ng2TelOutput)="TTCgetNumber($event)" ng2TelInput
+                         formControlName="TtcTeacherPhoneNumber"
+                      type="text" 
+                      />
+                         <mat-error *ngIf="ttcRegistrationForm.controls.TtcTeacherPhoneNumber.touched && ttcRegistrationForm.controls.TtcTeacherPhoneNumber.invalid">
+                            <span *ngIf="!ttcRegistrationForm.controls.TtcTeacherPhoneNumber.errors.pattern">Please Enter Valid 10 digit Phone Number</span>
+                           
+                        </mat-error>
+                </mat-form-field>
+      
+            </div>
+    
+    
+    
+    
+    
+            <div class="row">
+               
+                <div class="col-md-6">
+                    
+                  <!--<mat-form-field class="col-md-6">-->
+                        <mat-form-field >
+                    <input matInput required [matDatepicker]="picker" [max]="max_date" id="TtcExamDate" formControlName="TtcExamDate" placeholder="mm/dd/yyyy">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error *ngIf="ttcRegistrationForm.controls.TtcExamDate.touched && ttcRegistrationForm.controls.TtcExamDate.invalid">
+                        <span *ngIf="ttcRegistrationForm.controls.TtcExamDate.errors.required">This field is mandatory.</span>
+                        <span *ngIf="ttcRegistrationForm.controls.TtcExamDate.errors.pattern">This field is invalid.</span>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+               
+            </div>
+    
+    
+    
+      
+
+
+
+
+           
+
+
+ 
+          
+           
+
+
+
+
+
+      
+      
+      
+      
+            <div class="row">
+                <div  class="col ">
+              <button style="float: right;" mat-button type="submit" [disabled]="!ttcRegistrationForm.valid" class="mat-raised-button mat-primary">Register</button>
+             
+                </div>
+            </div>
+      
+          </div>
+      
+          
+       
+      
+        </form>
+      
+       
+      
+      
+      </mat-card>
+      </div> 
+      
+      

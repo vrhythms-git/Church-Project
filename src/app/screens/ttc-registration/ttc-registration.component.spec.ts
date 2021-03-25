@@ -1,24 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ButtonRendererComponent } from './button-renderer.component';
+import { TtcRegistrationComponent } from './ttc-registration.component';
 
-describe('ButtonRendererComponent', () => {
-  let component: ButtonRendererComponent;
-  let fixture: ComponentFixture<ButtonRendererComponent>;
+describe('TtcRegistrationComponent', () => {
+  let component: TtcRegistrationComponent;
+  let fixture: ComponentFixture<TtcRegistrationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ButtonRendererComponent ]
+      declarations: [ TtcRegistrationComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ButtonRendererComponent);
+    fixture = TestBed.createComponent(TtcRegistrationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-  
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

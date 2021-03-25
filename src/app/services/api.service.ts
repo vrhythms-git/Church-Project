@@ -13,7 +13,6 @@ export class ApiService {
   }
 
   constructor(private http: HttpClient) { }
-
  // private _baseUrl = 'https://cormentis.herokuapp.com';
  private _baseUrl = 'http://localhost:8081/api';
 

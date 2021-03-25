@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service'
-import { ApiService} from '../../services/api.service';
+import { ApiService } from '../../services/api.service';
+
 
 @Component({
   selector: 'app-sign-up',
@@ -14,13 +15,12 @@ export class SignUpComponent implements OnInit {
   contactNo: any;
   max_date!: any;
   parishList!: any[];
-  // isFamilyHead : boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private AuthService : AuthService,
-    private apiService :ApiService 
+    private AuthService : AuthService ,
+    private apiService : ApiService
     ) { }
 
 
@@ -68,8 +68,8 @@ export class SignUpComponent implements OnInit {
           console.log(JSON.stringify(data));
          })
         console.log("user registered");
-        this.signUpForm.reset();
       }
+     this.signUpForm.reset();
   }
 
 

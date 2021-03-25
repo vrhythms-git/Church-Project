@@ -1,4 +1,4 @@
-h2{
+h1{
     font-family: 'poppins'!important;
     font-weight: bold;
 	letter-spacing: 0.18px;
@@ -6,11 +6,12 @@ h2{
   }
   input.mat-input-element{
 	font-family: 'poppins'!important;
+
   }
   
   .container{
     font-family: 'poppins'!important;
-    width: 100%;
+    width: 60%;
 	padding-bottom: 2%;
 	justify-content: center;
 	letter-spacing: 0.18px;
@@ -31,26 +32,7 @@ h2{
     margin-bottom: 2%;
     
   }
+
  
-  mat-form-field{
-    font-family: poppins;
-    letter-spacing: 0.18px;
-}
 
-  /* Accordin panel CSS */
-
-
-.example-headers-align .mat-expansion-panel-header-title,
-.example-headers-align .mat-expansion-panel-header-description {
-  flex-basis: 0;
-}
-
-.example-headers-align .mat-expansion-panel-header-description {
-  justify-content: space-between;
-  align-items: right;
-}
-
-.example-headers-align .mat-form-field + .mat-form-field {
-  margin-left: 8px;
-}
-
+  
