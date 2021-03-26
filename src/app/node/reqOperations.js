@@ -1086,7 +1086,6 @@ async function deleteUsers(userData) {
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
     }
-
 }
 
 module.exports = {
