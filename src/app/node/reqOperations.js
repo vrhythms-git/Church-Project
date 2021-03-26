@@ -143,7 +143,10 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 				,vu.home_phone_no, vu.baptismal_name, 
                 vu.marital_status, vu.date_of_marriage,
                  vu.about_yourself,
-				vu.role_name, vu.menu_name,
+				vu.role_name, 
+                vu.menu_name,
+                vu.url menu_url,
+                vu.icon_path menu_icon,
                  vu.perm_name, 
                  vu.user_org org_name, 
                  vu.user_org_id org_id, 
@@ -195,8 +198,18 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 
             for (let row of res.rows) {
 
-                if (menus.indexOf(row.menu_name) < 0)
-                    menus.push(row.menu_name)
+              let index = menus.findIndex((item => item.name == row.menu_name))
+                if(index == -1){
+                    let tempJson = {
+                        name: row.menu_name,
+                        url : row.menu_url,
+                        icon : row.menu_icon
+                    };
+                    menus.push(tempJson);
+                }
+
+                // if (menus.indexOf(row.menu_name) < 0)
+                //     menus.push(row.menu_name)
                 if (permissions.indexOf(row.perm_name) < 0) {
                     permissions.push(row.perm_name)
                 }
