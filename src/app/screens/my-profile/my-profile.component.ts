@@ -21,6 +21,7 @@ export class MyProfileComponent implements OnInit {
   members: any;
   hasDeletePerm:boolean = false;
   userRecords: any;
+  fbUid: any;
   alluserdata: any;
   userId: any;
   isFamilyHead: any;
@@ -59,6 +60,7 @@ export class MyProfileComponent implements OnInit {
 
     this.alluserdata = this.uiCommonUtils.getUserMetaDataJson();
     this.userId = this.alluserdata.userId;
+    this.fbUid = this.alluserdata.fbUid;
     this.isFamilyHead = this.alluserdata.isFamilyHead;
     this.orgId = this.alluserdata.orgId;
     this.memberDetailsData = this.alluserdata.memberDetails;
@@ -160,15 +162,22 @@ export class MyProfileComponent implements OnInit {
     // let dob = this.myprofileform.value.dob;
     // console.log(dob);
     this.apiService.updateUserProfile({ data: this.myprofileform.value }).subscribe(res => {
-      console.log("User Profile Updated.");
+      console.log("res", JSON.stringify(res));
+
+      // if(res.status == "success"){
+            console.log("User Profile Updated.");
+            this.uiCommonUtils.showSnackBar("Profile updated successfully!","Dismiss",4000);
+
+            //let abc =  localStorage.getItem('chUserFbUid' + "");
+            this.apiService.callGetService(`getUserMetaData?fbuid=${this.fbUid}`).subscribe((data)=>{
+            localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData));
+          });
+      //  }
     });
     console.log("FormValues:", JSON.stringify(this.myprofileform.value));
-    this.uiCommonUtils.showSnackBar("My profile is updated successfully!","Dismiss",4000);
 
     
-    // this.apiService.callGetService(`getUserMetaData?fbuid=${}`).subscribe((data)=>{
-    //   localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
-    //   this.router.navigate(['/dashboard']);
-    // });
+    
+  
   }
 }
