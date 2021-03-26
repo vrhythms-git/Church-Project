@@ -9,6 +9,7 @@ import { OvbsRegistrationComponent } from './screens/ovbs-registration/ovbs-regi
 import { AppComponent } from './app.component';
 import { EventsComponent } from './screens/events/events.component';
 import { EventCreationComponent } from './screens/event-creation/event-creation.component';
+import { MyProfileComponent } from './screens/my-profile/my-profile.component';
 
 
 const routes: Routes = [
@@ -20,7 +21,8 @@ const routes: Routes = [
   children: [
     { path: 'ovbsregistration', component: OvbsRegistrationComponent },
     { path: 'users',component:LandingPageComponent},
-    { path: 'events', component: EventsComponent}
+    { path: 'events', component: EventsComponent},
+    {path : 'myprofile', component:MyProfileComponent}
     // { path: 'testEvent',component:UserProfileComponent},
   ]
 },

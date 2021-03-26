@@ -14,6 +14,8 @@ export class MyProfileComponent implements OnInit {
   constructor(private apiService: ApiService,
     private http: HttpClient, private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils) { }
 
+    
+
   myprofileform: any;
   members: any;
   userRecords: any;

@@ -5,33 +5,35 @@
       <button mat-icon-button (click)="sidenav.toggle()">
         <mat-icon >menu</mat-icon>
       </button>
-      <h1>Application Name</h1>
+      <h1>THE MALANKARA ORTHODOX SYRIAN CHURCH</h1>
       <span class="menu-spacer"></span>
       <div >
         <!-- <a mat-button [routerLink]="'/accounts'"> Accounts </a>-->
  
         
-        <a [matMenuTriggerFor]="menu" mat-button [routerLink]="'/my-profile'"> 
-            <mat-icon>account_circle</mat-icon>  {{userMetaData.firstName}}&nbsp;{{userMetaData.lastName}} </a>
+        <button [matMenuTriggerFor]="menu" mat-button [routerLink]="'/my-profile'"> 
+            <mat-icon>account_circle</mat-icon>  {{userMetaData.firstName}}&nbsp;{{userMetaData.lastName}} </button>
         
-            <mat-menu #menu="matMenu"  xPosition="before">
-                <button mat-menu-item>
-                    <mat-icon>account_box</mat-icon>    
-                   Profile
+            <mat-menu  #menu="matMenu"  xPosition="before">
+              <div class="ProfileInfo">
+                <button (click)="onmyProfileclick()" mat-menu-item>
+                    <mat-icon>person_outline</mat-icon>    
+                  My Profile
                 </button>
                 <button mat-menu-item>
                     <mat-icon>settings</mat-icon>
                     Settings</button>
                 <button mat-menu-item>
-                    <mat-icon>exit_to_app</mat-icon>
+                    <mat-icon>power_settings_new</mat-icon>
                     Logout</button>
+                  </div>
             </mat-menu>
 
         <!-- <a mat-button [routerLink]="'/login'"> Login </a>
         <a mat-button [routerLink]="'/signup'"> Sign up </a> -->
 
-        <a mat-button [routerLink]="'/contacts'"> 
-            <mat-icon>notifications_none</mat-icon> </a>
+        <button mat-button [routerLink]="'/contacts'"> 
+            <mat-icon>notifications_none</mat-icon> </button>
 
        
       </div>
@@ -44,34 +46,25 @@
   <mat-sidenav-container>
       
     <mat-sidenav #sidenav [(opened)]="opened" mode="side">
+
       <mat-nav-list >
-  
-        <ul class="nav navbar-nav" >
-
-          
-          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'"><mat-icon>supervised_user_circle</mat-icon>{{userMetaData.menus[1]}}</a></li>
-          <!--<li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/ovbsregistration'"><mat-icon>calendar_today</mat-icon>{{userMetaData.menus[0]}}</a></li> -->
-          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/events'"><mat-icon>calendar_today</mat-icon>{{userMetaData.menus[0]}}</a></li>
-          
-          <!--
-          <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/testEvent'">Events</a></li> 
-           <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/ovbsregistration'">Registration</a></li> 
-           <li><a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'">{{userMetaData.menus[1]}}</a></li>
-        -->
-        
         <!--
-            <li *ngFor="let menu of userMetaData.menus">
-                <a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'"> {{menu}}</a>
-            </li>
-        -->
-
-        </ul>
-
-
-        
-
+          <a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'"><mat-icon>supervised_user_circle</mat-icon>{{userMetaData.menus[0]}}</a>
+         
+          <a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/events'"><mat-icon>calendar_today</mat-icon>{{userMetaData.menus[1]}}</a>
+-->
+<div>
+  <a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/users'">
+      <mat-icon>supervised_user_circle</mat-icon><span  class="ml-2"> {{userMetaData.menus[0]}}</span></a>
+         
+  <a mat-list-item routerLinkActive="active" [routerLink]="'/dashboard/events'">
+      <mat-icon>calendar_today</mat-icon><span class="ml-2"> {{userMetaData.menus[1]}}</span></a>
   
+</div>
+        
       </mat-nav-list>
+
+
     </mat-sidenav>
     <mat-sidenav-content>
       

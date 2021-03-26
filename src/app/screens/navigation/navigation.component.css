@@ -2,6 +2,8 @@ h1{
 font-family: poppins;
 }
 
+.ProfileInfo { width: 170px; }
+
 .mat-button
 {
     float: right;

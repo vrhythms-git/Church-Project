@@ -50,6 +50,8 @@ import { EventCreationComponent } from './screens/event-creation/event-creation.
 import {MatAccordion} from '@angular/material/expansion';
 import { MatMenuItem } from '@angular/material/menu';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { MyProfileComponent } from './screens/my-profile/my-profile.component';
+
 
 
 @NgModule({
@@ -65,6 +67,8 @@ import {MatExpansionModule} from '@angular/material/expansion';
     EventsComponent,
     EventCreationComponent,
     ButtonRendererComponent,
+    MyProfileComponent,
+   
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],
