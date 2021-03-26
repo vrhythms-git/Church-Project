@@ -203,6 +203,24 @@ app.get('/api/getParishData', function (req, res) {
 });
 
 
+//Endpoint to delete users
+app.post('/api/deleteUsers', function (req, res) {
+  console.log("deleteUsers called with : " + JSON.stringify(req.body));
+  try {
+    processRequest.deleteUsers(req.body.data)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getParishData as : ' + error)
+  }
+});
 
 
 // firebaseAdminUtils.varifyUserToken(req.header('Authorization')).then(idToken => {});

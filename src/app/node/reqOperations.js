@@ -26,7 +26,7 @@ async function processSignInRequest(userInfo) {
         let userId;
         let isFamilyHead;
         console.log("1");
-        if(userInfo.data.memberType != "member"){
+        if (userInfo.data.memberType != "member") {
             console.log("Not member");
             let newUserInsStmt = `INSERT INTO t_user(
                 email_id, org_id, firebase_id, is_approved)
@@ -36,14 +36,14 @@ async function processSignInRequest(userInfo) {
                      '${userInfo.data.fbId}',
                      true
               ) returning user_id;`
-              let result = await client.query(newUserInsStmt);
-              console.log("2", this.userId);
-              this.userId = result.rows[0].user_id;
-              console.log("2", this.userId);
-              this.isFamilyHead = userInfo.data.isFamilyHead;
-              console.log("3", this.isFamilyHead);
+            let result = await client.query(newUserInsStmt);
+            console.log("2", this.userId);
+            this.userId = result.rows[0].user_id;
+            console.log("2", this.userId);
+            this.isFamilyHead = userInfo.data.isFamilyHead;
+            console.log("3", this.isFamilyHead);
         }
-        else{
+        else {
             console.log("Is member");
             let newUserInsStmt = `INSERT INTO t_user(
                 email_id, org_id, firebase_id)
@@ -52,12 +52,12 @@ async function processSignInRequest(userInfo) {
                      '${userInfo.data.orgId}',
                      '${userInfo.data.fbId}'
               ) returning user_id;`
-              let result = await client.query(newUserInsStmt);
-              console.log("2", this.userId);
-              this.userId = result.rows[0].user_id;
-              console.log("2", this.userId);
-              this.isFamilyHead = userInfo.data.isFamilyHead;
-              console.log("3", this.isFamilyHead);
+            let result = await client.query(newUserInsStmt);
+            console.log("2", this.userId);
+            this.userId = result.rows[0].user_id;
+            console.log("2", this.userId);
+            this.isFamilyHead = userInfo.data.isFamilyHead;
+            console.log("3", this.isFamilyHead);
 
         }
         /****************************************** t_person******************************************************************************/
@@ -145,8 +145,9 @@ async function processGetUserMetaDataRequest(firebaseToken) {
                  vu.about_yourself,
 				vu.role_name, vu.menu_name,
                  vu.perm_name, 
-                 vu.name org_name, 
-                 vu.org_id, vu.is_family_head 
+                 vu.user_org org_name, 
+                 vu.user_org_id org_id, 
+                 vu.is_family_head 
                 from v_user vu where firebase_id = '${firebaseToken}';`
 
 
@@ -754,16 +755,16 @@ async function processUpdateUserRoles(userData) {
 
         if (userData.memberDetails != undefined || userData.memberDetails != null) {
 
-         
+
             let existingMembers = [];
 
             for (let details of userData.memberDetails) {
 
                 console.log("details", details);
 
-                
 
-           
+
+
                 let selectEmail = `select user_id usercount, family_member_id membercount 
                 from t_user
                 left outer join t_person_relationship on family_member_id = user_id
@@ -845,10 +846,10 @@ async function processUpdateUserRoles(userData) {
                         console.error('Error while insterting record into t_person table as  : ' + error);
                     }
 
-                
 
 
-                    console.log("this.NewUserId",NewUserId);
+
+                    console.log("this.NewUserId", NewUserId);
                     let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
                     select ${NewUserId}, id from t_role where name = 'Member';`
                     console.log("insertRoleMappingmember", insertRoleMappingmember);
@@ -856,7 +857,7 @@ async function processUpdateUserRoles(userData) {
 
                     ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
 
-                    
+
                     console.log('Inserting records into t_person_relationship ....');
 
 
@@ -891,33 +892,33 @@ async function processUpdateUserRoles(userData) {
                 }
                 else {
 
-                    console.log("emailResults.rows[0].membercount",emailResults.rows[0].membercount);
+                    console.log("emailResults.rows[0].membercount", emailResults.rows[0].membercount);
 
                     if (emailResults.rows[0].membercount == null) {
 
-                    console.log("details", details);
-                    let insertPersonRelationship = `INSERT INTO t_person_relationship(
+                        console.log("details", details);
+                        let insertPersonRelationship = `INSERT INTO t_person_relationship(
                         family_head_id, family_member_id, relationship, updated_by, updated_date)
                           VALUES ($1, $2, $3, $4, $5);`
 
-                    console.log("2");
+                        console.log("2");
 
-                    insertPersonRelationshipValues = [
-                        userData.userId,
-                        emailResults.rows[0].usercount,
-                        details.relationship,
-                        userData.updatedBy,
-                        new Date().toISOString()
-                    ]
+                        insertPersonRelationshipValues = [
+                            userData.userId,
+                            emailResults.rows[0].usercount,
+                            details.relationship,
+                            userData.updatedBy,
+                            new Date().toISOString()
+                        ]
 
-                    console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+                        console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
 
-                    await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-                     }
-                    else{
+                        await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+                    }
+                    else {
                         let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = 'no' where family_member_id ='${emailResults.rows[0].membercount}';`
                         await client.query(deleteRelationship);
-                     }
+                    }
 
                     existingMembers.push(emailResults.rows[0].usercount);
                 }
@@ -1049,6 +1050,44 @@ async function getParishData() {
     });
 }
 
+
+async function deleteUsers(userData) {
+
+    let client = await dbConnections.getConnection();
+  
+    try {
+      //  let usersToDelete = userData.deleteUser.join(',');
+       // let deleteFromUserTable = `UPDATE t_user SET is_deleted = 'yes' where user_id in ('${usersToDelete}');`
+       let deleteFromUserTable = `UPDATE t_user SET is_deleted = true where user_id in (${userData.deleteUser});`
+        console.log("deleteFromUserTable : " + deleteFromUserTable)
+        await client.connect();
+        await client.query(deleteFromUserTable, (err, res)=>{
+            if(err)
+            console.log('Error occured : ' + err)
+        });
+
+        let deleteFromPersonTable = `UPDATE t_person SET is_deleted = true where user_id in (${userData.deleteUser});`
+
+        await client.query(deleteFromPersonTable,  (err, res)=>{
+            if(err)
+            console.log('Error occured : ' + err)
+        });
+
+        return ({
+            data: {
+                status: 'success',
+            }
+        });
+
+    } catch (err) {
+        client.query("ROLLBACK");
+        console.error(`reqOperations.js::deleteUsers() --> error : ${JSON.stringify(err)}`);
+        console.log("Transaction ROLLBACK called");
+        return (errorHandling.handleDBError('transactionError'));
+    }
+
+}
+
 module.exports = {
     processSignInRequest,
     processGetUserMetaDataRequest,
@@ -1057,5 +1096,6 @@ module.exports = {
     getRoleMetadata,
     getEventCategory,
     getParishData,
-    insertEvents
+    insertEvents,
+    deleteUsers
 }
