@@ -149,8 +149,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
                 vu.icon_path menu_icon,
                  vu.perm_name, 
                  vu.user_org org_name, 
-                 vu.user_org_id org_id, 
-                 vu.is_family_head 
+                 vu.user_org_id org_id, vu.is_family_head 
                 from v_user vu where firebase_id = '${firebaseToken}';`
 
 
@@ -768,16 +767,16 @@ async function processUpdateUserRoles(userData) {
 
         if (userData.memberDetails != undefined || userData.memberDetails != null) {
 
-
+         
             let existingMembers = [];
 
             for (let details of userData.memberDetails) {
 
                 console.log("details", details);
 
+                
 
-
-
+           
                 let selectEmail = `select user_id usercount, family_member_id membercount 
                 from t_user
                 left outer join t_person_relationship on family_member_id = user_id
@@ -789,7 +788,6 @@ async function processUpdateUserRoles(userData) {
 
                 console.log("emailResults", emailResults);
 
-                console.log("emailResults.rows.count", emailResults.rows[0]);
 
                 if (emailResults.rowCount == 0) {
                     let fbuid = "";
@@ -859,10 +857,10 @@ async function processUpdateUserRoles(userData) {
                         console.error('Error while insterting record into t_person table as  : ' + error);
                     }
 
+                
 
 
-
-                    console.log("this.NewUserId", NewUserId);
+                    console.log("this.NewUserId",NewUserId);
                     let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
                     select ${NewUserId}, id from t_role where name = 'Member';`
                     console.log("insertRoleMappingmember", insertRoleMappingmember);
@@ -870,7 +868,7 @@ async function processUpdateUserRoles(userData) {
 
                     ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
 
-
+                    
                     console.log('Inserting records into t_person_relationship ....');
 
 
@@ -905,33 +903,36 @@ async function processUpdateUserRoles(userData) {
                 }
                 else {
 
-                    console.log("emailResults.rows[0].membercount", emailResults.rows[0].membercount);
+                    console.log("emailResults.rows[0].membercount",emailResults.rows[0].membercount);
 
                     if (emailResults.rows[0].membercount == null) {
 
-                        console.log("details", details);
-                        let insertPersonRelationship = `INSERT INTO t_person_relationship(
+                    console.log("details", details);
+                    console.log("1");
+            
+                    let insertPersonRelationship = `INSERT INTO t_person_relationship(
                         family_head_id, family_member_id, relationship, updated_by, updated_date)
                           VALUES ($1, $2, $3, $4, $5);`
 
-                        console.log("2");
+                    console.log("2");
 
-                        insertPersonRelationshipValues = [
-                            userData.userId,
-                            emailResults.rows[0].usercount,
-                            details.relationship,
-                            userData.updatedBy,
-                            new Date().toISOString()
-                        ]
+                    insertPersonRelationshipValues = [
+                        userData.userId,
+                        emailResults.rows[0].usercount,
+                        details.relationship,
+                        userData.updatedBy,
+                        new Date().toISOString()
+                    ]
 
-                        console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+                    console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
 
-                        await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-                    }
-                    else {
-                        let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = 'no' where family_member_id ='${emailResults.rows[0].membercount}';`
-                        await client.query(deleteRelationship);
-                    }
+                    await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+                     }
+                    else{
+                        let updateRelationship = `UPDATE t_person_relationship SET is_deleted = 'no' where family_member_id =${emailResults.rows[0].membercount};`
+                        console.log("updateRelationship", updateRelationship);
+                        await client.query(updateRelationship);
+                     }
 
                     existingMembers.push(emailResults.rows[0].usercount);
                 }
@@ -940,8 +941,8 @@ async function processUpdateUserRoles(userData) {
             //// Delete users which are not present in membership detail array
 
             let usersToDelete = existingMembers.join(',');
-            console.log("usersToDelete", usersToDelete);
-            let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = 'yes' where family_member_id not in ('${usersToDelete}');`
+            let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = 'yes' where family_member_id not in (${usersToDelete});`
+            console.log("deleteRelationship", deleteRelationship);
             await client.query(deleteRelationship);
 
         }
@@ -1098,7 +1099,6 @@ async function deleteUsers(userData) {
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
     }
-
 }
 
 module.exports = {
