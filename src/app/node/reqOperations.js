@@ -25,7 +25,7 @@ async function processSignInRequest(userInfo) {
         await client.query("BEGIN");
         let userId;
         let isFamilyHead;
-        console.log("1");      
+        console.log("1");
         if(userInfo.data.memberType != "member"){
             console.log("Not member");
             let newUserInsStmt = `INSERT INTO t_user(
@@ -60,11 +60,6 @@ async function processSignInRequest(userInfo) {
               console.log("3", this.isFamilyHead);
 
         }
-    
-
-
-       
-
         /****************************************** t_person******************************************************************************/
         console.log("2");
         let insertPerson = `INSERT INTO t_person(
@@ -108,7 +103,7 @@ async function processSignInRequest(userInfo) {
         console.log("Before commit");
         await client.query("COMMIT");
         console.log("After commit");
-        //client.end()
+        client.end()
 
         return ({
             data: {
@@ -151,11 +146,11 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 				vu.role_name, vu.menu_name,
                  vu.perm_name, 
                  vu.name org_name, 
-                 vu.org_id  
+                 vu.org_id, vu.is_family_head 
                 from v_user vu where firebase_id = '${firebaseToken}';`
 
 
-                console.log("3");
+        console.log("3");
         let res = await client.query(query);
 
 
@@ -195,6 +190,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
             metaData.userRole = res.rows[0].role_name;
             metaData.orgName = res.rows[0].org_name;
             metaData.orgId = res.rows[0].org_id;
+            metaData.isFamilyHead = res.rows[0].is_family_head;
 
             for (let row of res.rows) {
 
@@ -208,18 +204,21 @@ async function processGetUserMetaDataRequest(firebaseToken) {
             metaData.permissions = permissions;
             metaData.menus = menus;
 
+            console.log("metaData.userId", metaData.userId);
+
             let query1 = `select distinct vu.user_id, vu.email_id, vu.title,
                     vu.first_name, vu.middle_name, vu.last_name,
 			    	vu.dob, vu.mobile_no, tpr.relationship,
                     tpr.id relationship_id
                     from v_user vu, t_person_relationship tpr 
                     where tpr.family_head_id = '${metaData.userId}' 
+                    and tpr.is_deleted = 'no'
                     and vu.user_id = tpr.family_member_id;`
 
-            let res1 = await client.query(query);
+            let res1 = await client.query(query1);
 
-            for(row of res1.rows){
-                let member= {};
+            for (row of res1.rows) {
+                let member = {};
                 member.userId = row.user_id;
                 member.emailId = row.email_id;
                 member.title = row.title;
@@ -230,13 +229,13 @@ async function processGetUserMetaDataRequest(firebaseToken) {
                 member.mobileNo = row.mobile_no;
                 member.relationship = row.relationship;
                 member.relationshipId = row.relationship_id;
-                memberDetails.push(member);          
+                memberDetails.push(member);
             }
 
             metaData.memberDetails = memberDetails;
 
             client.end();
-            
+
             return ({
                 data: {
                     status: 'success',
@@ -258,8 +257,8 @@ async function getuserRecords() {
 
     let client = dbConnections.getConnection();
     await client.connect();
-        try {
-            let getuserRecords = `select distinct vu.user_id, vu.email_id,
+    try {
+        let getuserRecords = `select distinct vu.user_id, vu.email_id,
             vu.title, vu.first_name, vu.middle_name, vu.last_name,
                    vu.nick_name, vu.dob,
                     vu.mobile_no,
@@ -273,90 +272,90 @@ async function getuserRecords() {
                    from v_user vu order by vu.user_id;`
 
 
-            let res = await client.query(getuserRecords);
-              
-                if (res && res.rowCount > 0) {
+        let res = await client.query(getuserRecords);
 
-                    console.log("In response" + res);
-                    let user = {}
-                    let users = [];
-                    let roles = [];
-                    let userid = 0;
+        if (res && res.rowCount > 0) {
 
-                    for (let row of res.rows) {
-                        console.log("Datbase User id" + row.user_id);
-                        console.log("User id" + userid);
-                        if (userid != row.user_id && userid != 0) {
-                            console.log("In Pushing user to users" + row.user_id);
-                            user.roles = roles;
-                            users.push(user);
-                            user = {}
-                            roles = []
-                            //   userid = row.user_id;
-                        }
-                        if (userid != row.user_id) {
-                            console.log("User id In IF Condition" + row.user_id);
+            console.log("In response" + res);
+            let user = {}
+            let users = [];
+            let roles = [];
+            let userid = 0;
 
-                            user.userId = row.user_id;
-                            user.emailId = row.email_id;
-                            user.title = row.title;
-                            user.firstName = row.first_name;
-                            user.middleNmae = row.middle_name;
-                            user.lastName = row.last_name;
-                            user.nickName = row.nick_name;
-                            user.dob = row.dob;
-                            user.mobileNo = row.mobile_no;
-                            user.addressLine1 = row.address_line1;
-                            user.addressLine2 = row.address_line2;
-                            user.addressLine3 = row.address_line3;
-                            user.city = row.city;
-                            user.state = row.state;
-                            user.postalCode = row.postal_code;
-                            user.country = row.country;
-                            user.homePhoneNo = row.home_phone_no;
-                            user.baptismalNname = row.baptismal_name;
-                            user.maritalStatus = row.marital_status;
-                            user.dateofMarriage = row.date_of_marriage;
-                            user.aboutYourself = row.about_yourself;
-                            user.roleId = row.role_id;
-                            user.orgId = row.org_id;
-                            user.orgType = row.org_type;
-                            // if(userid == 0){
-                            //     userid = row.user_id;
-                            // }
-                            userid = row.user_id;
-                        }
-                        //console.log("In for" + JSON.stringify(user));
-                        let role = {}
-                        role.roleId = row.role_id;
-                        role.orgType = row.org_type;
-                        role.orgId = row.org_id;
-                        console.log("In user" + user);
-                        console.log("In role" + JSON.stringify(role));
-                        console.log("In roles" + JSON.stringify(roles));
-
-                        if (_.findWhere(roles, role) == null) {
-                            console.log("role" + JSON.stringify(role));
-                            roles.push(role);
-                        }
-
-                    }
+            for (let row of res.rows) {
+                console.log("Datbase User id" + row.user_id);
+                console.log("User id" + userid);
+                if (userid != row.user_id && userid != 0) {
+                    console.log("In Pushing user to users" + row.user_id);
                     user.roles = roles;
                     users.push(user);
-                    console.log("Before Resolve" + res);
-                    client.end();
-                    return ({
-                        data: {
-                            status: 'success',
-                            metaData: users
-                        }
-                    })
-                }         
-        } catch (error) {
+                    user = {}
+                    roles = []
+                    //   userid = row.user_id;
+                }
+                if (userid != row.user_id) {
+                    console.log("User id In IF Condition" + row.user_id);
+
+                    user.userId = row.user_id;
+                    user.emailId = row.email_id;
+                    user.title = row.title;
+                    user.firstName = row.first_name;
+                    user.middleNmae = row.middle_name;
+                    user.lastName = row.last_name;
+                    user.nickName = row.nick_name;
+                    user.dob = row.dob;
+                    user.mobileNo = row.mobile_no;
+                    user.addressLine1 = row.address_line1;
+                    user.addressLine2 = row.address_line2;
+                    user.addressLine3 = row.address_line3;
+                    user.city = row.city;
+                    user.state = row.state;
+                    user.postalCode = row.postal_code;
+                    user.country = row.country;
+                    user.homePhoneNo = row.home_phone_no;
+                    user.baptismalNname = row.baptismal_name;
+                    user.maritalStatus = row.marital_status;
+                    user.dateofMarriage = row.date_of_marriage;
+                    user.aboutYourself = row.about_yourself;
+                    user.roleId = row.role_id;
+                    user.orgId = row.org_id;
+                    user.orgType = row.org_type;
+                    // if(userid == 0){
+                    //     userid = row.user_id;
+                    // }
+                    userid = row.user_id;
+                }
+                //console.log("In for" + JSON.stringify(user));
+                let role = {}
+                role.roleId = row.role_id;
+                role.orgType = row.org_type;
+                role.orgId = row.org_id;
+                console.log("In user" + user);
+                console.log("In role" + JSON.stringify(role));
+                console.log("In roles" + JSON.stringify(roles));
+
+                if (_.findWhere(roles, role) == null) {
+                    console.log("role" + JSON.stringify(role));
+                    roles.push(role);
+                }
+
+            }
+            user.roles = roles;
+            users.push(user);
+            console.log("Before Resolve" + res);
             client.end();
-            console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
-            return(errorHandling.handleDBError('connectionError'));
+            return ({
+                data: {
+                    status: 'success',
+                    metaData: users
+                }
+            })
         }
+    } catch (error) {
+        client.end();
+        console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    }
 }
 
 async function getRoleMetadata() {
@@ -465,7 +464,7 @@ async function getEventCategory() {
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
-                
+
                 if (res) {
                     console.log("In response" + res);
                     let metadata = {};
@@ -511,7 +510,7 @@ async function getParishData() {
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
-                
+
                 if (res) {
                     console.log("In response" + res);
                     let metadata = {};
@@ -667,10 +666,6 @@ async function insertEvents(eventsData) {
 
 
 
-
-
-
-
 async function processUpdateUserRoles(userData) {
     let client = dbConnections.getConnection();
     console.log("User Data" + JSON.stringify(userData));
@@ -685,12 +680,13 @@ async function processUpdateUserRoles(userData) {
                       org_id=$3,
                       is_family_head=$4
                   WHERE user_id= $5;`;
+
         console.log("2");
 
         const updateUserTbl_values = [
             userData.updatedBy,
             new Date().toISOString(),
-            userData.roles.orgId,
+            userData.orgId,
             userData.isFamilyHead,
             userData.userId,
         ];
@@ -756,47 +752,35 @@ async function processUpdateUserRoles(userData) {
 
         console.log("6");
 
-        if (userData.isFamilyHead) {
+        if (userData.memberDetails != undefined || userData.memberDetails != null) {
 
-
-            // let selectEmail = `select email_id from t_user;`
-            // let emailResults = await client.query(selectEmail);
-
-            // let allEmails = [];
-            // for (let email of emailResults.rows) {
-            //     let emails = {};
-            //     emails = email.email_id;
-            //     allEmails.push(emails);
-            // }
-            // console.log("All emails", allEmails);
-            // console.log("Userdata emailid", userData.emailId);
-
-
-            // let findIfEmailExist = allEmails.indexOf(userData.emailId);
-            // console.log("findIfEmailExist", findIfEmailExist);
-
-
-
-            // if (this.findIfEmailExist == -1) {
-            //     console.log("EmailId does not exist");
+         
+            let existingMembers = [];
 
             for (let details of userData.memberDetails) {
 
                 console.log("details", details);
 
-                let selectEmail = `select count(user_id) from t_user where email_id = '${details.emailId}';`
+                
+
+           
+                let selectEmail = `select user_id usercount, family_member_id membercount 
+                from t_user
+                left outer join t_person_relationship on family_member_id = user_id
+                where email_id = '${details.emailId}';`
+
+
                 console.log("selectEmail", selectEmail);
                 let emailResults = await client.query(selectEmail);
 
                 console.log("emailResults", emailResults);
 
-                console.log("emailResults.rows.count", emailResults.rows[0].count);
+                console.log("emailResults.rows.count", emailResults.rows[0]);
 
-                if (emailResults.rows[0].count == 0) {
+                if (emailResults.rowCount == 0) {
                     let fbuid = "";
                     try {
 
-                      
                         await firebase.auth().createUserWithEmailAndPassword(details.emailId, 'User#123!').then((data) => {
                             try {
                                 fbuid = data.user.uid;
@@ -816,9 +800,9 @@ async function processUpdateUserRoles(userData) {
                     /////////////////////////////////////////    t_user    /////////////////////////////////////////////////////////////////////////////////////
                     let NewUserId;
                     try {
-                    console.log('Inserting records into t_user ....');
-                    console.log('New member UID' + fbuid)
-                    const insertuserTbl = `INSERT INTO t_user(
+                        console.log('Inserting records into t_user ....');
+                        console.log('New member UID' + fbuid)
+                        const insertuserTbl = `INSERT INTO t_user(
                         email_id, org_id, firebase_id)
                         VALUES (                    
                           '${details.emailId}',
@@ -826,61 +810,75 @@ async function processUpdateUserRoles(userData) {
                           '${fbuid}'
                         ) returning user_id;`;
 
-                    let result = await client.query(insertuserTbl);
-                    NewUserId = result.rows[0].user_id;
-                    
-                } catch (error) {
-                        console.error('Error while insterting record into t_user table as  : ' + NewUserId);
-                }
+                        let result = await client.query(insertuserTbl);
+                        NewUserId = result.rows[0].user_id;
 
-                ////////////////////////////////////////////////   t_person  /////////////////////////////////////////////////////////////////////////////
+                    } catch (error) {
+                        console.error('Error while insterting record into t_user table as  : ' + NewUserId);
+                    }
+
+                    ////////////////////////////////////////////////   t_person  /////////////////////////////////////////////////////////////////////////////
 
                     console.log('Inserting records into t_person ....');
-                    console.log('New user if for member is ' + details.emailId + ' is ' + this.userId)
+                    console.log('New user if for member is ' + details.emailId + ' is ' + NewUserId)
 
                     try {
-                    let insertPerson = `INSERT INTO t_person(
+                        let insertPerson = `INSERT INTO t_person(
                                         user_id, title, first_name, middle_name, last_name, dob, mobile_no)
                                         VALUES ($1, $2, $3, $4, $5, $6, $7);`
 
-                    insertPersonValues =
-                        [
-                            NewUserId,
-                            details.title,
-                            details.firstName,
-                            details.middleName,
-                            details.lastName,
-                            details.dob,
-                            details.mobileNo
-                        ]
+                        insertPersonValues =
+                            [
+                                NewUserId,
+                                details.title,
+                                details.firstName,
+                                details.middleName,
+                                details.lastName,
+                                details.dob,
+                                details.mobileNo
+                            ]
 
-                    console.log('insertPersonValues :' + insertPersonValues);
-                    await client.query(insertPerson, insertPersonValues);
+                        console.log('insertPersonValues :' + insertPersonValues);
+                        await client.query(insertPerson, insertPersonValues);
 
-                } catch (error) {
-                    console.error('Error while insterting record into t_person table as  : ' + error);
-                }
-                     ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
+                    } catch (error) {
+                        console.error('Error while insterting record into t_person table as  : ' + error);
+                    }
+
                 
-                     console.log('Inserting records into t_person_relationship ....');
 
-                     let insertPersonRelationship = `INSERT INTO t_person_relationship(
+
+                    console.log("this.NewUserId",NewUserId);
+                    let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+                    select ${NewUserId}, id from t_role where name = 'Member';`
+                    console.log("insertRoleMappingmember", insertRoleMappingmember);
+                    await client.query(insertRoleMappingmember);
+
+                    ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
+
+                    
+                    console.log('Inserting records into t_person_relationship ....');
+
+
+                    let insertPersonRelationship = `INSERT INTO t_person_relationship(
                         family_head_id, family_member_id, relationship, updated_by, updated_date)
                           VALUES ($1, $2, $3, $4, $5);`
-        
-                                        insertPersonRelationshipValues = [
-                                            userData.userId,
-                                            NewUserId,
-                                            details.relationship,
-                                            userData.updatedBy,
-                                            new Date().toISOString()
-                                        ]
-        
-                                        console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
-        
-                                        await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-        
-                                        console.log('New member created successfully.');
+
+                    insertPersonRelationshipValues = [
+                        userData.userId,
+                        NewUserId,
+                        details.relationship,
+                        userData.updatedBy,
+                        new Date().toISOString()
+                    ]
+
+                    console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+
+                    await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+
+                    console.log('New member created successfully.');
+
+                    existingMembers.push(NewUserId);
 
                     ///this.userId = result.rows[0].user_id;
                     //console.log("userid", this.userId)
@@ -893,6 +891,10 @@ async function processUpdateUserRoles(userData) {
                 }
                 else {
 
+                    console.log("emailResults.rows[0].membercount",emailResults.rows[0].membercount);
+
+                    if (emailResults.rows[0].membercount == null) {
+
                     console.log("details", details);
                     let insertPersonRelationship = `INSERT INTO t_person_relationship(
                         family_head_id, family_member_id, relationship, updated_by, updated_date)
@@ -902,7 +904,7 @@ async function processUpdateUserRoles(userData) {
 
                     insertPersonRelationshipValues = [
                         userData.userId,
-                        1234,
+                        emailResults.rows[0].usercount,
                         details.relationship,
                         userData.updatedBy,
                         new Date().toISOString()
@@ -911,56 +913,59 @@ async function processUpdateUserRoles(userData) {
                     console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
 
                     await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+                     }
+                    else{
+                        let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = 'no' where family_member_id ='${emailResults.rows[0].membercount}';`
+                        await client.query(deleteRelationship);
+                     }
 
-
+                    existingMembers.push(emailResults.rows[0].usercount);
                 }
-
             }
 
-            // }
-            // else {
-            //     console.log("EmailId Already exist");
+            //// Delete users which are not present in membership detail array
 
-            //     for (let details of userData.memberDetails) {
+            let usersToDelete = existingMembers.join(',');
+            console.log("usersToDelete", usersToDelete);
+            let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = 'yes' where family_member_id not in ('${usersToDelete}');`
+            await client.query(deleteRelationship);
 
-            //         /////////////////////////////////////////////// t_person_relationship //////////////////////////////////////////////////////////////////////////////
-
-            //         console.log("details", details);
-            //         let insertPersonRelationship = `INSERT INTO t_person_relationship(
-            //     family_head_id, family_member_id, relationship, updated_by, updated_date)   
-            //       VALUES ($1, $2, $3, $4, $5);`
-
-            //         //  family_head_id, family_member_id,
-
-            //         insertPersonRelationshipValues = [
-            //             this.userId,
-            //             1234,
-            //             userData.relationship,
-            //             userData.updatedBy,
-            //             new Date().toISOString()
-            //         ]
-
-            //         await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-            //     }
-            // }
         }
 
 
-        /**********************Delete -> t_user_role_mapping ************************* */
-        const deleteFromRoleMapping = `DELETE FROM public.t_user_role_mapping WHERE user_id='${userData.userId}';`
-        await client.query(deleteFromRoleMapping);
-
-        /**********************Delete -> t_user_role_context ************************* */
-        const deleteFromRoleContext = `DELETE FROM public.t_user_role_context WHERE user_id='${userData.userId}';`
-        client.query(deleteFromRoleContext);
-
         /**********************Insert -> t_user_role_mapping ************************* */
 
-        const insertRoleMapping = `INSERT INTO public.t_user_role_mapping(
+
+
+        console.log("10");
+
+        if (userData.roles != undefined || userData.roles != null) {
+            console.log("7");
+            /**********************Delete -> t_user_role_mapping ************************* */
+            const deleteFromRoleMapping = `DELETE FROM public.t_user_role_mapping WHERE user_id='${userData.userId}';`
+            await client.query(deleteFromRoleMapping);
+
+            console.log("8");
+            /**********************Delete -> t_user_role_context ************************* */
+            const deleteFromRoleContext = `DELETE FROM public.t_user_role_context WHERE user_id='${userData.userId}';`
+            client.query(deleteFromRoleContext);
+
+            console.log("9");
+
+
+
+            for (let role of userData.roles) {
+
+                const insertRoleMapping = `INSERT INTO public.t_user_role_mapping(
                     role_id, user_id, is_deleted)
                     VALUES ($1, $2, $3);`
 
-        const insertRoleContext = `INSERT INTO public.t_user_role_context(
+                //t_user_role_context 
+                console.log(`Inserting role ${JSON.stringify(role)} into t_user_role_mapping t_user_role_context and t_user_role_context table.`)
+                insertRoleMapping_value = [role.roleId, userData.userId, false];
+                await client.query(insertRoleMapping, insertRoleMapping_value);
+
+                const insertRoleContext = `INSERT INTO public.t_user_role_context(
                                                         role_id,
                                                         user_id,
                                                         org_id, 
@@ -971,31 +976,28 @@ async function processUpdateUserRoles(userData) {
                                                         updated_date)
                                                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`
 
-        for (let role of userData.roles) {
-            //t_user_role_context 
-            console.log(`Inserting role ${JSON.stringify(role)} into t_user_role_mapping t_user_role_context and t_user_role_context table.`)
-            insertRoleMapping_value = [role.roleId, userData.userId, false];
-            await client.query(insertRoleMapping, insertRoleMapping_value);
+                //t_user_role_context
+                console.log("RoleData");
+                insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString()]
+                console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
+                await client.query(insertRoleContext, insertRoleContext_value);
 
-
-            //t_user_role_context
-            console.log("RoleData");
-            insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString()]
-            console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
-            await client.query(insertRoleContext, insertRoleContext_value);
-
+            }
         }
+
+
+        console.log("11");
 
         console.log("Before commit");
         await client.query("COMMIT");
         console.log("After commit");
-        client.end()
+        client.end();
         return ({
             data: {
                 status: 'success'
             }
         })
-        
+
 
     } catch (err) {
         client.query("ROLLBACK");
