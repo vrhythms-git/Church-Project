@@ -917,7 +917,7 @@ async function processUpdateUserRoles(userData) {
                      }
                     else{
                         let updateRelationship = `UPDATE t_person_relationship SET is_deleted = 'no' where family_member_id =${emailResults.rows[0].membercount};`
-                        console.log("deleteRelationship", updateRelationship);
+                        console.log("updateRelationship", updateRelationship);
                         await client.query(updateRelationship);
                      }
 
