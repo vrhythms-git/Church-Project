@@ -65,7 +65,16 @@ getParishListData():Observable<any>{
   // console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
   return this.http.get(`${this._baseUrl}/getParishData` );   
 }
-
+deleteUser(userData : any){
+  console.log("Delete User Profile Called..")
+let headerObj = new HttpHeaders({
+                                    'Authorization': localStorage.getItem('chUserToken')!,
+                                    'Content-Type' : 'application/json'
+                                  });
+ console.log('headers set to ' + JSON.stringify(headerObj))
+ console.log(JSON.stringify(userData));
+return this.http.post(`${this._baseUrl}/deleteUsers`, JSON.stringify(userData),{ headers: headerObj } );
+}
 updateUserProfile(userData  : any){
 console.log("update User Profile Called..")
 let headerObj = new HttpHeaders({
