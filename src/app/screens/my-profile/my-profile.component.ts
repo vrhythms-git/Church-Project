@@ -175,9 +175,5 @@ export class MyProfileComponent implements OnInit {
       //  }
     });
     console.log("FormValues:", JSON.stringify(this.myprofileform.value));
-
-    
-    
-  
   }
 }
