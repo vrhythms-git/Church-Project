@@ -1,83 +1,81 @@
-
 <!-- Header navigation Bar -->
 <mat-toolbar style="color:white;background-color: #bd34069e">
-    <mat-toolbar-row>
-      <button mat-icon-button (click)="sidenav.toggle()">
-        <mat-icon >menu</mat-icon>
-      </button>
-      <h1>THE MALANKARA ORTHODOX SYRIAN CHURCH</h1>
-      <span class="menu-spacer"></span>
-      <div >
-        <!-- <a mat-button [routerLink]="'/accounts'"> Accounts </a>-->
- 
-        
-        <button [matMenuTriggerFor]="menu" mat-button [routerLink]="'/my-profile'"> 
-            <mat-icon>account_circle</mat-icon>  {{userMetaData.firstName}}&nbsp;{{userMetaData.lastName}} </button>
-        
-            <mat-menu  #menu="matMenu"  xPosition="before">
-              <div class="ProfileInfo">
-                <button (click)="onmyProfileclick()" mat-menu-item>
-                    <mat-icon>person_outline</mat-icon>    
-                  My Profile
-                </button>
-                <button mat-menu-item>
-                    <mat-icon>settings</mat-icon>
-                    Settings</button>
-                <button mat-menu-item>
-                    <mat-icon>power_settings_new</mat-icon>
-                    Logout</button>
-                  </div>
-            </mat-menu>
+  <mat-toolbar-row>
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <h1>THE MALANKARA ORTHODOX SYRIAN CHURCH</h1>
+    <span class="menu-spacer"></span>
+    <div>
+      <!-- <a mat-button [routerLink]="'/accounts'"> Accounts </a>-->
 
-        <!-- <a mat-button [routerLink]="'/login'"> Login </a>
+
+      <button [matMenuTriggerFor]="menu" mat-button [routerLink]="'/my-profile'">
+        <mat-icon>account_circle</mat-icon> {{userMetaData.firstName}}&nbsp;{{userMetaData.lastName}}
+      </button>
+
+      <mat-menu #menu="matMenu" xPosition="before">
+        <div class="ProfileInfo">
+          <button (click)="onmyProfileclick()" mat-menu-item>
+            <mat-icon>person_outline</mat-icon>
+            My Profile
+          </button>
+          <button mat-menu-item>
+            <mat-icon>settings</mat-icon>
+            Settings
+          </button>
+          <button mat-menu-item>
+            <mat-icon>power_settings_new</mat-icon>
+            Logout
+          </button>
+        </div>
+      </mat-menu>
+
+      <!-- <a mat-button [routerLink]="'/login'"> Login </a>
         <a mat-button [routerLink]="'/signup'"> Sign up </a> -->
 
-        <button mat-button [routerLink]="'/contacts'"> 
-            <mat-icon>notifications_none</mat-icon> </button>
-
-       
-      </div>
-    </mat-toolbar-row>
-  
-        
-  </mat-toolbar>
-
-  <!-- Side navigation bar -->
-  <mat-sidenav-container>
-      
-    <mat-sidenav #sidenav [(opened)]="opened" mode="side">
-
-      <mat-sidenav #sidenav [(opened)]="opened" mode="side">
-
-        <mat-nav-list >
-         
-        <div *ngFor="let item of userMetaData.menus;let a = index">
-        
-          <a mat-list-item routerLinkActive="active" [routerLink]="item.url">
-            <mat-icon>{{item.icon}}</mat-icon> <span class="ml-2"></span> {{item.name}}</a>
-        
-  
-        </div>
-        </mat-nav-list>
-  
-  
-      </mat-sidenav>
+      <button mat-button [routerLink]="'/contacts'">
+        <mat-icon>notifications_none</mat-icon>
+      </button>
 
 
-    </mat-sidenav>
-    <mat-sidenav-content>
-      
-        
-        <!-- <app-ovbs-registration></app-ovbs-registration> -->
-       <!-- <app-user-profile></app-user-profile>
-       -->
-       <router-outlet></router-outlet>
-    </mat-sidenav-content>
+    </div>
+  </mat-toolbar-row>
+
+
+</mat-toolbar>
+
+<!-- Side navigation bar -->
+<mat-sidenav-container>
+
+  <mat-sidenav #sidenav [(opened)]="opened" mode="side">
+
+    <mat-nav-list >
+     
+    <div *ngFor="let item of userMetaData.menus;let a = index">
     
-  </mat-sidenav-container>
+      <a mat-list-item routerLinkActive="active" [routerLink]="item.url">
+        <mat-icon>{{item.icon}}</mat-icon> <span class="ml-2"></span> {{item.name}}</a>
+    
 
-  <!-- Footer bar -->
-  <!--
+    </div>
+    </mat-nav-list>
+
+
+  </mat-sidenav>
+  <mat-sidenav-content>
+
+
+    <!-- <app-ovbs-registration></app-ovbs-registration> -->
+    <!-- <app-user-profile></app-user-profile>
+       -->
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
+
+<!-- Footer bar -->
+<!--
   <mat-toolbar>
     <mat-toolbar-row style="font-size:15px;text-align:center">
                

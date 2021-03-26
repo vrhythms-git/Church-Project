@@ -123,7 +123,7 @@ async function processSignInRequest(userInfo) {
 
 
 async function processGetUserMetaDataRequest(firebaseToken) {
-    
+
 
     let client = dbConnections.getConnection();
     await client.connect();
@@ -147,6 +147,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 				vu.role_name, 
                 vu.menu_name,
                 vu.url menu_url,
+                vu.firebase_id fbuid,
                 vu.icon_path menu_icon,
                  vu.perm_name, 
                  vu.user_org org_name, 
@@ -171,6 +172,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
             let menus = [];
 
             metaData.userId = res.rows[0].user_id;
+            metaData.fbUid = res.rows[0].fbuid;
             metaData.emailId = res.rows[0].email_id;
             metaData.title = res.rows[0].title;
             metaData.firstName = res.rows[0].first_name;
