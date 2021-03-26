@@ -123,6 +123,7 @@ async function processSignInRequest(userInfo) {
 
 
 async function processGetUserMetaDataRequest(firebaseToken) {
+    
 
     let client = dbConnections.getConnection();
     await client.connect();
