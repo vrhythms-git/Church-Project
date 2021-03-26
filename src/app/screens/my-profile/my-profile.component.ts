@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
+import { getInterpolationArgsLength } from '@angular/compiler/src/render3/view/util';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { uiCommonUtils } from 'src/app/common/uiCommonUtils';
 import { ApiService } from 'src/app/services/api.service';
 
@@ -12,12 +14,12 @@ import { ApiService } from 'src/app/services/api.service';
 export class MyProfileComponent implements OnInit {
 
   constructor(private apiService: ApiService,
-    private http: HttpClient, private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils) { }
-
-    
+    private http: HttpClient, private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils,
+    public router: Router) { }
 
   myprofileform: any;
   members: any;
+  hasDeletePerm:boolean = false;
   userRecords: any;
   alluserdata: any;
   userId: any;
@@ -32,10 +34,8 @@ export class MyProfileComponent implements OnInit {
       firstName: new FormControl('', Validators.required),
       middleName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
-
       nickName: new FormControl('', Validators.required),
       batismalName: new FormControl('', Validators.required),
-
       dob: new FormControl('', [Validators.required]),
       homePhoneNo: new FormControl('', [Validators.required]),
       mobileNo: new FormControl('', [Validators.required]),
@@ -63,6 +63,8 @@ export class MyProfileComponent implements OnInit {
     this.orgId = this.alluserdata.orgId;
     this.memberDetailsData = this.alluserdata.memberDetails;
     this.myprofileform.setControl('memberDetails', this.setMemberDetails(this.memberDetailsData));
+
+    this.hasDeletePerm = this.uiCommonUtils.hasPermissions("delete_user");
 
     // this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
     //   console.log('These are users from database : ');
@@ -141,7 +143,7 @@ export class MyProfileComponent implements OnInit {
     });
   }
 
-  onremovebtnclick(index: any) {
+  onremovebtnclick(index: any) { 
     (<FormArray>this.myprofileform.get('memberDetails').removeAt(index));
   }
 
@@ -158,10 +160,15 @@ export class MyProfileComponent implements OnInit {
     // let dob = this.myprofileform.value.dob;
     // console.log(dob);
     this.apiService.updateUserProfile({ data: this.myprofileform.value }).subscribe(res => {
-      console.log("User Profile Updated.")
+      console.log("User Profile Updated.");
     });
     console.log("FormValues:", JSON.stringify(this.myprofileform.value));
-    // }
-  }
+    this.uiCommonUtils.showSnackBar("My profile is updated successfully!","Dismiss",4000);
 
+    
+    // this.apiService.callGetService(`getUserMetaData?fbuid=${}`).subscribe((data)=>{
+    //   localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
+    //   this.router.navigate(['/dashboard']);
+    // });
+  }
 }
