@@ -1,9 +1,9 @@
 <div class="container mt-4">
-  <mat-card style="box-shadow: 7px 7px 22px grey;">
+  <mat-card class="shadow">
 <form [formGroup]="myprofileform">
   <div class="row">
 
-    <h2 class="col-md-12">My Profile</h2>
+    <h1 class="col-md-12">My Profile</h1>
   </div>
   <div class="row" style="padding-left: 1.6%;">
                          
@@ -149,19 +149,22 @@
   <div class="row">
   <mat-form-field class="col-md-12">
     <mat-label>About Yourself</mat-label>
-    <input id="aboutYourself" matInput formControlName="aboutYourself" placeholder="Enter About Yourself" />
+    <textarea id="aboutYourself" matInput formControlName="aboutYourself" placeholder="Enter About Yourself" >
+    </textarea>
 </mat-form-field>
 </div>
 
 
 <div class="row">
-  <div style="padding-left: 2%;">
-  <h3>Is family head ?</h3>
-  <mat-radio-group aria-label="Select an option">
-    <mat-radio-button value="true">Yes</mat-radio-button>&nbsp;
-    <mat-radio-button value="false">No</mat-radio-button>
-  </mat-radio-group>
-</div>
+    <div class="col-md-2">
+      <h3>Is family head ?</h3>
+    </div>
+    <div class="col-md-4" style="padding-top: 0.4%;margin-left: -4%;">
+      <mat-radio-group aria-label="Select an option">
+        <mat-radio-button value="true">Yes</mat-radio-button>&nbsp;
+        <mat-radio-button value="false">No</mat-radio-button>
+      </mat-radio-group>
+    </div>
 </div>
 
   <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
