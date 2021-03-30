@@ -1,6 +1,6 @@
 <div class="container mt-4">
   <mat-card class="shadow">
-<form [formGroup]="myprofileform">
+<form (change)="isDirty = true" [formGroup]="myprofileform">
   <div class="row">
 
     <h1 class="col-md-12">My Profile</h1>
@@ -66,13 +66,13 @@
   </div>
   <div class="row">
           <mat-form-field class="col-md-4">
-                  <mat-label>Mobile Number</mat-label>
-                  <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile Number" />
+                  <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
+                  <input id="mobileNo" matInput formControlName="mobileNo"  ng2TelInput length="10" placeholder="Enter Mobile Number" />
           </mat-form-field>
 
           <mat-form-field class="col-md-4">
-            <mat-label>Home Phone Number</mat-label>
-            <input id="homePhoneNo" matInput formControlName="homePhoneNo" placeholder="Enter Mobile Number" />
+            <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
+            <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput length="10" placeholder="Enter Home Phone Number" />
          </mat-form-field>
 
          <mat-form-field class="col-md-4">
@@ -107,7 +107,7 @@
           </mat-form-field>
 
           <mat-form-field class="col-md">
-            <mat-label>State</mat-label>
+            <mat-label>State/Province</mat-label>
             <input required id="state" matInput formControlName="state" placeholder="Enter State" />
     </mat-form-field>
   </div>
@@ -187,8 +187,8 @@
                   
 
                         <div class="row">
-                          <div class="col-md-6">
-                          <mat-form-field class="col-md-6 col text-left">
+                          <div class="col-md-4" style="margin-left: -0.2%;">
+                          <mat-form-field class="col text-left">
                             <mat-label>Relationship</mat-label>
                             <mat-select matNativeControl required id="relationship" formControlName="relationship" placeholder="Enter Relationship"> 
                               <mat-option value="husband">Husband</mat-option>
@@ -202,7 +202,7 @@
                         </div>
 
                       
-                          <div class="col-md-6">
+                          <div class="col-md-8">
                           <div *ngIf = "hasDeletePerm" class="col text-right">
                             <button (click)="onremovebtnclick(i)" mat-button >
                               <mat-icon>delete</mat-icon><span>Delete</span></button>
@@ -261,8 +261,8 @@
                         </mat-form-field>
 
                         <mat-form-field class="col-md-4">
-                          <mat-label>Mobile Number</mat-label>
-                          <input required id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" />                 
+                          <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
+                          <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" ng2TelInput length="10"/>                 
                         </mat-form-field>
 
                         <mat-form-field class="col-md-4" style="padding-right: 2%;">
@@ -270,9 +270,6 @@
                           <input required id="emailId" matInput formControlName="emailId" placeholder="Enter Email Address" />                 
                         </mat-form-field>
                       </div>
-      
-  
-                        
   
                       </div>
       
@@ -286,7 +283,7 @@
   <div class="row" style="padding-top: 1%;">
           <div class="col text-center">
 
-                  <button mat-button type="submit" mat-button class="mbutton" (click)="updateUserProfile()">
+                  <button mat-button type="submit" mat-button class="mbutton" (change)="isDirty = false" (click)="updateUserProfile()">
                           Update</button>
           </div>
   </div>
