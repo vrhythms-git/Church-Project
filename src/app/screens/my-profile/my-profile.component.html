@@ -1,9 +1,9 @@
 <div class="container mt-4">
-  <mat-card style="box-shadow: 7px 7px 22px grey;">
-<form [formGroup]="myprofileform">
+  <mat-card class="shadow">
+<form (change)="isDirty = true" [formGroup]="myprofileform">
   <div class="row">
 
-    <h2 class="col-md-12">My Profile</h2>
+    <h1 class="col-md-12">My Profile</h1>
   </div>
   <div class="row" style="padding-left: 1.6%;">
                          
@@ -66,13 +66,13 @@
   </div>
   <div class="row">
           <mat-form-field class="col-md-4">
-                  <mat-label>Mobile Number</mat-label>
-                  <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile Number" />
+                  <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
+                  <input id="mobileNo" matInput formControlName="mobileNo"  ng2TelInput length="10" placeholder="Enter Mobile Number" />
           </mat-form-field>
 
           <mat-form-field class="col-md-4">
-            <mat-label>Home Phone Number</mat-label>
-            <input id="homePhoneNo" matInput formControlName="homePhoneNo" placeholder="Enter Mobile Number" />
+            <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
+            <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput length="10" placeholder="Enter Home Phone Number" />
          </mat-form-field>
 
          <mat-form-field class="col-md-4">
@@ -107,7 +107,7 @@
           </mat-form-field>
 
           <mat-form-field class="col-md">
-            <mat-label>State</mat-label>
+            <mat-label>State/Province</mat-label>
             <input required id="state" matInput formControlName="state" placeholder="Enter State" />
     </mat-form-field>
   </div>
@@ -149,23 +149,27 @@
   <div class="row">
   <mat-form-field class="col-md-12">
     <mat-label>About Yourself</mat-label>
-    <input id="aboutYourself" matInput formControlName="aboutYourself" placeholder="Enter About Yourself" />
+    <textarea id="aboutYourself" matInput formControlName="aboutYourself" placeholder="Enter About Yourself" >
+    </textarea>
 </mat-form-field>
 </div>
 
 
 <div class="row">
-  <div style="padding-left: 2%;">
-  <h3>Is family head ?</h3>
-  <mat-radio-group aria-label="Select an option">
-    <mat-radio-button value="true">Yes</mat-radio-button>&nbsp;
-    <mat-radio-button value="false">No</mat-radio-button>
-  </mat-radio-group>
-</div>
+    <div class="col-md-2">
+      <h3>Is family head ?</h3>
+    </div>
+    <div class="col-md-4" style="padding-top: 0.4%;margin-left: -4%;">
+      <mat-radio-group aria-label="Select an option">
+        <mat-radio-button value="true">Yes</mat-radio-button>&nbsp;
+        <mat-radio-button value="false">No</mat-radio-button>
+      </mat-radio-group>
+    </div>
 </div>
 
   <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
   </mat-divider>
+  <div *ngIf = "hasAddMemPerm">
   <div class="row" style="padding-top: 1%;">
           <div class="col-md-6">
                   <h2>Family Member Assignment</h2>
@@ -178,14 +182,14 @@
           </div>
   </div>
 
-  <fieldset>
+                <fieldset>
                   <div class="row" formArrayName="memberDetails" *ngFor="let item of myprofileform.get('memberDetails')['controls']; let i = index;">
                       <div style="padding-left: 1%; width: 100%;" [formGroupName]="i">
                   
 
                         <div class="row">
-                          <div class="col-md-6">
-                          <mat-form-field class="col-md-6 col text-left">
+                          <div class="col-md-4" style="margin-left: -0.2%;">
+                          <mat-form-field class="col text-left">
                             <mat-label>Relationship</mat-label>
                             <mat-select matNativeControl required id="relationship" formControlName="relationship" placeholder="Enter Relationship"> 
                               <mat-option value="husband">Husband</mat-option>
@@ -199,8 +203,8 @@
                         </div>
 
                       
-                          <div class="col-md-6">
-                          <div *ngIf = "hasDeletePerm" class="col text-right">
+                          <div class="col-md-8">
+                          <div class="col text-right">
                             <button (click)="onremovebtnclick(i)" mat-button >
                               <mat-icon>delete</mat-icon><span>Delete</span></button>
                           </div>
@@ -258,8 +262,8 @@
                         </mat-form-field>
 
                         <mat-form-field class="col-md-4">
-                          <mat-label>Mobile Number</mat-label>
-                          <input required id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" />                 
+                          <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
+                          <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" ng2TelInput length="10"/>                 
                         </mat-form-field>
 
                         <mat-form-field class="col-md-4" style="padding-right: 2%;">
@@ -267,9 +271,6 @@
                           <input required id="emailId" matInput formControlName="emailId" placeholder="Enter Email Address" />                 
                         </mat-form-field>
                       </div>
-      
-  
-                        
   
                       </div>
       
@@ -277,13 +278,17 @@
       
               </fieldset> 
 
-  <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
-  </mat-divider>
+              <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+              </mat-divider>
+
+            </div>
+
+  
 
   <div class="row" style="padding-top: 1%;">
           <div class="col text-center">
 
-                  <button mat-button type="submit" mat-button class="mbutton" (click)="updateUserProfile()">
+                  <button mat-button type="submit" mat-button class="mbutton" (change)="isDirty = false" (click)="updateUserProfile()">
                           Update</button>
           </div>
   </div>

@@ -3,7 +3,9 @@ import { getInterpolationArgsLength } from '@angular/compiler/src/render3/view/u
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { uiCommonUtils } from 'src/app/common/uiCommonUtils';
+import { ComponentCanDeactivate } from 'src/app/component-can-deactivate';
 import { ApiService } from 'src/app/services/api.service';
 
 @Component({
@@ -11,15 +13,20 @@ import { ApiService } from 'src/app/services/api.service';
   templateUrl: './my-profile.component.html',
   styleUrls: ['./my-profile.component.css']
 })
-export class MyProfileComponent implements OnInit {
+export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
 
   constructor(private apiService: ApiService,
     private http: HttpClient, private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils,
     public router: Router) { }
 
+  canDeactivate() : boolean{
+    return !this.isDirty;
+  }
+
   myprofileform: any;
   members: any;
-  hasDeletePerm:boolean = false;
+  isDirty:boolean = false;
+  hasAddMemPerm:boolean = false;
   userRecords: any;
   fbUid: any;
   alluserdata: any;
@@ -66,7 +73,7 @@ export class MyProfileComponent implements OnInit {
     this.memberDetailsData = this.alluserdata.memberDetails;
     this.myprofileform.setControl('memberDetails', this.setMemberDetails(this.memberDetailsData));
 
-    this.hasDeletePerm = this.uiCommonUtils.hasPermissions("delete_user");
+    this.hasAddMemPerm = this.uiCommonUtils.hasPermissions("add_member");
 
     // this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
     //   console.log('These are users from database : ');
@@ -82,6 +89,7 @@ export class MyProfileComponent implements OnInit {
     });
 
 
+    
     this.myprofileform.patchValue({
       title: this.alluserdata.title,
       firstName: this.alluserdata.firstName,
