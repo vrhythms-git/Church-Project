@@ -89,6 +89,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
     });
 
 
+    
     this.myprofileform.patchValue({
       title: this.alluserdata.title,
       firstName: this.alluserdata.firstName,
