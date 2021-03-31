@@ -169,6 +169,7 @@
 
   <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
   </mat-divider>
+  <div *ngIf = "hasAddMemPerm">
   <div class="row" style="padding-top: 1%;">
           <div class="col-md-6">
                   <h2>Family Member Assignment</h2>
@@ -203,7 +204,7 @@
 
                       
                           <div class="col-md-8">
-                          <div *ngIf = "hasDeletePerm" class="col text-right">
+                          <div class="col text-right">
                             <button (click)="onremovebtnclick(i)" mat-button >
                               <mat-icon>delete</mat-icon><span>Delete</span></button>
                           </div>
@@ -277,8 +278,12 @@
       
               </fieldset> 
 
-  <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
-  </mat-divider>
+              <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+              </mat-divider>
+
+            </div>
+
+  
 
   <div class="row" style="padding-top: 1%;">
           <div class="col text-center">

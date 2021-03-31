@@ -26,7 +26,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
   myprofileform: any;
   members: any;
   isDirty:boolean = false;
-  hasDeletePerm:boolean = false;
+  hasAddMemPerm:boolean = false;
   userRecords: any;
   fbUid: any;
   alluserdata: any;
@@ -73,7 +73,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
     this.memberDetailsData = this.alluserdata.memberDetails;
     this.myprofileform.setControl('memberDetails', this.setMemberDetails(this.memberDetailsData));
 
-    this.hasDeletePerm = this.uiCommonUtils.hasPermissions("delete_user");
+    this.hasAddMemPerm = this.uiCommonUtils.hasPermissions("add_member");
 
     // this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
     //   console.log('These are users from database : ');
