@@ -1,4 +1,5 @@
 const processRequest = require(`${__dirname}/reqOperations`);
+const processUserRequest = require(`${__dirname}/userReqOperations`)
 const dbConnections = require(`${__dirname}/dbConnection`);
 express = require('express')
 const cors = require('cors')
@@ -51,11 +52,11 @@ app.post('/api/signUp', function (req, res) {
 });
 
 app.get('/api/getuserRecords', function (req, res) {
-  console.log("signUp called with : " + JSON.stringify(req.body));
+  console.log("getuserRecords called with : " + req.query.type +' loggedInUser : ' + req.query.loggedInUser );
 
   //console.log(`Header info : ${JSON.stringify(req.header('user-agent'))}`)
   try {
-    processRequest.getuserRecords()
+    processRequest.getuserRecords(req.query.type, req.query.loggedInUser)
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
@@ -222,6 +223,43 @@ app.post('/api/deleteUsers', function (req, res) {
   }
 });
 
+//Endpoint to set user is_approved status 
+app.post('/api/setUserApprovalState', function (req, res) {
+  console.log("setUserApprovalState called with : " + JSON.stringify(req.body));
+  try {
+    processUserRequest.setUserApprovalState(req.body.data)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in setUserApprovalState as : ' + error)
+  }
+});
+
+//Endpoint to set user is_approved status 
+// app.post('/api/getCountryStates', function (req, res) {
+//   console.log("getCountryStates called with : ");
+//   try {
+//     processUserRequest.getCountryStates()
+//       .then((data) => {
+//         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+//         res.send(data);
+//         res.end();
+//       }).catch((error) => {
+//         console.log(`Returning with resonse : ${error}`)
+//         res.send(error);
+//         res.end();
+//       })
+//   } catch (error) {
+//     console.error('Error in getCountryStates as : ' + error)
+//   }
+// });
 
 // firebaseAdminUtils.varifyUserToken(req.header('Authorization')).then(idToken => {});
 

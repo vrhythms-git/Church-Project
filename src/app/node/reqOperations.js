@@ -200,12 +200,12 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 
             for (let row of res.rows) {
 
-              let index = menus.findIndex((item => item.name == row.menu_name))
-                if(index == -1){
+                let index = menus.findIndex((item => item.name == row.menu_name))
+                if (index == -1) {
                     let tempJson = {
                         name: row.menu_name,
-                        url : row.menu_url,
-                        icon : row.menu_icon
+                        url: row.menu_url,
+                        icon: row.menu_icon
                     };
                     menus.push(tempJson);
                 }
@@ -225,7 +225,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
             let query1 = `select distinct vu.user_id, vu.email_id, vu.title,
                     vu.first_name, vu.middle_name, vu.last_name,
 			    	vu.dob, vu.mobile_no, tpr.relationship,
-                    tpr.id relationship_id
+                    tpr.relationship_id relationship_id
                     from v_user vu, t_person_relationship tpr 
                     where tpr.family_head_id = '${metaData.userId}' 
                     and tpr.is_deleted = 'no'
@@ -269,34 +269,73 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 }
 
 
-async function getuserRecords() {
+async function getuserRecords(userType, loggedInUser) {
 
     let client = dbConnections.getConnection();
     await client.connect();
     try {
-        let getuserRecords = `select distinct vu.user_id, vu.email_id,
-            vu.title, vu.first_name, vu.middle_name, vu.last_name,
-                   vu.nick_name, vu.dob,
-                    vu.mobile_no,
-                   vu.address_line1, vu.address_line2,
-                    vu.address_line3, vu.city, vu.state,
-                     vu.postal_code, vu.country
-                   ,vu.home_phone_no, vu.baptismal_name, 
-                   vu.marital_status, vu.date_of_marriage,
-                    vu.about_yourself,
-                   vu.role_id, vu.org_id, vu.org_type
-                   from v_user vu order by vu.user_id;`
 
+        let condition = ' ';
+
+        if (userType == 'unapproved') {
+            condition = ' vu.is_approved = false AND '
+       }
+    
+        let  getuserRecords = 
+                    `SELECT DISTINCT vu.user_id,
+                        vu.email_id,
+                        vu.title,
+                        vu.first_name,
+                        vu.middle_name,
+                        vu.last_name,
+                        vu.nick_name,
+                        vu.dob,
+                        vu.mobile_no,
+                        vu.address_line1,
+                        vu.address_line2,
+                        vu.address_line3,
+                        vu.city,
+                        vu.state,
+                        vu.postal_code,
+                        vu.country ,
+                        vu.home_phone_no,
+                        vu.baptismal_name,
+                        vu.marital_status,
+                        vu.date_of_marriage,
+                        vu.about_yourself,
+                        vu.role_id,
+                        vu.org_id,
+                        vu.org_type
+                    FROM  v_user vu
+                    WHERE ${condition} vu.user_org_id IN ( WITH recursive child_orgs 
+                                 AS (
+                                    SELECT org_id
+                                    FROM   t_organization parent_org 
+                                    WHERE  org_id IN
+                                            (
+                                                    SELECT a.org_id
+                                                    FROM   t_user_role_context a,                                                                            t_user b
+                                                    WHERE  b.user_id = ${loggedInUser}        
+                                                    AND    a.user_id = b.user_id)                                                        UNION
+                                    SELECT     child_org.org_id child_id
+                                    FROM       t_organization child_org
+                                    INNER JOIN child_orgs c
+                                    ON         c.org_id = child_org.parent_org_id ) SELECT *
+                                        FROM   child_orgs );`
+
+        console.log('Executing query : ' + getuserRecords)
 
         let res = await client.query(getuserRecords);
 
+        let user = {}
+        let users = [];
+        let roles = [];
+        let userid = 0;
+        
         if (res && res.rowCount > 0) {
 
             console.log("In response" + res);
-            let user = {}
-            let users = [];
-            let roles = [];
-            let userid = 0;
+           
 
             for (let row of res.rows) {
                 console.log("Datbase User id" + row.user_id);
@@ -366,6 +405,13 @@ async function getuserRecords() {
                     metaData: users
                 }
             })
+        }else{
+            return ({
+                data: {
+                    status: 'success',
+                    metaData: users
+                }
+            })
         }
     } catch (error) {
         client.end();
@@ -377,8 +423,8 @@ async function getuserRecords() {
 async function getRoleMetadata() {
 
     return new Promise((resolve, reject) => {
-        let getRoles = `select id, name from t_role where is_deleted = 'no' order by name;`
-        let getorgs = `select org_type, id, name, level from t_organization where is_deleted = 'no' order by level, org_type, name;`
+        let getRoles = `select role_id id, name from t_role where is_deleted = 'no' order by name;`
+        let getorgs = `select org_type, org_id id, name, level from t_organization where is_deleted = 'no' order by level, org_type, name;`
         let client = dbConnections.getConnection();
         let metadata = {};
         let roles = [];
@@ -468,7 +514,7 @@ async function getRoleMetadata() {
 async function getEventCategory() {
 
     return new Promise((resolve, reject) => {
-        let getEventCategory = `select id,name,description,school_grade_from,school_grade_to from t_event_category;`
+        let getEventCategory = `select event_category_id id, name, description ,school_grade_from,school_grade_to from t_event_category;`
         let client = dbConnections.getConnection();
 
         try {
@@ -514,7 +560,7 @@ async function getEventCategory() {
 async function getParishData() {
 
     return new Promise((resolve, reject) => {
-        let getParishData = `select id, name from t_organization where org_type = 'Parish'`
+        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
         let client = dbConnections.getConnection();
 
         try {
@@ -568,7 +614,7 @@ async function insertEvents(eventsData) {
             console.log("1");
             /********************** t_event*******************************************************************************************/
             const insertevent = `INSERT INTO public.t_event(name, event_type, description, org_id, start_date, end_date, registration_start_date, registration_end_date) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning id;`
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning event_id;`
             const insertevent_values = [
                 eventsData.name,
                 eventsData.eventType,
@@ -580,7 +626,7 @@ async function insertEvents(eventsData) {
                 eventsData.registrationEndDate,
             ];
             let result = await client.query(insertevent, insertevent_values);
-            this.eventId = result.rows[0].id;
+            this.eventId = result.rows[0].event_id;
             console.log("event id" + this.eventId);
 
 
@@ -770,16 +816,16 @@ async function processUpdateUserRoles(userData) {
 
         if (userData.memberDetails != undefined || userData.memberDetails != null) {
 
-         
+
             let existingMembers = [];
 
             for (let details of userData.memberDetails) {
 
                 console.log("details", details);
 
-                
 
-           
+
+
                 let selectEmail = `select user_id usercount, family_member_id membercount 
                 from t_user
                 left outer join t_person_relationship on family_member_id = user_id
@@ -860,18 +906,18 @@ async function processUpdateUserRoles(userData) {
                         console.error('Error while insterting record into t_person table as  : ' + error);
                     }
 
-                
 
 
-                    console.log("this.NewUserId",NewUserId);
+
+                    console.log("this.NewUserId", NewUserId);
                     let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
-                    select ${NewUserId}, id from t_role where name = 'Member';`
+                    select ${NewUserId}, role_id from t_role where name = 'Member';`
                     console.log("insertRoleMappingmember", insertRoleMappingmember);
                     await client.query(insertRoleMappingmember);
 
                     ///////////////////////////////////////////////  t_person_relationship  //////////////////////////////////////////////////////////////////////////////
 
-                    
+
                     console.log('Inserting records into t_person_relationship ....');
 
 
@@ -906,36 +952,36 @@ async function processUpdateUserRoles(userData) {
                 }
                 else {
 
-                    console.log("emailResults.rows[0].membercount",emailResults.rows[0].membercount);
+                    console.log("emailResults.rows[0].membercount", emailResults.rows[0].membercount);
 
                     if (emailResults.rows[0].membercount == null) {
 
-                    console.log("details", details);
-                    console.log("1");
-            
-                    let insertPersonRelationship = `INSERT INTO t_person_relationship(
+                        console.log("details", details);
+                        console.log("1");
+
+                        let insertPersonRelationship = `INSERT INTO t_person_relationship(
                         family_head_id, family_member_id, relationship, updated_by, updated_date)
                           VALUES ($1, $2, $3, $4, $5);`
 
-                    console.log("2");
+                        console.log("2");
 
-                    insertPersonRelationshipValues = [
-                        userData.userId,
-                        emailResults.rows[0].usercount,
-                        details.relationship,
-                        userData.updatedBy,
-                        new Date().toISOString()
-                    ]
+                        insertPersonRelationshipValues = [
+                            userData.userId,
+                            emailResults.rows[0].usercount,
+                            details.relationship,
+                            userData.updatedBy,
+                            new Date().toISOString()
+                        ]
 
-                    console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+                        console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
 
-                    await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-                     }
-                    else{
-                        let updateRelationship = `UPDATE t_person_relationship SET is_deleted = 'no' where family_member_id =${emailResults.rows[0].membercount};`
+                        await client.query(insertPersonRelationship, insertPersonRelationshipValues);
+                    }
+                    else {
+                        let updateRelationship = `UPDATE t_person_relationship SET is_deleted = false where family_member_id =${emailResults.rows[0].membercount};`
                         console.log("updateRelationship", updateRelationship);
                         await client.query(updateRelationship);
-                     }
+                    }
 
                     existingMembers.push(emailResults.rows[0].usercount);
                 }
@@ -944,7 +990,7 @@ async function processUpdateUserRoles(userData) {
             //// Delete users which are not present in membership detail array
 
             let usersToDelete = existingMembers.join(',');
-            let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = 'yes' where family_member_id not in (${usersToDelete});`
+            let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = true where family_member_id not in (${usersToDelete});`
             console.log("deleteRelationship", deleteRelationship);
             await client.query(deleteRelationship);
 
@@ -1028,7 +1074,7 @@ async function processUpdateUserRoles(userData) {
 async function getParishData() {
 
     return new Promise((resolve, reject) => {
-        let getParishData = `select id, name from t_organization where org_type = 'Parish'`
+        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
         let client = dbConnections.getConnection();
 
         try {
@@ -1071,23 +1117,23 @@ async function getParishData() {
 async function deleteUsers(userData) {
 
     let client = await dbConnections.getConnection();
-  
+
     try {
-      //  let usersToDelete = userData.deleteUser.join(',');
-       // let deleteFromUserTable = `UPDATE t_user SET is_deleted = 'yes' where user_id in ('${usersToDelete}');`
-       let deleteFromUserTable = `UPDATE t_user SET is_deleted = true where user_id in (${userData.deleteUser});`
+        //  let usersToDelete = userData.deleteUser.join(',');
+        // let deleteFromUserTable = `UPDATE t_user SET is_deleted = 'yes' where user_id in ('${usersToDelete}');`
+        let deleteFromUserTable = `UPDATE t_user SET is_deleted = true where user_id in (${userData.deleteUser});`
         console.log("deleteFromUserTable : " + deleteFromUserTable)
         await client.connect();
-        await client.query(deleteFromUserTable, (err, res)=>{
-            if(err)
-            console.log('Error occured : ' + err)
+        await client.query(deleteFromUserTable, (err, res) => {
+            if (err)
+                console.log('Error occured : ' + err)
         });
 
         let deleteFromPersonTable = `UPDATE t_person SET is_deleted = true where user_id in (${userData.deleteUser});`
 
-        await client.query(deleteFromPersonTable,  (err, res)=>{
-            if(err)
-            console.log('Error occured : ' + err)
+        await client.query(deleteFromPersonTable, (err, res) => {
+            if (err)
+                console.log('Error occured : ' + err)
         });
 
         return ({
