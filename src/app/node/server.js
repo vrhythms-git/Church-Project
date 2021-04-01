@@ -1,5 +1,6 @@
 const processRequest = require(`${__dirname}/reqOperations`);
 const processUserRequest = require(`${__dirname}/userReqOperations`)
+const processMiscRequest = require(`${__dirname}/miscReqOperations`)
 const dbConnections = require(`${__dirname}/dbConnection`);
 express = require('express')
 const cors = require('cors')
@@ -227,7 +228,7 @@ app.post('/api/deleteUsers', function (req, res) {
 app.post('/api/setUserApprovalState', function (req, res) {
   console.log("setUserApprovalState called with : " + JSON.stringify(req.body));
   try {
-    processUserRequest.setUserApprovalState(req.body.data)
+   processUserRequest.setUserApprovalState(req.body.data)
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
@@ -243,23 +244,23 @@ app.post('/api/setUserApprovalState', function (req, res) {
 });
 
 //Endpoint to set user is_approved status 
-// app.post('/api/getCountryStates', function (req, res) {
-//   console.log("getCountryStates called with : ");
-//   try {
-//     processUserRequest.getCountryStates()
-//       .then((data) => {
-//         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
-//         res.send(data);
-//         res.end();
-//       }).catch((error) => {
-//         console.log(`Returning with resonse : ${error}`)
-//         res.send(error);
-//         res.end();
-//       })
-//   } catch (error) {
-//     console.error('Error in getCountryStates as : ' + error)
-//   }
-// });
+app.get('/api/getCountryStates', function (req, res) {
+  console.log("getCountryStates called with : ");
+  try {
+    processMiscRequest.getCountryStates()
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getCountryStates as : ' + error)
+  }
+});
 
 // firebaseAdminUtils.varifyUserToken(req.header('Authorization')).then(idToken => {});
 
