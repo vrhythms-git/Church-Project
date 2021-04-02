@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Component, ElementRef, Inject, OnInit, ViewChild  } from '@angular/core';
 // import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+// import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarConfig, MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 
 @Injectable({
     providedIn: 'root'
@@ -11,10 +12,23 @@ export class uiCommonUtils {
         private snackBar: MatSnackBar
     ) { }
 
-    showSnackBar(message: string, action: string, duration: number) {
-        this.snackBar.open(message, action, {
+    showSnackBar(message: string, type: string, duration: number) {
+        // this.snackBar.open(message, action, {
+        //     duration: duration,
+        // });
+
+        let config = {
+            message  :  message,
+            type :  type
+        }
+        let styleClass = type == 'success'? 'successSnackBarStyle' : 'errorSnackBarStyle';
+        this.snackBar.openFromComponent(customSnackBar, {
             duration: duration,
-        });
+            data: config,
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            panelClass: [styleClass]
+          });
     }
 
     hasPermissions(permission: string): boolean {
@@ -38,3 +52,14 @@ export class uiCommonUtils {
 
     }
 }
+
+@Component({
+    selector: 'custom-snackbar.component',
+    templateUrl: 'custom-snackbar.component.html',
+    styles: [],
+  })
+  export class customSnackBar {
+    constructor(
+      public snackBarRef: MatSnackBarRef<customSnackBar>,
+      @Inject(MAT_SNACK_BAR_DATA) public data: any) { }
+  }

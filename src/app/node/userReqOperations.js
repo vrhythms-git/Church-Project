@@ -40,9 +40,7 @@ async function setUserApprovalState(userData) {
                                 flag = false;
                                 let putRowInParisgTbl = `INSERT INTO PUBLIC.t_user_parish
                             (
-                             user_parish_id,
                              user_id,
-                             org_id,
                              membership_no,
                              membership_type,
                              membership_effective_date,
@@ -50,9 +48,9 @@ async function setUserApprovalState(userData) {
                              created_date,
                              updated_by,
                              updated_date)
-                         VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`
+                         VALUES ( $1, $2, $3, $4, $5, $6, $7, $8);`
 
-                                let putRowInParisgTblValues = [userData.userId, userData.perishId, 0, randomMemId, 'Guest', new Date().toISOString(), userData.LoggedInuserId, new Date().toISOString(), userData.LoggedInuserId, new Date().toISOString()]
+                                let putRowInParisgTblValues = [userData.userId,  randomMemId, 'Guest', new Date().toISOString(), userData.LoggedInuserId, new Date().toISOString(), userData.LoggedInuserId, new Date().toISOString()]
 
                                 client.query(putRowInParisgTbl, putRowInParisgTblValues, (err, res) => {
                                     if (err) {
@@ -71,9 +69,6 @@ async function setUserApprovalState(userData) {
                     if (flag == true)
                         break;
                 }
-
-
-
 
                 let operationTblQuery = `INSERT INTO public.t_user_operation_log
     (user_id, operation_type, performed_by, performed_date) VALUES($1, $2, $3 ,$4);`;
@@ -102,7 +97,7 @@ async function setUserApprovalState(userData) {
 
         } else if (userData.isApproved == false) {
 
-            let upUserTbl = `UPDATE t_user SET is_approved = false where user_id = ${userData.userId} ;`
+            let upUserTbl = `UPDATE t_user SET is_approved = false, is_deleted = true where user_id = ${userData.userId} ;`
 
             await client.query(upUserTbl, (err, res) => {
                 if (err) {
@@ -110,6 +105,7 @@ async function setUserApprovalState(userData) {
                     return (errorHandling.handleDBError('queryExecutionError'));
                 }
                 else console.log(upUserTbl + ' Executed successfully.');
+                //client.end();
             });
 
 
@@ -124,9 +120,10 @@ async function setUserApprovalState(userData) {
                     return (errorHandling.handleDBError('queryExecutionError'));
                 }
                 else console.log(operationTblQuery + ' Executed successfully.');
+               // client.end();
             });
             
-            client.end();
+           
             return {
                 data: {
                     status: 'success'

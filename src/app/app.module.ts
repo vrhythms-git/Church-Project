@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ButtonRendererComponent } from './screens/button-renderer/button-renderer.component';
 import { AppRoutingModule,routingComponents } from './app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { SignUpComponent } from './screens/sign-up/sign-up.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -51,13 +51,15 @@ import {MatAccordion} from '@angular/material/expansion';
 import { MatMenuItem } from '@angular/material/menu';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { MyProfileComponent } from './screens/my-profile/my-profile.component';
+import { LoaderInterceptor } from './app.LoaderInterceptor';
+import { NgxSpinnerModule } from "ngx-spinner";
+import {customSnackBar} from './common/uiCommonUtils'
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    SignUpComponent,
     SignInComponent,
     FooterComponent,
     NavigationComponent,
@@ -68,7 +70,7 @@ import { MyProfileComponent } from './screens/my-profile/my-profile.component';
     EventCreationComponent,
     ButtonRendererComponent,
     MyProfileComponent,
-   
+    customSnackBar
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],
@@ -111,9 +113,10 @@ import { MyProfileComponent } from './screens/my-profile/my-profile.component';
     //MatAccordion,
     //MatMenuItem,
     MatExpansionModule,
-    AgGridModule.withComponents([ButtonRendererComponent])  
+    AgGridModule.withComponents([ButtonRendererComponent]),
+    NgxSpinnerModule
   ],
-  providers: [AuthService],
+  providers: [AuthService,  { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },],
   bootstrap: [AppComponent],
   schemas:[CUSTOM_ELEMENTS_SCHEMA ]
 })

@@ -1,40 +1,68 @@
 /* You can add global styles to this file, and also import other style files */
+
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-alpine.css";
-
-html, body { height: 100%; }
-body { margin: 0; font-family: poppins!important;}
-
-@font-face {
-    font-family: poppins;
-    src: url(assets/Poppins/Poppins-Regular.ttf);
-  }
-
-  .mbutton{
-    background-color: #b130059e;
-    border:none;
-  }
-  .mbutton:hover{
-    background-color: #a82b029e;
-    border:none;
-
-  }
-  .mbutton:focus{
-    background-color: #a82b029e;
-    border:none;
-  }
-.box-shadow{
-  box-shadow: 2px 2px 10px rgb(191 191 191 / 75%);
+html, body {
+  height: 100%;
 }
-.container-fluid{
-  height:100%;
-}
-.ag-theme-alpine{
+
+body {
+  margin: 0;
   font-family: poppins!important;
 }
-.ag-theme-alpine .ag-root-wrapper{
-  border-radius: 8px; 
-}
-.mat-button{
+
+@font-face {
   font-family: poppins;
+  src: url(assets/Poppins/Poppins-Regular.ttf);
+}
+
+.mbutton {
+  background-color: #b130059e;
+  border: none;
+}
+
+.mbutton:hover {
+  background-color: #a82b029e;
+  border: none;
+}
+
+.mbutton:focus {
+  background-color: #a82b029e;
+  border: none;
+}
+
+.box-shadow {
+  box-shadow: 2px 2px 10px rgb(191 191 191 / 75%);
+}
+
+.container-fluid {
+  height: 100%;
+}
+
+.ag-theme-alpine {
+  font-family: poppins!important;
+}
+
+.ag-theme-alpine .ag-root-wrapper {
+  border-radius: 8px;
+}
+
+.mat-button {
+  font-family: poppins;
+}
+
+.successSnackBarStyle {
+  background-color: #ffffff!important;
+  color: black!important;
+  font-family: 'poppins'!important;
+  border: 1px solid #2ad66c !important;
+  max-width: inherit!important;
+}
+
+.errorSnackBarStyle {
+  background-color: #ffffff!important;
+  color: black!important;
+  font-family: 'poppins'!important;
+  border: 1px solid #e44444 !important;
+  max-width: inherit!important;
 }

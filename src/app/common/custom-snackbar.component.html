@@ -1,0 +1,22 @@
+<div class=" container col-md-12 col-sm-12 row d-flex" style="padding: 10px;line-height: normal;align-items: center;">
+  <span class="col-md-1" style="align-self: center;">
+    <mat-icon *ngIf="data.type == 'error'" style="color:#e44444;object-fit: contain;padding-top: 5px;font-size: 2.8vw;">error
+    </mat-icon>
+    <mat-icon *ngIf="data.type == 'success'" style="color:#2ad66c;object-fit: contain;padding-top: 5px;font-size: 2.8vw;">check_circle
+    </mat-icon>
+  </span>
+  <span class="col-md-10">
+    <span style="font-family: 'poppins';font-size: 1.19vw;letter-spacing: 0.18px;padding-left: 15px;">
+      {{data.message}}
+    </span>
+  </span>
+  <span class="col-md-1" style="margin: 0px;padding: 0px;align-self: center;">
+    <button *ngIf="data.type == 'error'"
+      style=" border: unset; background-color: transparent;color: #e44444;font-size: 1.19vw;font-family: 'poppins';"
+      (click)="snackBarRef.dismiss()">Dismiss</button>
+
+      <button *ngIf="data.type == 'success'"
+      style=" border: unset; background-color: transparent;color: #2ad66c;font-size: 1.19vw;font-family: 'poppins';"
+      (click)="snackBarRef.dismiss()">Dismiss</button>
+  </span>
+</div>

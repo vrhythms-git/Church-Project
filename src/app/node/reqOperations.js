@@ -23,82 +23,115 @@ async function processSignInRequest(userInfo) {
     try {
         await client.connect();
         await client.query("BEGIN");
-        let userId;
-        let isFamilyHead;
-        console.log("1");
-        if (userInfo.data.memberType != "member") {
-            console.log("Not member");
-            let newUserInsStmt = `INSERT INTO t_user(
-                email_id, org_id, firebase_id, is_approved)
-              VALUES (          
-                     '${userInfo.data.email}',
-                     '${userInfo.data.orgId}',
-                     '${userInfo.data.fbId}',
-                     true
-              ) returning user_id;`
-            let result = await client.query(newUserInsStmt);
-            console.log("2", this.userId);
-            this.userId = result.rows[0].user_id;
-            console.log("2", this.userId);
-            this.isFamilyHead = userInfo.data.isFamilyHead;
-            console.log("3", this.isFamilyHead);
-        }
-        else {
-            console.log("Is member");
-            let newUserInsStmt = `INSERT INTO t_user(
-                email_id, org_id, firebase_id)
-              VALUES (          
-                     '${userInfo.data.email}',
-                     '${userInfo.data.orgId}',
-                     '${userInfo.data.fbId}'
-              ) returning user_id;`
-            let result = await client.query(newUserInsStmt);
-            console.log("2", this.userId);
-            this.userId = result.rows[0].user_id;
-            console.log("2", this.userId);
-            this.isFamilyHead = userInfo.data.isFamilyHead;
-            console.log("3", this.isFamilyHead);
 
-        }
+        // if (userInfo.data.memberType != "member") {
+        //     console.log("Not member");
+        // let newUserInsStmt = `INSERT INTO t_user(
+        //     email_id, org_id, firebase_id, is_approved)
+        //   VALUES (          
+        //          '${userInfo.data.email}',
+        //          '${userInfo.data.orgId}',
+        //          '${userInfo.data.fbId}',
+        //          true
+        //   ) returning user_id;`
+
+        let newUserInsStmt = `INSERT INTO public.t_user
+            (email_id, org_id, firebase_id, title, first_name, middle_name, last_name, about_yourself, created_date, member_type )
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning user_id;`;
+
+        let newUserInsStmtValue = [
+            userInfo.data.email,
+            userInfo.data.orgId,
+            userInfo.data.fbId,
+            userInfo.data.title,
+            userInfo.data.firstName,
+            userInfo.data.middleName,
+            userInfo.data.lastName,
+            userInfo.data.abtyrslf,
+            new Date().toISOString(),
+            userInfo.data.memberType
+        ];
+
+        let result = await client.query(newUserInsStmt, newUserInsStmtValue);
+        //  console.log("2", this.userId);
+        let newUserId = result.rows[0].user_id;
+        console.log('Newly created user\'s id is : ' + newUserId);
+        // this.isFamilyHead = userInfo.data.isFamilyHead;
+        // console.log("3", this.isFamilyHead);
+
+
+        let newPersonTblInsQuery = `INSERT INTO public.t_person
+            (user_id, dob,  mobile_no, created_by, created_date, membership_type)
+            VALUES($1 , $2, $3, $4, $5, $6);`;
+
+        let newPersonTblInsQueryValue = [
+            newUserId,
+            userInfo.data.dob,
+            userInfo.data.mobileNo,
+            newUserId,
+            new Date().toISOString(),
+            userInfo.data.memberType
+        ];
+
+        await client.query(newPersonTblInsQuery, newPersonTblInsQueryValue);
+
+        // }
+        // else {
+        //     console.log("Is member");
+        //     let newUserInsStmt = `INSERT INTO t_user(
+        //         email_id, org_id, firebase_id)
+        //       VALUES (          
+        //              '${userInfo.data.email}',
+        //              '${userInfo.data.orgId}',
+        //              '${userInfo.data.fbId}'
+        //       ) returning user_id;`
+        //     let result = await client.query(newUserInsStmt);
+        //     console.log("2", this.userId);
+        //     this.userId = result.rows[0].user_id;
+        //     console.log("2", this.userId);
+        //     this.isFamilyHead = userInfo.data.isFamilyHead;
+        //     console.log("3", this.isFamilyHead);
+
+        // }
         /****************************************** t_person******************************************************************************/
-        console.log("2");
-        let insertPerson = `INSERT INTO t_person(
-                user_id, title, first_name, middle_name, last_name, mobile_no)
-              VALUES ($1, $2, $3, $4, $5, $6);`
+        // console.log("2");
+        // let insertPerson = `INSERT INTO t_person(
+        //         user_id, title, first_name, middle_name, last_name, mobile_no)
+        //       VALUES ($1, $2, $3, $4, $5, $6);`
 
-        console.log("2", this.userId);
-        insertPersonValues =
-            [
-                this.userId,
-                userInfo.data.title,
-                userInfo.data.firstName,
-                userInfo.data.middleName,
-                userInfo.data.lastName,
-                userInfo.data.mobileNo
-            ]
+        // console.log("2", this.userId);
+        // insertPersonValues =
+        //     [
+        //         this.userId,
+        //         userInfo.data.title,
+        //         userInfo.data.firstName,
+        //         userInfo.data.middleName,
+        //         userInfo.data.lastName,
+        //         userInfo.data.mobileNo
+        //     ]
 
-        console.log(insertPersonValues);
-        console.log("4");
+        // console.log(insertPersonValues);
+        // console.log("4");
 
-        await client.query(insertPerson, insertPersonValues);
+        // await client.query(insertPerson, insertPersonValues);
 
         /**********************************************t_user_role_mapping*********************************************************************************** */
 
-        console.log("3");
-        console.log("isfamily head ", this.isFamilyHead);
-        if (this.isFamilyHead) {
-            console.log("6");
-            console.log("this.userId", this.userId);
-            let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
-                select ${this.userId}, id from t_role where name = 'Family Head';`
-            await client.query(insertRoleMapping);
-        }
-        if (!this.isFamilyHead) {
-            console.log("7");
-            let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
-                select ${this.userId}, id from t_role where name = 'Member';`
-            await client.query(insertRoleMappingmember);
-        }
+        // console.log("3");
+        // console.log("isfamily head ", this.isFamilyHead);
+        // if (this.isFamilyHead) {
+        //     console.log("6");
+        //     console.log("this.userId", this.userId);
+        //     let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
+        //         select ${this.userId}, id from t_role where name = 'Family Head';`
+        //     await client.query(insertRoleMapping);
+        // }
+        // if (!this.isFamilyHead) {
+        //     console.log("7");
+        //     let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+        //         select ${this.userId}, id from t_role where name = 'Member';`
+        //     await client.query(insertRoleMappingmember);
+        // }
 
         console.log("Before commit");
         await client.query("COMMIT");
@@ -127,13 +160,39 @@ async function processGetUserMetaDataRequest(firebaseToken) {
 
     let client = dbConnections.getConnection();
     await client.connect();
-    console.log("1");
+
+    //Validate user, if not valid then respond him back with appropriate request
+    try {   
+        //console.log('Validating user approval and his deleted status.')
+        const userValidationQuery = `SELECT  CASE WHEN tu.is_approved = false THEN false
+                                            WHEN tu.is_approved = true THEN true
+                                            ELSE false
+                                    end as is_approved,
+                                    
+                                    CASE WHEN tu.is_deleted = false THEN false
+                                            WHEN tu.is_deleted = true THEN true
+                                            ELSE false
+                                    end as is_deleted
+                                    FROM t_user tu where firebase_id = '${firebaseToken}' ;`;
+                       
+        let result = await client.query(userValidationQuery);
+        console.log(`for user ${firebaseToken} is_approved : ${result.rows[0].is_approved} and is_deleted : ${result.rows[0].is_deleted}` )     
+        if (result.rows[0].is_approved == false)
+            return errorHandling.handleDBError('not_approved')
+        if (result.rows[0].is_deleted == true)
+            return errorHandling.handleDBError('account_deleted')
+
+    } catch (error) {
+        console.error('reqOperations::processGetUserMetaDataRequest() ---> error occured : ' + error)
+        return errorHandling.handleDBError('connectionError')
+    }
+
+
     try {
         // let query = `select user_id,first_name,last_name,email_id,mobile_no, role_name,menu_name,perm_name 
         //             from v_user
         //             where firebase_id = '${firebaseToken}';`
 
-        console.log("2");
         let query = `select distinct vu.user_id, vu.email_id,
          vu.title, vu.first_name, vu.middle_name, vu.last_name,
 				vu.nick_name, vu.dob,
@@ -155,7 +214,6 @@ async function processGetUserMetaDataRequest(firebaseToken) {
                 from v_user vu where firebase_id = '${firebaseToken}';`
 
 
-        console.log("3");
         let res = await client.query(query);
 
 
@@ -279,10 +337,10 @@ async function getuserRecords(userType, loggedInUser) {
 
         if (userType == 'unapproved') {
             condition = ' vu.is_approved = false AND '
-       }
-    
-        let  getuserRecords = 
-                    `SELECT DISTINCT vu.user_id,
+        }
+
+        let getuserRecords =
+            `SELECT DISTINCT vu.user_id,
                         vu.email_id,
                         vu.title,
                         vu.first_name,
@@ -331,11 +389,11 @@ async function getuserRecords(userType, loggedInUser) {
         let users = [];
         let roles = [];
         let userid = 0;
-        
+
         if (res && res.rowCount > 0) {
 
             console.log("In response" + res);
-           
+
 
             for (let row of res.rows) {
                 console.log("Datbase User id" + row.user_id);
@@ -405,7 +463,7 @@ async function getuserRecords(userType, loggedInUser) {
                     metaData: users
                 }
             })
-        }else{
+        } else {
             return ({
                 data: {
                     status: 'success',
@@ -419,6 +477,7 @@ async function getuserRecords(userType, loggedInUser) {
         return (errorHandling.handleDBError('connectionError'));
     }
 }
+
 
 async function getRoleMetadata() {
 
@@ -730,63 +789,81 @@ async function insertEvents(eventsData) {
 
 async function processUpdateUserRoles(userData) {
     let client = dbConnections.getConnection();
-    console.log("User Data" + JSON.stringify(userData));
+    //  console.log("User Data" + JSON.stringify(userData));
     try {
         await client.connect();
         await client.query("BEGIN");
-        console.log("1");
-        /********************** t_user************************* */
-        const updateUserTbl = `UPDATE t_user SET
-                      updated_by=$1,
-                      updated_date=$2, 
-                      org_id=$3,
-                      is_family_head=$4
-                  WHERE user_id= $5;`;
+        // console.log("1");
 
-        console.log("2");
+
+        if (userData.isFamilyHead == true) {
+
+            let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
+                select ${userData.userId}, role_id from t_role where name = 'Family Head';`
+            await client.query(insertRoleMapping)
+            console.log('User is family head gave him add member permission');
+        }
+        if (userData.isFamilyHead == false) {
+
+            let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+                select ${userData.userId}, role_id from t_role where name = 'Member';`
+
+            await client.query(insertRoleMappingmember)
+        }
+
+        /********************** t_user************************* */
+
+        const updateUserTbl = `UPDATE public.t_user
+                SET  org_id=$1,
+                     title=$2, 
+                     first_name=$3, 
+                     middle_name=$4,
+                     last_name=$5,
+                     about_yourself=$6,
+                     is_family_head=$7,
+                     updated_by=$8, 
+                     updated_date=$9
+                WHERE user_id=$10;`;
 
         const updateUserTbl_values = [
-            userData.updatedBy,
-            new Date().toISOString(),
             userData.orgId,
-            userData.isFamilyHead,
-            userData.userId,
-        ];
-        console.log(updateUserTbl_values);
-        await client.query(updateUserTbl, updateUserTbl_values);
-
-        console.log("3");
-        /*************************** t_person********************************************* */
-        const updatePersonTbl = `UPDATE t_person SET
-                title=$1,
-                first_name=$2, 
-                middle_name=$3,
-                last_name=$4,
-                nick_name=$5,
-                dob=$6,
-                address_line1=$7,
-                address_line2=$8,
-                address_line3=$9,
-                city=$10,
-                state=$11,
-                postal_code=$12,
-                country=$13,
-                mobile_no=$14,
-                home_phone_no=$15,
-                baptismal_name=$16,
-                marital_status=$17,
-                date_of_marriage=$18,
-                about_yourself=$19,
-                updated_by=$20,
-                updated_date=$21
-            WHERE user_id= $22;`;
-
-        console.log("4");
-        const updatePersonTblValues = [
             userData.title,
             userData.firstName,
             userData.middleName,
             userData.lastName,
+            userData.aboutYourself,
+            userData.isFamilyHead,
+            userData.updatedBy,
+            new Date().toISOString(),
+            userData.userId
+        ];
+
+        //console.log(updateUserTbl_values);
+        await client.query(updateUserTbl, updateUserTbl_values)
+
+        // console.log("3");
+        /*************************** t_person********************************************* */
+
+        const updatePersonTbl = `UPDATE PUBLIC.t_person
+                        SET     nick_name = $1,
+                                dob = $2,
+                                address_line1 = $3,
+                                address_line2 = $4,
+                                address_line3 = $5,
+                                city = $6,
+                                state = $7,
+                                postal_code = $8,
+                                country = $9,
+                                mobile_no = $10,
+                                home_phone_no = $11,
+                                updated_by = $12,
+                                updated_date = $13,
+                                baptismal_name = $14,
+                                marital_status = $15,
+                                date_of_marriage = $16
+                        WHERE   user_id = $17; `
+
+        const updatePersonTblValues = [
             userData.nickName,
             userData.dob,
             userData.addressLine1,
@@ -798,33 +875,22 @@ async function processUpdateUserRoles(userData) {
             userData.country,
             userData.mobileNo,
             userData.homePhoneNo,
+            userData.updatedBy,
+            new Date().toISOString(),
             userData.batismalName,
             userData.maritalStatus,
             userData.dateofMarriage,
-            userData.aboutYourself,
-            userData.updatedBy,
-            new Date().toISOString(),
-            userData.userId,
+            userData.userId
         ];
-        console.log("updatePersonTblValues", updatePersonTblValues);
-        console.log("5");
-        await client.query(updatePersonTbl, updatePersonTblValues);
+
+        await client.query(updatePersonTbl, updatePersonTblValues)
 
         /***************************** Family Member Data Insertion**************************************************** */
 
-        console.log("6");
-
         if (userData.memberDetails != undefined || userData.memberDetails != null) {
-
-
             let existingMembers = [];
-
             for (let details of userData.memberDetails) {
-
                 console.log("details", details);
-
-
-
 
                 let selectEmail = `select user_id usercount, family_member_id membercount 
                 from t_user
@@ -859,44 +925,57 @@ async function processUpdateUserRoles(userData) {
 
 
                     /////////////////////////////////////////    t_user    /////////////////////////////////////////////////////////////////////////////////////
-                    let NewUserId;
+                    let newUserId;
                     try {
                         console.log('Inserting records into t_user ....');
                         console.log('New member UID' + fbuid)
-                        const insertuserTbl = `INSERT INTO t_user(
-                        email_id, org_id, firebase_id)
-                        VALUES (                    
-                          '${details.emailId}',
-                           ${userData.orgId},
-                          '${fbuid}'
-                        ) returning user_id;`;
 
-                        let result = await client.query(insertuserTbl);
-                        NewUserId = result.rows[0].user_id;
+                        const insertuserTbl = `INSERT INTO public.t_user
+                        (email_id, org_id, firebase_id, title, first_name, middle_name, last_name, created_by, created_date, member_type )
+                        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning user_id;`;
+
+                        const insertuserTblValues = [
+                            details.emailId,
+                            userData.orgId,
+                            fbuid,
+                            details.title,
+                            details.firstName,
+                            details.middleName,
+                            details.lastName,
+                            userData.updatedBy,
+                            new Date().toISOString(),
+                            'member'
+                        ]
+
+                        let result = await client.query(insertuserTbl, insertuserTblValues)
+                        newUserId = result.rows[0].user_id;
 
                     } catch (error) {
-                        console.error('Error while insterting record into t_user table as  : ' + NewUserId);
+                        console.error('Error while insterting record into t_user table as  : ' + error);
                     }
 
                     ////////////////////////////////////////////////   t_person  /////////////////////////////////////////////////////////////////////////////
 
                     console.log('Inserting records into t_person ....');
-                    console.log('New user if for member is ' + details.emailId + ' is ' + NewUserId)
+                    console.log('New user if for member is ' + details.emailId + ' is ' + newUserId)
 
                     try {
-                        let insertPerson = `INSERT INTO t_person(
-                                        user_id, title, first_name, middle_name, last_name, dob, mobile_no)
-                                        VALUES ($1, $2, $3, $4, $5, $6, $7);`
+                        // let insertPerson = `INSERT INTO t_person(
+                        //                 user_id, title, first_name, middle_name, last_name, dob, mobile_no)
+                        //                 VALUES ($1, $2, $3, $4, $5, $6, $7);`
+
+                        const insertPerson = `INSERT INTO public.t_person
+                        (user_id, dob,  mobile_no, created_by, created_date, membership_type)
+                        VALUES($1 , $2, $3, $4, $5, $6);`;
 
                         insertPersonValues =
                             [
-                                NewUserId,
-                                details.title,
-                                details.firstName,
-                                details.middleName,
-                                details.lastName,
+                                newUserId,
                                 details.dob,
-                                details.mobileNo
+                                details.mobileNo,
+                                userData.updatedBy,
+                                new Date().toISOString(),
+                                'member'
                             ]
 
                         console.log('insertPersonValues :' + insertPersonValues);
@@ -1040,8 +1119,6 @@ async function processUpdateUserRoles(userData) {
                                                         updated_date)
                                                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`
 
-                //t_user_role_context
-                console.log("RoleData");
                 insertRoleContext_value = [role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString()]
                 console.log(role.roleId, userData.userId, role.orgId, false, userData.updatedBy, new Date().toISOString(), userData.updatedBy, new Date().toISOString());
                 await client.query(insertRoleContext, insertRoleContext_value);
@@ -1065,7 +1142,7 @@ async function processUpdateUserRoles(userData) {
 
     } catch (err) {
         client.query("ROLLBACK");
-        console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${JSON.stringify(err)}`);
+        console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${err}`);
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
     }

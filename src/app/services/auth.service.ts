@@ -51,7 +51,7 @@ export class AuthService {
     this.afAuth.auth.signInWithEmailAndPassword(data.data.username, data.data.password)
       .then((result: any) => {
         if (result.user?.emailVerified == false) {
-          this.uiCommonUtils.showSnackBar('Please verify your email.', 'Dismiss', 3000)
+          this.uiCommonUtils.showSnackBar('Please verify your email.', 'error', 3000)
           return;
         } else {
           this.signedInUser = result.user;
@@ -59,9 +59,14 @@ export class AuthService {
             result.user?.getIdToken().then((token: string) => {
               localStorage.setItem('chUserToken', token)
             })
-            this.apiService.callGetService(`getUserMetaData?fbuid=${result.user?.uid}`).subscribe((data)=>{
-              localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
-              this.router.navigate(['/dashboard']);
+            this.apiService.callGetService(`getUserMetaData?fbuid=${result.user?.uid}`).subscribe((data) => {
+
+              if (data.data.status == 'failed') {
+                this.uiCommonUtils.showSnackBar(data.data.errorMessage, 'error', 3000);
+              } else {
+                localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
+                this.router.navigate(['/dashboard']);
+              }
             })
           });
         }
