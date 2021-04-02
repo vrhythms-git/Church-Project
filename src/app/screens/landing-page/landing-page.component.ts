@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
-import { ButtonRendererComponent } from '../button-renderer/button-renderer.component';
+import { ButtonRendererComponent } from '../renderers/button-renderer/button-renderer.component';
 import { GridOptions, GridApi } from "ag-grid-community";
 import { AgGridAngular } from "ag-grid-angular";
 import { uiCommonUtils } from '../../common/uiCommonUtils';
@@ -45,6 +45,10 @@ export class LandingPageComponent implements OnInit {
   hasRolePermission : Boolean = false;
   hasDeletePermission : Boolean = true;
   hasEditPermission : boolean = false;
+  inputObj: any;
+  selectedUserData: any;
+  loggedInUser : any;
+  countries!: any[];
 
   constructor(private apiService: ApiService, private uiCommonUtils :uiCommonUtils,
     private http: HttpClient, private formBuilder: FormBuilder) { }
@@ -56,6 +60,11 @@ export class LandingPageComponent implements OnInit {
   }
   ngOnInit(): void {
 
+    this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
+    this.loggedInUser = this.userMetaData.userId;
+       this.hasRolePermission = this.uiCommonUtils.hasPermissions("assign_role");
+      
+      this.hasDeletePermission = this.uiCommonUtils.hasPermissions("delete_user");
 
     this.updateuserinfo = this.formBuilder.group({
       title: new FormControl('', Validators.required),
@@ -99,6 +108,8 @@ export class LandingPageComponent implements OnInit {
 
 
     ];
+
+
       this.getUserData();
 
     this.max_date = new Date;
@@ -141,10 +152,10 @@ export class LandingPageComponent implements OnInit {
     $("#imagemodal").modal("show");
 
     let rowData = event;
-    let selectedUserData = event.data;
-    console.log(selectedUserData);
+    this.selectedUserData = event.data;
+    console.log(this.selectedUserData);
     let i = rowData.rowIndex;
-    this.userId = selectedUserData.userId;
+    this.userId = this.selectedUserData.userId;
 
     this.apiService.getParishListData().subscribe(res => {
       for (let i = 0; i < res.data.metaData.Parish.length; i++) {
@@ -154,34 +165,34 @@ export class LandingPageComponent implements OnInit {
     })
 
     this.updateuserinfo.patchValue({
-      title:selectedUserData.title,
-      firstName: selectedUserData.firstName,
-      middleName: selectedUserData.middleNmae,
-      lastName: selectedUserData.lastName,
-      nickName: selectedUserData.nickName,
-      batismalName: selectedUserData.batismalName,
-      dob: selectedUserData.dob,
-      mobileNo: selectedUserData.mobileNo,
-      homePhoneNo: selectedUserData.homePhoneNo,
-      emailAddress: selectedUserData.emailId,
-      addressLine1: selectedUserData.addressLine1,
-      addressLine2: selectedUserData.addressLine2,
-      addressLine3: selectedUserData.addressLine3,
-      city: selectedUserData.city,
-      postalCode: selectedUserData.postalCode,
-      state: selectedUserData.state,
-      country: selectedUserData.country,
-      parish: selectedUserData.parish,
-      maritalStatus: selectedUserData.maritalStatus,
-      dateofMarriage: selectedUserData.dateofMarriage,
-      about_urself: selectedUserData.about_urself,
-      isFamilyHead : selectedUserData.isFamilyHead,
+      title:this.selectedUserData.title,
+      firstName: this.selectedUserData.firstName,
+      middleName: this.selectedUserData.middleNmae,
+      lastName: this.selectedUserData.lastName,
+      nickName: this.selectedUserData.nickName,
+      batismalName: this.selectedUserData.batismalName,
+      dob: this.selectedUserData.dob,
+      mobileNo: this.selectedUserData.mobileNo,
+      homePhoneNo: this.selectedUserData.homePhoneNo,
+      emailAddress: this.selectedUserData.emailId,
+      addressLine1: this.selectedUserData.addressLine1,
+      addressLine2: this.selectedUserData.addressLine2,
+      addressLine3: this.selectedUserData.addressLine3,
+      city: this.selectedUserData.city,
+      postalCode: this.selectedUserData.postalCode,
+      state: this.selectedUserData.state,
+      country: this.selectedUserData.country,
+      parish: this.selectedUserData.parish,
+      maritalStatus: this.selectedUserData.maritalStatus,
+      dateofMarriage: this.selectedUserData.dateofMarriage,
+      about_urself: this.selectedUserData.about_urself,
+      isFamilyHead : this.selectedUserData.isFamilyHead,
       //  role : selectedUserData.roles[0].roleId,
       //  accesslvltype : selectedUserData.roles[0].orgType,
       //  accesslvlid : selectedUserData.roles[0].orgId  
       // roles: selectedUserData.roles
     })
-    this.selectedUserRole = selectedUserData.roles;
+    this.selectedUserRole = this.selectedUserData.roles;
     console.log("selectedUserRole", this.selectedUserRole)
 
     this.rolesArr = [];
@@ -196,10 +207,7 @@ export class LandingPageComponent implements OnInit {
         this.rolesArr.push(e);
       }
     });
-
-
-
-
+    
     this.updateuserinfo.setControl('roles', this.setRoles(this.selectedUserRole));
   }
 
@@ -283,7 +291,9 @@ export class LandingPageComponent implements OnInit {
   }
 
   getUserData(){  
-    this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
+     
+    //this.userRecords.loggedInUser = this.loggedInUser;
+    this.apiService.getUsersData( this.loggedInUser ).subscribe((res) => {
       console.log('These are users from database : ');
       console.log(res.data.metaData);
       this.rowData = res.data.metaData;
@@ -296,7 +306,7 @@ export class LandingPageComponent implements OnInit {
     }
     else {
       this.updateuserinfo.value.userId = this.userId;
-      this.updateuserinfo.value.updatedBy = this.userId;
+      this.updateuserinfo.value.updatedBy = this.loggedInUser;
       let dob = this.updateuserinfo.value.dob;
       console.log(dob);
       this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe(res => {

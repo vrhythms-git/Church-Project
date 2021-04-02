@@ -78,12 +78,12 @@
                                                 </div>
                                                 <div class="row">
                                                         <mat-form-field class="col-md-4">
-                                                                <mat-label>Mobile Number</mat-label>
-                                                                <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile Number" required/>
+                                                                <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
+                                                                <input id="mobileNo" matInput formControlName="mobileNo"  ng2TelInput length="10" placeholder="Enter Mobile Number" />
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-4">
-                                                                <mat-label>Home Phone Number</mat-label>
-                                                                <input id="homePhoneNo" matInput formControlName="homePhoneNo" placeholder="Enter Mobile Number" />
+                                                                <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
+                                                                <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput length="10" placeholder="Enter Home Phone Number" />
                                                         </mat-form-field>
 
                                                         <mat-form-field class="col-md-4">
@@ -120,8 +120,10 @@
                                                                 <input required id="postalCode" matInput formControlName="postalCode" placeholder="Enter Address" />
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-4">
-                                                                <mat-label>State</mat-label>
-                                                                <input required id="state" matInput formControlName="state" placeholder="Enter State" />
+                                                                <mat-label>Parish</mat-label>
+                                                                <select matNativeControl required formControlName="parish">
+                                                                        <option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</option>
+                                                                </select>
                                                         </mat-form-field>
                                                 </div>
                                                 <div class="row">
@@ -134,10 +136,8 @@
                                                                 </select>
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-6">
-                                                                <mat-label>Parish</mat-label>
-                                                                <select matNativeControl required formControlName="parish">
-                                                                        <option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</option>
-                                                                </select>
+                                                                <mat-label>State/Province</mat-label>
+                                                                <input required id="state" matInput formControlName="state" placeholder="Enter State" />
                                                         </mat-form-field>
                                                 </div>
                                                 <div class="row">

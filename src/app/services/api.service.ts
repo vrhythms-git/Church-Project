@@ -37,15 +37,27 @@ export class ApiService {
     console.log('headers set to ' + JSON.stringify(headerObj))
     return this.http.get(`${this._baseUrl}/${endPoint}`,{ headers: headerObj });
   }
-  getUsersData(userData: any):Observable<any>{
+  getUsersData(loggedInUserId: any):Observable<any>{
     console.log(`calling the usesData()`);
     let headerObj = new HttpHeaders({
                     'Authorization': localStorage.getItem('cormUserTokenId')!,
                     'Content-Type' : 'application/json'
                   });
-    console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords`),userData);
-    return this.http.get(`${this._baseUrl}/getuserRecords`, userData );   
+    console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords?loggedInUser=loggedInUserId`),loggedInUserId);
+    return this.http.get(`${this._baseUrl}/getuserRecords?loggedInUser=` +loggedInUserId);   
 }
+
+getUnapprovedUserData(loggedInUserId: any):Observable<any>{
+  console.log(`calling the getUnapprovedUserData()`);
+  let headerObj = new HttpHeaders({
+                  'Authorization': localStorage.getItem('cormUserTokenId')!,
+                  'Content-Type' : 'application/json'
+                });
+  console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords`),loggedInUserId);
+  return this.http.get(`${this._baseUrl}/getuserRecords?type=unapproved&loggedInUser=`+ loggedInUserId );  
+   
+}
+
 getUserRoleData():Observable<any>{
   console.log(`calling the usersRoleData()`);
   let headerObj = new HttpHeaders({
@@ -65,6 +77,7 @@ getParishListData():Observable<any>{
   // console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
   return this.http.get(`${this._baseUrl}/getParishData` );   
 }
+
 deleteUser(userData : any){
   console.log("Delete User Profile Called..")
 let headerObj = new HttpHeaders({
@@ -94,6 +107,23 @@ getEventCategoryData():Observable<any>{
                 });
   console.log( 'Event Category data is : ' + this.http.get(`${this._baseUrl}/getEventCategory`));
   return this.http.get(`${this._baseUrl}/getEventCategory` );   
+}
+
+approveOrRejReq(reqData : any){
+  console.log("update User Profile Called..")
+  let headerObj = new HttpHeaders({
+                                      'Authorization': localStorage.getItem('chUserToken')!,
+                                      'Content-Type' : 'application/json'
+                                    });
+   console.log('headers set to ' + JSON.stringify(headerObj))
+   console.log(JSON.stringify(reqData));
+  return this.http.post(`${this._baseUrl}/setUserApprovalState`, JSON.stringify(reqData),{ headers: headerObj } );
+}
+
+getCountryStates(){
+  console.log(`calling the getCountryStates()`);
+  
+  return this.http.get(`${this._baseUrl}/getCountryStates` );   
 }
 }
 

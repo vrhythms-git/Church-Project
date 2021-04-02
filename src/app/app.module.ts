@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ButtonRendererComponent } from './screens/button-renderer/button-renderer.component';
+import { ButtonRendererComponent } from './screens/renderers/button-renderer/button-renderer.component';
 import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app.component';
@@ -54,12 +54,16 @@ import { MyProfileComponent } from './screens/my-profile/my-profile.component';
 import { LoaderInterceptor } from './app.LoaderInterceptor';
 import { NgxSpinnerModule } from "ngx-spinner";
 import {customSnackBar} from './common/uiCommonUtils'
+import { ReqRendererComponent } from './screens/renderers/req-renderer/req-renderer.component';
+import { ApprovalRequestsComponent } from './screens/approval-requests/approval-requests.component';
+
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
+	SignUpComponent,
     SignInComponent,
     FooterComponent,
     NavigationComponent,
@@ -70,6 +74,8 @@ import {customSnackBar} from './common/uiCommonUtils'
     EventCreationComponent,
     ButtonRendererComponent,
     MyProfileComponent,
+    ApprovalRequestsComponent,
+    ReqRendererComponent,  
     customSnackBar
     //UserProfileComponent,
     //OvbsRegistrationComponent
