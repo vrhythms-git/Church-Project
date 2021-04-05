@@ -1,0 +1,14 @@
+.modal{
+    width: 115%;
+}
+
+mat-form-field{
+    font-family: poppins;
+    letter-spacing: 0.18px;
+} 
+#approve-icon{
+    color:green;
+}
+#reject-icon{
+    color:red;
+}

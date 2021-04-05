@@ -16,18 +16,18 @@ export class ApprovalRequestsComponent implements OnInit {
 
   data: any;
   params: any;
-  columnDefs:any;
-  rowData:any;
+  columnDefs: any;
+  rowData: any;
   userRecords!: any[];
   selectedUserData: any;
   approveReqForm: any;
   reqDisableForm: any;
-  userMetaData : any;
-  isApproved : boolean = true;
-  loggedInUser : any;
+  userMetaData: any;
+  isApproved: boolean = true;
+  loggedInUser: any;
 
-  constructor(private apiService:ApiService, private formBuilder:FormBuilder, 
-    private uiCommonUtils :uiCommonUtils, private router: Router) { }
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder,
+    private uiCommonUtils: uiCommonUtils, private router: Router) { }
 
   agInit(params: any) {
     this.params = params;
@@ -40,7 +40,7 @@ export class ApprovalRequestsComponent implements OnInit {
       firstName: new FormControl('', Validators.required),
       middleName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
-      nickName: new FormControl('',),
+      nickName: new FormControl('', ),
       batismalName: new FormControl(''),
       dob: new FormControl('', [Validators.required]),
       mobileNo: new FormControl('', [Validators.required]),
@@ -57,11 +57,11 @@ export class ApprovalRequestsComponent implements OnInit {
       maritalStatus: new FormControl('', Validators.required),
       dateofMarriage: new FormControl(''),
       about_urself: new FormControl(''),
-      isFamilyHead : new FormControl(''),
+      isFamilyHead: new FormControl(''),
     })
 
     this.approveReqForm = this.formBuilder.group({
-      comment: new FormControl('')
+      comment: new FormControl('', Validators.required)
     })
 
 
@@ -69,19 +69,19 @@ export class ApprovalRequestsComponent implements OnInit {
       { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
       { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
       { headerName: 'Email Id', field: 'emailId', sortable: true, filter: true, width: 220 },
-      { headerName: 'Mobile Number', field: 'mobileNo', sortable: true, filter: true },
-      { headerName: 'Org Type', field:'orgType',sortable: true, filter: true, width:170},
-      { headerName: 'Actions', field: 'action', cellRendererFramework: ReqRendererComponent, width: 160}
+      { headerName: 'Mobile Number', field: 'mobileNo', sortable: true, filter: true, width: 180 },
+      { headerName: 'Org Type', field: 'orgType', sortable: true, filter: true, width: 180 },
+      { headerName: 'Actions', field: 'action', cellRendererFramework: ReqRendererComponent, width: 170 }
     ]
 
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
     this.loggedInUser = this.userMetaData.userId;
     this.getUnapprovedUserData();
-   
+
   }
 
-  getUnapprovedUserData(){
-    this.apiService.getUnapprovedUserData(this.loggedInUser ).subscribe((res) => {
+  getUnapprovedUserData() {
+    this.apiService.getUnapprovedUserData(this.loggedInUser).subscribe((res) => {
       console.log('These are unapproved users from database : ');
       console.log(res.data.metaData);
       this.rowData = res.data.metaData;
@@ -89,8 +89,8 @@ export class ApprovalRequestsComponent implements OnInit {
   }
 
   onRowClicked(event: any) {
-     $("#imagemodal").modal("show");
-   // this.router.navigate(['/dashboard/myprofile']);
+    $("#imagemodal").modal("show");
+    // this.router.navigate(['/dashboard/myprofile']);
     let rowData = event;
     this.selectedUserData = event.data;
     console.log(this.selectedUserData);
@@ -99,7 +99,7 @@ export class ApprovalRequestsComponent implements OnInit {
     this.reqDisableForm.disable();
 
     this.reqDisableForm.patchValue({
-      title:this.selectedUserData.title,
+      title: this.selectedUserData.title,
       firstName: this.selectedUserData.firstName,
       middleName: this.selectedUserData.middleNmae,
       lastName: this.selectedUserData.lastName,
@@ -120,38 +120,43 @@ export class ApprovalRequestsComponent implements OnInit {
       maritalStatus: this.selectedUserData.maritalStatus,
       dateofMarriage: this.selectedUserData.dateofMarriage,
       about_urself: this.selectedUserData.about_urself,
-      isFamilyHead : this.selectedUserData.isFamilyHead
-    })    
+      isFamilyHead: this.selectedUserData.isFamilyHead
+    })
   }
 
-  onRejectClick(){
-    $("#comment").show;
-    if (!$('#comment').val()) {
-      $('<span class="error" style="color:red;">Please Enter Comment</span>').
-            insertBefore('#comment');
-}    this.isApproved = false;
-  }
-
-  onReqSubmit(){
+  onUserReject() {
+    //     $("#comment").show;
+    //     if (!$('#comment').val()) {
+    //       $('<span class="error" style="color:red;">Please Enter Comment</span>').
+    //             insertBefore('#comment');
+    // }    
+    this.isApproved = false;
     this.approveReqForm.value.userId = this.selectedUserData.userId;
     this.approveReqForm.value.isApproved = this.isApproved;
     this.approveReqForm.value.loggedInuserId = this.loggedInUser;
     console.log(this.approveReqForm.value);
-    if(this.isApproved == false && this.approveReqForm.value.comment != ""){
-      this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe( res => {
-        console.log(res);
-        this.getUnapprovedUserData();
-        $("#imagemodal").modal("hide");
-      })
-    }
-    else if(this.isApproved == true){
-      this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe( res => {
-        console.log(res);
-        this.getUnapprovedUserData();
-        $("#imagemodal").modal("hide");
-      })
-    }
-    return;
+    this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe(res => {
+      console.log(res);
+      this.getUnapprovedUserData();
+      $("#imagemodal").modal("hide");
+    })
+  }
+
+  onUserApprove() {
+    this.approveReqForm.value.userId = this.selectedUserData.userId;
+    this.approveReqForm.value.isApproved = this.isApproved;
+    this.approveReqForm.value.loggedInuserId = this.loggedInUser;
+    console.log(this.approveReqForm.value);
+    this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe(res => {
+      console.log(res);
+      this.getUnapprovedUserData();
+      $("#imagemodal").modal("hide");
+    })
+  }
+
+
+  resetForm() {
+    this.approveReqForm.reset();
   }
 }
 

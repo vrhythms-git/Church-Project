@@ -1,7 +1,7 @@
 <div class="container mt-3" style="overflow: hidden;">
 
     <div class="form-group form-inline row m-0 p-0">
-        <input type="text" class="form-control col-12 search" placeholder="Search Here" >
+        <input type="text" class="form-control col-12 search" placeholder="Search Here">
     </div>
 
     <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" [rowData]="rowData " [columnDefs]="columnDefs"
@@ -14,8 +14,8 @@
         <div class="modal-dialog modal-dialog-scrollable modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <!-- <h4 class="modal-title" id="myModalLabel">Edit User Profile</h4> -->
-                    <button mat-button class="ml-auto" data-dismiss="modal">
+                    <h4 class="modal-title" id="myModalLabel">Approve / Reject User</h4>
+                    <button mat-button class="ml-auto" data-dismiss="modal" (click)="resetForm()">
                         <mat-icon>clear</mat-icon>
                     </button>
                 </div>
@@ -67,7 +67,7 @@
                             </mat-form-field>
                             <mat-form-field class="col-md">
                                 <mat-label>Date of Birth</mat-label>
-                                <input matInput type="input" [matDatepicker]="picker" required id="dob" formControlName="dob" >
+                                <input matInput type="input" [matDatepicker]="picker" required id="dob" formControlName="dob">
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
                             </mat-form-field>
@@ -147,7 +147,7 @@
                             </mat-form-field>
                             <mat-form-field class="col-md">
                                 <mat-label>Date of Marriage</mat-label>
-                                <input matInput type="input" [matDatepicker]="marriageDatepicker" id="dateofMarriage" formControlName="dateofMarriage" >
+                                <input matInput type="input" [matDatepicker]="marriageDatepicker" id="dateofMarriage" formControlName="dateofMarriage">
                                 <mat-datepicker-toggle matSuffix [for]="marriageDatepicker"></mat-datepicker-toggle>
                                 <mat-datepicker #marriageDatepicker></mat-datepicker>
                             </mat-form-field>
@@ -166,23 +166,28 @@
                                 <mat-radio-button class="ml-1" value="false" [checked]=true>No</mat-radio-button>
                             </mat-radio-group>
                         </div>
-                        </form>
-                        <form [formGroup]="approveReqForm">
-                        <div class="text-center">
-                            <button mat-button type="submit" mat-button class=" mr-1 border" >
-                                <mat-icon>check_circle</mat-icon><span>Approve</span></button>
-                            <button mat-button type="submit" mat-button class="border" (click)="onRejectClick()">
-                               <mat-icon>cancel</mat-icon><span>Reject</span></button>
-                        </div>
+                    </form>
+                    <form [formGroup]="approveReqForm">
                         <div class="row p-0 m-0">
                             <mat-form-field class="col-md-12">
-                                    <!-- <mat-label>Comment</mat-label> -->
-                                    <textarea id="comment" matInput formControlName="comment" ></textarea>
+                                <textarea id="comment" matInput formControlName="comment" required placeholder="Please justify reason for user approval / rejection"></textarea>
                             </mat-form-field>
-                    </div>
-                    <div class="text-center">
-                    <button mat-button type="submit" mat-button class="mbutton mr-1" (click)="onReqSubmit()">
-                        Submit</button></div>
+                        </div>
+                        <div class="text-center">
+                            <button mat-button type="submit" mat-button class=" mr-1 border" (click)="onUserApprove()">
+                                <mat-icon id="approve-icon">check_circle</mat-icon>
+                                <span>Approve</span>
+                            </button>
+                            <button mat-button type="submit" mat-button class="border" (click)="onUserReject()">
+                                <mat-icon id="reject-icon">cancel</mat-icon>
+                                <span>Reject</span>
+                            </button>
+                        </div>
+
+                        <!-- <div class="text-center">
+                            <button mat-button type="submit" mat-button class="mbutton mr-1" (click)="onReqSubmit()">
+                                Submit</button>
+                        </div> -->
                     </form>
                 </div>
             </div>
