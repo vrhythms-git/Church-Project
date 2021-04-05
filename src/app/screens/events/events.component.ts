@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 declare let $: any;
 @Component({
@@ -12,7 +13,7 @@ export class EventsComponent implements OnInit {
   columnDefs!: any[];
   rowData : any;
   gridOptions:any;
-  constructor() { }
+  constructor(private router : Router) { }
 
   ngOnInit(): void {
 
@@ -42,5 +43,8 @@ export class EventsComponent implements OnInit {
     };
   }
 
+  onAddEventClick(){
+    this.router.navigate(['/dashboard/createevent']);
+  }
 
 }
