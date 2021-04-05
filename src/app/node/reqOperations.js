@@ -569,26 +569,16 @@ async function getRoleMetadata() {
     });
 }
 
-
 async function getEventCategory() {
 
-    return new Promise((resolve, reject) => {
-        let getEventCategory = `select event_category_id id, name, description ,school_grade_from,school_grade_to from t_event_category;`
-        let client = dbConnections.getConnection();
-
+    let client = dbConnections.getConnection();
+    await client.connect();
         try {
-            client.connect();
-            client.query(getEventCategory, (err, res) => {
-                if (err) {
-                    console.log("Inside Error" + res);
-                    console.error(`reqOperations.js::getEventCategory() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
-                    return;
-                }
-
-                if (res) {
+            let metadata = {};
+            let getEventCategory = `select event_category_id id, name, description ,school_grade_from,school_grade_to from t_event_category;`
+            let res = await client.query(getEventCategory);
+                if (res && res.rowCount > 0) {
                     console.log("In response" + res);
-                    let metadata = {};
                     let eventCategory = [];
                     for (let row of res.rows) {
                         let events = {};
@@ -600,20 +590,55 @@ async function getEventCategory() {
                         eventCategory.push(events);
                     }
                     metadata.eventCategory = eventCategory;
-                    client.end()
-                    resolve({
-                        data: {
-                            status: 'success',
-                            metaData: metadata
-                        }
-                    })
+                    //client.end()
+                   
                 }
-            });
+
+
+
+            let getVenueData = `select * from t_venue;`    
+            let res1 = await client.query(getVenueData);
+            if (res1 && res1.rowCount > 0) {
+                console.log("In getVenueData" + res1);
+
+                let venuesData = [];
+                for (let row of res1.rows) {
+                    let venues = {};
+                    venues.venueId = row.venue_id;
+                    venues.name = row.name;
+                    venues.orgId = row.org_id;
+                    venues.description = row.description;
+                    venues.addressLine1 = row.address_line1;
+                    venues.addressLine2 = row.address_line2;
+                    venues.addressLine3 = row.address_line3;
+                    venues.city = row.city;
+                    venues.state = row.state;
+                    venues.postalCode = row.postal_code;
+                    venues.country = row.country;
+                    venues.mobileNo = row.mobile_no;
+                    venues.homePhoneNo = row.phone_no;
+                    venues.mapUrl = row.map_url;
+                    venuesData.push(venues);
+                }
+                metadata.venuesData = venuesData;
+                client.end()
+               
+            }
+
+                return({
+                    data: {
+                        status: 'success',
+                        metaData: metadata
+                    }
+                })
+            
         } catch (error) {
-            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
-        }
-    });
+        client.end();
+        console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    
+
+    }
 }
 
 async function getParishData() {
@@ -660,6 +685,7 @@ async function getParishData() {
 }
 
 
+
 async function insertEvents(eventsData) {
 
 
@@ -691,8 +717,8 @@ async function insertEvents(eventsData) {
 
             /********************** t_event_venue************************************************************************************/
             console.log("2");
-            const insertVenue = `INSERT INTO t_event_venue(event_id, name, description, address_line1, address_line2, city, state, postal_code, country, proctor_id)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`
+            const insertVenue = `INSERT INTO t_event_venue(event_id, venue_id, proctor_id)
+                    VALUES ($1, $2, $3);`
 
             for (let venue of eventsData.venues) {
                 //t_event_venue 
@@ -700,37 +726,45 @@ async function insertEvents(eventsData) {
                 insertVenue_value =
                     [
                         this.eventId,
-                        venue.name,
-                        venue.description,
-                        venue.addressLine1,
-                        venue.addressLine2,
-                        venue.city,
-                        venue.state,
-                        venue.postalCode,
-                        venue.country,
+                        venue.venueId,
                         venue.proctorId
                     ]
-                await client.query(insertVenue, insertVenue_value)
+                await client.query(insertVenue, insertVenue_value);
             }
 
 
-
-            /********************** t_event_category_map,  t_event_cat_user_map*******************************************************************************/
+            /********************** t_event_category_map,   t_event_cat_staff_map*******************************************************************************/
             console.log("3");
-            const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id)
-                    VALUES ($1, $2);`
+            const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id,venue_id)
+                    VALUES ($1, $2, $3) returning event_category_id, venue_id;`
 
+           
             for (let category of eventsData.categories) {
                 //t_event_venue 
                 console.log(`Inserting category ${JSON.stringify(category)}`);
                 insertCategory_value =
                     [
                         this.eventId,
-                        category.eventCategoryID
+                        category.eventCategoryID,
+                        category.venueId
                     ]
-                await client.query(insertCategory, insertCategory_value);
+                let result = await client.query(insertCategory, insertCategory_value);
+                this.eventCategoryID = result.rows[0].event_category_id;
+                this.venueId = result.rows[0].venue_id;
 
-                const insertCatUserMap = `INSERT INTO t_event_cat_user_map(event_id, event_category_id, user_id, role_type)
+                console.log("4");
+
+                const eventCatVenueMap = `INSERT INTO t_event_category_venue_map(event_cat_map_id, event_venue_id) VALUES ($1, $2);`
+                eventCatVenueMapValues = [
+                            this.eventCategoryID,
+                            this.venueId
+                ]
+                await client.query(eventCatVenueMap, eventCatVenueMapValues);    
+
+
+                console.log("5");
+
+                const insertCatUserMap = `INSERT INTO  t_event_cat_staff_map(event_id, event_category_id, user_id, role_type)
                     VALUES ($1, $2, $4, $3),($1, $2, $5, $3),($1, $2, $6, $3);`
 
                 insertCatUserMap_values = [
@@ -741,10 +775,12 @@ async function insertEvents(eventsData) {
                     category.judge2,
                     category.judge3
                 ]
+
+                console.log("insertCatUserMap_values", insertCatUserMap_values);
                 await client.query(insertCatUserMap, insertCatUserMap_values);
             }
 
-            console.log("4");
+            console.log("6");
 
             const insertQuestionare = `INSERT INTO t_event_questionnaire(event_id, question, answer_type)
                     VALUES ($1, $2, $3);`
@@ -761,9 +797,10 @@ async function insertEvents(eventsData) {
                 await client.query(insertQuestionare, insertQuestionareValue);
             }
 
-            client.end()
+            //client.end()
             console.log("Before commit");
             await client.query("COMMIT");
+            console.log("After commit");
 
             return ({
                 data: {

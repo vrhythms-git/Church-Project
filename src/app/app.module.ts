@@ -56,6 +56,8 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import {customSnackBar} from './common/uiCommonUtils'
 import { ReqRendererComponent } from './screens/renderers/req-renderer/req-renderer.component';
 import { ApprovalRequestsComponent } from './screens/approval-requests/approval-requests.component';
+import {MatStepperModule} from '@angular/material/stepper';
+
 
 
 
@@ -120,7 +122,8 @@ import { ApprovalRequestsComponent } from './screens/approval-requests/approval-
     //MatMenuItem,
     MatExpansionModule,
     AgGridModule.withComponents([ButtonRendererComponent]),
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    MatStepperModule
   ],
   providers: [AuthService,  { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },],
   bootstrap: [AppComponent],
