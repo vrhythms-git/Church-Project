@@ -25,7 +25,8 @@ const routes: Routes = [
     { path: 'users',component:LandingPageComponent},
     { path: 'events', component: EventsComponent},
     { path: 'requests', component:ApprovalRequestsComponent},
-    {path : 'myprofile', component:MyProfileComponent, canDeactivate:[DirtycheckGuard]}
+    {path : 'myprofile', component:MyProfileComponent, canDeactivate:[DirtycheckGuard]},
+    { path : 'createevent', component: EventCreationComponent }
     // { path: 'testEvent',component:UserProfileComponent},
   ]
 },

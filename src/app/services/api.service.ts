@@ -125,5 +125,16 @@ getCountryStates(){
   
   return this.http.get(`${this._baseUrl}/getCountryStates` );   
 }
+
+insertevents(eventsData  : any){
+  console.log("update User Profile Called..")
+  let headerObj = new HttpHeaders({
+                                      'Authorization': localStorage.getItem('chUserToken')!,
+                                      'Content-Type' : 'application/json'
+                                    });
+   console.log('headers set to ' + JSON.stringify(headerObj))
+   console.log(JSON.stringify(eventsData));
+  return this.http.post(`${this._baseUrl}/insertevents`, JSON.stringify(eventsData),{ headers: headerObj } );
+  }
 }
 
