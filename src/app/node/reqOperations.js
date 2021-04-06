@@ -126,12 +126,12 @@ async function processSignInRequest(userInfo) {
         //         select ${this.userId}, id from t_role where name = 'Family Head';`
         //     await client.query(insertRoleMapping);
         // }
-        // if (!this.isFamilyHead) {
-        //     console.log("7");
-        //     let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
-        //         select ${this.userId}, id from t_role where name = 'Member';`
-        //     await client.query(insertRoleMappingmember);
-        // }
+       // if (!this.isFamilyHead) {
+         //   console.log("7");
+            let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+                select ${newUserId}, role_id from t_role where name = 'Member';`
+            await client.query(insertRoleMappingmember);
+        //}
 
         console.log("Before commit");
         await client.query("COMMIT");
@@ -147,7 +147,7 @@ async function processSignInRequest(userInfo) {
     }
     catch (error) {
         await client.query("ROLLBACK");
-        console.error(`reqOperations.js::processSignInRequest() --> error : ${JSON.stringify(error)}`)
+        console.error(`reqOperations.js::processSignInRequest() --> error : ${error}`)
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
     }
