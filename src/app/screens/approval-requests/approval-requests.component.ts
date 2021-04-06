@@ -25,6 +25,11 @@ export class ApprovalRequestsComponent implements OnInit {
   userMetaData: any;
   isApproved: boolean = true;
   loggedInUser: any;
+  parishList!: any[];
+  countries!: any[];
+  states! : any[];
+  selectedCountry:any;
+
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder,
     private uiCommonUtils: uiCommonUtils, private router: Router) { }
@@ -68,15 +73,22 @@ export class ApprovalRequestsComponent implements OnInit {
     this.columnDefs = [
       { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
       { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
-      { headerName: 'Email Id', field: 'emailId', sortable: true, filter: true, width: 220 },
-      { headerName: 'Mobile Number', field: 'mobileNo', sortable: true, filter: true, width: 180 },
-      { headerName: 'Org Type', field: 'orgType', sortable: true, filter: true, width: 180 },
+      { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
+      { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
+      { headerName: 'City', field: 'city', sortable: true, filter: true, width:150 },
+      { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
+      { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
       { headerName: 'Actions', field: 'action', cellRendererFramework: ReqRendererComponent, width: 170 }
     ]
 
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
     this.loggedInUser = this.userMetaData.userId;
     this.getUnapprovedUserData();
+
+    this.apiService.getCountryStates().subscribe( res => {
+      this.countries = res.data.countryState;
+      console.log("Countries", this.countries);
+  })
 
   }
 
@@ -98,7 +110,7 @@ export class ApprovalRequestsComponent implements OnInit {
 
     this.reqDisableForm.disable();
 
-    this.reqDisableForm.patchValue({
+      this.reqDisableForm.patchValue({
       title: this.selectedUserData.title,
       firstName: this.selectedUserData.firstName,
       middleName: this.selectedUserData.middleNmae,
@@ -116,7 +128,7 @@ export class ApprovalRequestsComponent implements OnInit {
       postalCode: this.selectedUserData.postalCode,
       state: this.selectedUserData.state,
       country: this.selectedUserData.country,
-      parish: this.selectedUserData.parish,
+      parish: this.selectedUserData.parish_name,
       maritalStatus: this.selectedUserData.maritalStatus,
       dateofMarriage: this.selectedUserData.dateofMarriage,
       about_urself: this.selectedUserData.about_urself,
@@ -154,6 +166,15 @@ export class ApprovalRequestsComponent implements OnInit {
     })
   }
 
+  changeCountry(country:any){
+    //this.states = this.countries.find((cntry: any) => cntry.name == country.target.value).states;
+    for (let i = 0; i < this.countries.length; i++) {
+      if (this.countries[i].countryName == country.target.value) {
+        console.log(this.countries[i].states);
+        this.states = this.countries[i].states;
+      }
+    }
+  }
 
   resetForm() {
     this.approveReqForm.reset();

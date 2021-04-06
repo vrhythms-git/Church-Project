@@ -363,7 +363,9 @@ async function getuserRecords(userType, loggedInUser) {
                         vu.about_yourself,
                         vu.role_id,
                         vu.org_id,
-                        vu.org_type
+                        vu.org_type,
+                        membership_type,
+                        (select name from t_organization where org_id = vu.org_id) parish_name
                     FROM  v_user vu
                     WHERE ${condition} vu.user_org_id IN ( WITH recursive child_orgs 
                                  AS (
@@ -433,6 +435,9 @@ async function getuserRecords(userType, loggedInUser) {
                     user.roleId = row.role_id;
                     user.orgId = row.org_id;
                     user.orgType = row.org_type;
+                    user.memberType = row.membership_type;
+                    user.parish_name = row.parish_name;
+
                     // if(userid == 0){
                     //     userid = row.user_id;
                     // }

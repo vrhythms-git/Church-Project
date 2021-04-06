@@ -19,7 +19,7 @@
                         <div class="modal-content">
                                 <div class="modal-header">
                                         <h4 class="modal-title" id="myModalLabel">Edit User Profile</h4>
-                                        <button mat-button class="ml-auto" data-dismiss="modal">
+                                        <button mat-button class="ml-auto" data-dismiss="modal" (click)="resetForm()">
                                                 <mat-icon>clear</mat-icon>
                                         </button>
                                 </div>
@@ -130,15 +130,22 @@
 
                                                         <mat-form-field class="col-md-6">
                                                                 <mat-label>Country</mat-label>
-                                                                <select matNativeControl required id="country" formControlName="country" placeholder="Enter Country">
-                                                                        <option value="USA">USA</option>
-                                                                        <option value="India">India</option>
+                                                                <select matNativeControl required id="country" formControlName="country" placeholder="Select Country" [(ngModel)]="selectedCountry" (change)="changeCountry($event)">
+                                                                        <!-- <option value="USA">USA</option>
+                                                                        <option value="India">India</option> -->
+                                                                        <option *ngFor="let country of countries" [value]="country.countryName">{{country.countryName}}</option>
                                                                 </select>
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-6">
                                                                 <mat-label>State/Province</mat-label>
-                                                                <input required id="state" matInput formControlName="state" placeholder="Enter State" />
-                                                        </mat-form-field>
+                                                                <select matNativeControl required id="state" formControlName="state" placeholder="Select State/Province" >
+                                                                                                                                              
+                                                                        <!-- <option value="USA">USA</option>
+                                                                        <option value="India">India</option>  -->
+
+                                                                        <option *ngFor="let state of states" [value]="state">{{state}}</option>
+                                                                </select>
+                                                                        </mat-form-field>
                                                 </div>
                                                 <div class="row">
                                                         <mat-form-field class="col-md">

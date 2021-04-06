@@ -49,6 +49,8 @@ export class LandingPageComponent implements OnInit {
   selectedUserData: any;
   loggedInUser : any;
   countries!: any[];
+  states! : any[];
+  selectedCountry:any;
 
   constructor(private apiService: ApiService, private uiCommonUtils :uiCommonUtils,
     private http: HttpClient, private formBuilder: FormBuilder) { }
@@ -94,10 +96,12 @@ export class LandingPageComponent implements OnInit {
 
     this.columnDefs = [
       { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
-      { headerName: 'Middle Name', field: 'middleNmae', sortable: true, filter: true, width: 170 },
       { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
-      { headerName: 'Email Id', field: 'emailId', sortable: true, filter: true, width: 220 },
-      { headerName: 'Mobile Number', field: 'mobileNo', sortable: true, filter: true },
+      { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
+      { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
+      { headerName: 'City', field: 'city', sortable: true, filter: true, width:150 },
+      { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
+      { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
       { headerName: 'Actions', field: 'action', cellRendererFramework: ButtonRendererComponent, width: 160,
         cellRendererParams: function (params: any) {
           // onClick: this.openModal.bind(this),
@@ -105,10 +109,7 @@ export class LandingPageComponent implements OnInit {
           // `<button>Edit</button>`;
         }, suppressSizeToFit: false
       }
-
-
     ];
-
 
       this.getUserData();
 
@@ -130,6 +131,11 @@ export class LandingPageComponent implements OnInit {
       console.log("Roles Data:", this.orgs);
     })
 
+    this.apiService.getCountryStates().subscribe( res => {
+        this.countries = res.data.countryState;
+        console.log("Countries", this.countries);
+    })
+
     this.gridOptions = {
       columnDefs: this.columnDefs,
       rowData: this.rowData,
@@ -141,6 +147,10 @@ export class LandingPageComponent implements OnInit {
         filter: 'agTextColumnFilter'
       }
     };
+  }
+
+  resetForm(){
+    this.updateuserinfo.reset();
   }
 
   openModal() {
@@ -316,7 +326,9 @@ export class LandingPageComponent implements OnInit {
       //  }
       this.getUserData();
       })
+      this.updateuserinfo.reset();
       $("#imagemodal").modal("hide");
+      
     }  
   }
 
@@ -350,5 +362,15 @@ export class LandingPageComponent implements OnInit {
     })
     this.getUserData();
     console.log("Records Deleted...");
+  }
+
+  changeCountry(country:any){
+    //this.states = this.countries.find((cntry: any) => cntry.name == country.target.value).states;
+    for (let i = 0; i < this.countries.length; i++) {
+      if (this.countries[i].countryName == country.target.value) {
+        console.log(this.countries[i].states);
+        this.states = this.countries[i].states;
+      }
+    }
   }
 }

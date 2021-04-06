@@ -117,25 +117,22 @@
                                 <input required id="postalCode" matInput formControlName="postalCode" placeholder="Enter Address" />
                             </mat-form-field>
                             <mat-form-field class="col-md-4">
-                                <mat-label>State/Province</mat-label>
-                                <input required id="state" matInput formControlName="state" placeholder="Enter State" />
+                                    <mat-label>Parish</mat-label>
+                                    <input required id="parish" matInput formControlName="parish" placeholder="Parish" />
                             </mat-form-field>
                         </div>
                         <div class="row">
 
-                            <mat-form-field class="col-md-6">
-                                <mat-label>Country</mat-label>
-                                <select matNativeControl required id="country" formControlName="country" placeholder="Enter Country">
-                                    <option value="USA">USA</option>
-                                    <option value="India">India</option>
-                                </select>
-                            </mat-form-field>
-                            <!-- <mat-form-field class="col-md-6">
-                                <mat-label>Parish</mat-label>
-                                <select matNativeControl required formControlName="parish">
-                                    <option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</option>
-                                </select>
-                            </mat-form-field> -->
+                                <mat-form-field class="col-md-6">
+                                        <mat-label>Country</mat-label>
+                                        <input required id="country" matInput formControlName="country" placeholder="Country" />
+                                </mat-form-field>
+                                <mat-form-field class="col-md-6">
+                                        <mat-label>State/Province</mat-label>
+                                     
+                                        <input required id="state" matInput formControlName="state" placeholder="State/Province" />
+
+                                                </mat-form-field>
                         </div>
                         <div class="row">
                             <mat-form-field class="col-md">

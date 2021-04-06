@@ -12,3 +12,8 @@ mat-form-field{
 #reject-icon{
     color:red;
 }
+.modal-title{
+    font-weight: bold;
+    font-family: poppins;
+    letter-spacing: 0.18px;
+}
