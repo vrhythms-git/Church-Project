@@ -160,6 +160,17 @@ export class AuthService {
 
   }
 
+    // Reset Forggot password
+    forgotPassword(passwordResetEmail: string) {
+      return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail)
+        .then(() => {
+         // window.alert('Password reset email sent, check your inbox.');
+          this.uiCommonUtils.showSnackBar('Password reset link has been sent to your email.','success',5000)
+        }).catch((error) => {
+          console.log('Error occured while resetting password as : ' + error); 
+        })
+    }
+
   // Sign out
   SignOut() {
     return this.afAuth.auth.signOut().then(() => {

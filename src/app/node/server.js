@@ -1,6 +1,7 @@
 const processRequest = require(`${__dirname}/reqOperations`);
 const processUserRequest = require(`${__dirname}/userReqOperations`)
 const processMiscRequest = require(`${__dirname}/miscReqOperations`)
+const processEventRequest = require(`./eventReqOperations`)
 const dbConnections = require(`${__dirname}/dbConnection`);
 express = require('express')
 const cors = require('cors')
@@ -265,7 +266,23 @@ app.get('/api/getCountryStates', function (req, res) {
 // firebaseAdminUtils.varifyUserToken(req.header('Authorization')).then(idToken => {});
 
 
-
+app.post('/api/updateEvent', function (req, res) {
+  console.log("updateEvent called with : " + JSON.stringify(req.body));
+  try {
+    processEventRequest.updateEvent(req.body.data)
+      .then((data) => {
+        console.log(`Returning with resonse : ${data}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in updateEvent as : ' + error)
+  }
+});
 
 
 

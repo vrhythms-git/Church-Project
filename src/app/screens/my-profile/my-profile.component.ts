@@ -166,7 +166,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
     this.myprofileform.value.userId = this.userId;
     this.myprofileform.value.updatedBy = this.userId;
     this.myprofileform.value.orgId = this.orgId;
-    this.myprofileform.value.isFamilyHead = this.isFamilyHead;
+    //this.myprofileform.value.isFamilyHead = this.isFamilyHead;
     // let dob = this.myprofileform.value.dob;
     // console.log(dob);
     this.apiService.updateUserProfile({ data: this.myprofileform.value }).subscribe(res => {

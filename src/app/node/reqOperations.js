@@ -126,11 +126,11 @@ async function processSignInRequest(userInfo) {
         //         select ${this.userId}, id from t_role where name = 'Family Head';`
         //     await client.query(insertRoleMapping);
         // }
-       // if (!this.isFamilyHead) {
-         //   console.log("7");
-            let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+        // if (!this.isFamilyHead) {
+        //   console.log("7");
+        let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
                 select ${newUserId}, role_id from t_role where name = 'Member';`
-            await client.query(insertRoleMappingmember);
+        await client.query(insertRoleMappingmember);
         //}
 
         console.log("Before commit");
@@ -162,7 +162,7 @@ async function processGetUserMetaDataRequest(firebaseToken) {
     await client.connect();
 
     //Validate user, if not valid then respond him back with appropriate request
-    try {   
+    try {
         //console.log('Validating user approval and his deleted status.')
         const userValidationQuery = `SELECT  CASE WHEN tu.is_approved = false THEN false
                                             WHEN tu.is_approved = true THEN true
@@ -174,9 +174,9 @@ async function processGetUserMetaDataRequest(firebaseToken) {
                                             ELSE false
                                     end as is_deleted
                                     FROM t_user tu where firebase_id = '${firebaseToken}' ;`;
-                       
+
         let result = await client.query(userValidationQuery);
-        console.log(`for user ${firebaseToken} is_approved : ${result.rows[0].is_approved} and is_deleted : ${result.rows[0].is_deleted}` )     
+        console.log(`for user ${firebaseToken} is_approved : ${result.rows[0].is_approved} and is_deleted : ${result.rows[0].is_deleted}`)
         if (result.rows[0].is_approved == false)
             return errorHandling.handleDBError('not_approved')
         if (result.rows[0].is_deleted == true)
@@ -578,70 +578,70 @@ async function getEventCategory() {
 
     let client = dbConnections.getConnection();
     await client.connect();
-        try {
-            let metadata = {};
-            let getEventCategory = `select event_category_id id, name, description ,school_grade_from,school_grade_to from t_event_category;`
-            let res = await client.query(getEventCategory);
-                if (res && res.rowCount > 0) {
-                    console.log("In response" + res);
-                    let eventCategory = [];
-                    for (let row of res.rows) {
-                        let events = {};
-                        events.id = row.id;
-                        events.name = row.name;
-                        events.description = row.description;
-                        events.schoolGradeFrom = row.school_grade_from;
-                        events.schoolGradeTo = row.school_grade_to;
-                        eventCategory.push(events);
-                    }
-                    metadata.eventCategory = eventCategory;
-                    //client.end()
-                   
-                }
-
-
-
-            let getVenueData = `select * from t_venue;`    
-            let res1 = await client.query(getVenueData);
-            if (res1 && res1.rowCount > 0) {
-                console.log("In getVenueData" + res1);
-
-                let venuesData = [];
-                for (let row of res1.rows) {
-                    let venues = {};
-                    venues.venueId = row.venue_id;
-                    venues.name = row.name;
-                    venues.orgId = row.org_id;
-                    venues.description = row.description;
-                    venues.addressLine1 = row.address_line1;
-                    venues.addressLine2 = row.address_line2;
-                    venues.addressLine3 = row.address_line3;
-                    venues.city = row.city;
-                    venues.state = row.state;
-                    venues.postalCode = row.postal_code;
-                    venues.country = row.country;
-                    venues.mobileNo = row.mobile_no;
-                    venues.homePhoneNo = row.phone_no;
-                    venues.mapUrl = row.map_url;
-                    venuesData.push(venues);
-                }
-                metadata.venuesData = venuesData;
-                client.end()
-               
+    try {
+        let metadata = {};
+        let getEventCategory = `select event_category_id id, name, description ,school_grade_from,school_grade_to from t_event_category;`
+        let res = await client.query(getEventCategory);
+        if (res && res.rowCount > 0) {
+            console.log("In response" + res);
+            let eventCategory = [];
+            for (let row of res.rows) {
+                let events = {};
+                events.id = row.id;
+                events.name = row.name;
+                events.description = row.description;
+                events.schoolGradeFrom = row.school_grade_from;
+                events.schoolGradeTo = row.school_grade_to;
+                eventCategory.push(events);
             }
+            metadata.eventCategory = eventCategory;
+            //client.end()
 
-                return({
-                    data: {
-                        status: 'success',
-                        metaData: metadata
-                    }
-                })
-            
-        } catch (error) {
+        }
+
+
+
+        let getVenueData = `select * from t_venue;`
+        let res1 = await client.query(getVenueData);
+        if (res1 && res1.rowCount > 0) {
+            console.log("In getVenueData" + res1);
+
+            let venuesData = [];
+            for (let row of res1.rows) {
+                let venues = {};
+                venues.venueId = row.venue_id;
+                venues.name = row.name;
+                venues.orgId = row.org_id;
+                venues.description = row.description;
+                venues.addressLine1 = row.address_line1;
+                venues.addressLine2 = row.address_line2;
+                venues.addressLine3 = row.address_line3;
+                venues.city = row.city;
+                venues.state = row.state;
+                venues.postalCode = row.postal_code;
+                venues.country = row.country;
+                venues.mobileNo = row.mobile_no;
+                venues.homePhoneNo = row.phone_no;
+                venues.mapUrl = row.map_url;
+                venuesData.push(venues);
+            }
+            metadata.venuesData = venuesData;
+            client.end()
+
+        }
+
+        return ({
+            data: {
+                status: 'success',
+                metaData: metadata
+            }
+        })
+
+    } catch (error) {
         client.end();
         console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    
+
 
     }
 }
@@ -743,7 +743,7 @@ async function insertEvents(eventsData) {
             const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id,venue_id)
                     VALUES ($1, $2, $3) returning event_category_id, venue_id;`
 
-           
+
             for (let category of eventsData.categories) {
                 //t_event_venue 
                 console.log(`Inserting category ${JSON.stringify(category)}`);
@@ -761,10 +761,10 @@ async function insertEvents(eventsData) {
 
                 const eventCatVenueMap = `INSERT INTO t_event_category_venue_map(event_cat_map_id, event_venue_id) VALUES ($1, $2);`
                 eventCatVenueMapValues = [
-                            this.eventCategoryID,
-                            this.venueId
+                    this.eventCategoryID,
+                    this.venueId
                 ]
-                await client.query(eventCatVenueMap, eventCatVenueMapValues);    
+                await client.query(eventCatVenueMap, eventCatVenueMapValues);
 
 
                 console.log("5");
@@ -841,7 +841,7 @@ async function processUpdateUserRoles(userData) {
         if (userData.isFamilyHead == true) {
 
             let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
-                select ${userData.userId}, role_id from t_role where name = 'Family Head';`
+                (select ${userData.userId}, role_id from t_role where name = 'Family Head';)`
             await client.query(insertRoleMapping)
             console.log('User is family head gave him add member permission');
         }
@@ -1030,9 +1030,9 @@ async function processUpdateUserRoles(userData) {
 
 
 
-                    console.log("this.NewUserId", NewUserId);
+                    console.log("this.NewUserId", newUserId);
                     let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
-                    select ${NewUserId}, role_id from t_role where name = 'Member';`
+                    select ${newUserId}, role_id from t_role where name = 'Member';`
                     console.log("insertRoleMappingmember", insertRoleMappingmember);
                     await client.query(insertRoleMappingmember);
 
@@ -1048,7 +1048,7 @@ async function processUpdateUserRoles(userData) {
 
                     insertPersonRelationshipValues = [
                         userData.userId,
-                        NewUserId,
+                        newUserId,
                         details.relationship,
                         userData.updatedBy,
                         new Date().toISOString()
@@ -1060,7 +1060,7 @@ async function processUpdateUserRoles(userData) {
 
                     console.log('New member created successfully.');
 
-                    existingMembers.push(NewUserId);
+                    existingMembers.push(newUserId);
 
                     ///this.userId = result.rows[0].user_id;
                     //console.log("userid", this.userId)
@@ -1109,12 +1109,12 @@ async function processUpdateUserRoles(userData) {
             }
 
             //// Delete users which are not present in membership detail array
-
-            let usersToDelete = existingMembers.join(',');
-            let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = true where family_member_id not in (${usersToDelete});`
-            console.log("deleteRelationship", deleteRelationship);
-            await client.query(deleteRelationship);
-
+            if (existingMembers.length > 0) {
+                let usersToDelete = existingMembers.join(',');
+                let deleteRelationship = `UPDATE t_person_relationship SET is_deleted = true where family_member_id not in (${usersToDelete});`
+                console.log("deleteRelationship", deleteRelationship);
+                await client.query(deleteRelationship);
+            }
         }
 
 

@@ -46,7 +46,7 @@ export class SignInComponent implements OnInit {
     if (emailAdd.length == 0)
       return;
     else
-      // this.authService.ForgotPassword(emailAdd);
+       this.authService.forgotPassword(emailAdd);
       this.router.navigate(['signin'])
   }
 
