@@ -1269,6 +1269,43 @@ async function deleteUsers(userData) {
     }
 }
 
+async function getProctorData(userData){
+
+    let client = dbConnections.getConnection();
+    await client.connect();
+        try {
+            let metadata = {};
+            console.log("userData",userData);
+            let getProctorData = `select user_id, CONCAT(first_name, ' ',last_name) as name from v_user where user_org_id = ${userData};`
+            let res = await client.query(getProctorData);
+                if (res && res.rowCount > 0) {
+                    console.log("In response" + res);
+
+                    let proctorData = [];
+                    for (let row of res.rows) {
+                        let proctor = {};
+                        proctor.userId = row.user_id;
+                        proctor.name = row.name;
+                        proctorData.push(proctor);
+                    }
+                    metadata.proctorData = proctorData;
+                }
+
+                return({
+                    data: {
+                        status: 'success',
+                        metaData: metadata
+                    }
+                })
+
+        } catch (error) {
+            client.end();
+            console.error(`reqOperations.js::getProctorData() --> error executing query as : ${error}`);
+            return (errorHandling.handleDBError('connectionError')); 
+        }
+}
+
+
 module.exports = {
     processSignInRequest,
     processGetUserMetaDataRequest,

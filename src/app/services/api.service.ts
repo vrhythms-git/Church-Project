@@ -136,5 +136,15 @@ insertevents(eventsData  : any){
    console.log(JSON.stringify(eventsData));
   return this.http.post(`${this._baseUrl}/insertevents`, JSON.stringify(eventsData),{ headers: headerObj } );
   }
+
+  getProctorData(userData: any):Observable<any>{
+    console.log(`calling the getProctorData()`);
+    let headerObj = new HttpHeaders({
+                    'Authorization': localStorage.getItem('chUserToken')!,
+                    'Content-Type' : 'application/json'
+                  });
+    console.log( 'getProctorData is : ' + this.http.get(`${this._baseUrl}/getProctorData`), userData);
+    return this.http.get(`${this._baseUrl}/getProctorData?userData=`+ userData );   
+  }
 }
 

@@ -285,6 +285,26 @@ app.post('/api/updateEvent', function (req, res) {
 });
 
 
+app.get('/api/getProctorData', function (req, res) {
+  console.log("getProctorData called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processRequest.getProctorData(req.query.userData)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getProctorData as : ' + error)
+  }
+});
+
+
+
 
 
 

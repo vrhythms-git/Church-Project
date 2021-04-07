@@ -15,6 +15,11 @@ import { uiCommonUtils } from 'src/app/common/uiCommonUtils';
 export class EventCreationComponent implements OnInit {
 
   eventCreationForm: any;
+  eventsDataFormGroup: any;
+  venuesDataFormGroup: any;
+  categoriesDataFormGroup: any;
+  questionnaireDataFormGroup: any;
+
   venues: any;
   questionnaire: any;
   term: any;
@@ -25,6 +30,7 @@ export class EventCreationComponent implements OnInit {
   venuesdataOfdata!: any[];
   venuesList!: any[];
   parishList!: any[];
+  proctorData!: any[];
 
   eventcategories: any;
   eventcategorydata!: any[];
@@ -43,7 +49,7 @@ export class EventCreationComponent implements OnInit {
     this.orgId = this.alluserdata.orgId;
     this.userId = this.alluserdata.userId;
 
-    this.eventCreationForm = this.formBuilder.group({
+    this.eventsDataFormGroup = this.formBuilder.group({
       name: new FormControl('', Validators.required),
       eventType: new FormControl('', Validators.required),
       parishName: new FormControl('', Validators.required),
@@ -53,24 +59,27 @@ export class EventCreationComponent implements OnInit {
       endDate: new FormControl('', Validators.required),
       registrationStartDate: new FormControl('', Validators.required),
       registrationEndDate: new FormControl('', Validators.required),
-     
-      //venueId: new FormControl('', Validators.required),
-      venues: this.formBuilder.array([this.adduserVenuAndProcter()]),
-     
-      categories: this.formBuilder.array([this.addeventCategory()]),
+      //venueId: new FormControl('', Validators.required),   
+    });
+
+    this.venuesDataFormGroup = this.formBuilder.group({
+      venues: this.formBuilder.array([this.adduserVenuAndProcter()])
+    });
+
+    this.categoriesDataFormGroup = this.formBuilder.group({
+      categories: this.formBuilder.array([this.addeventCategory()])
+    });
+
+    this.questionnaireDataFormGroup = this.formBuilder.group({
       questionnaire: this.formBuilder.array([this.adduserquestionary()])
     });
 
-    //this.categoryData = this.eventCreationForm.get('categoryData') as FormArray;
-    //this.categoryData.push(this.addeventCategory());
-
-
     this.apiService.getEventCategoryData().subscribe((res) => {
       console.log('These are Event category from database : ');
-      console.log(res.data.metaData);
+      //console.log(res.data.metaData);
       this.eventcategorydata = res.data.metaData.eventCategory;
 
-      this.eventCreationForm.setControl('categories', this.setEventCategory(this.eventcategorydata));
+      this.categoriesDataFormGroup.setControl('categories', this.setEventCategory(this.eventcategorydata));
 
       this.venuesdataOfdata = res.data.metaData.venuesData;
       console.log(this.venuesdataOfdata[1].name);
@@ -85,9 +94,12 @@ export class EventCreationComponent implements OnInit {
       }
       console.log(this.parishList);
     });
+
+   
+
   }
 
- 
+  
 
   setuserVenuAndProcter(venuesdataOfdata: any): FormArray {
     const formArray = new FormArray([]);
@@ -100,15 +112,22 @@ export class EventCreationComponent implements OnInit {
     return formArray;
   }
 
-
   onaddbtnclick() {
-    this.venues = this.eventCreationForm.get('venues') as FormArray;
+    this.venues = this.venuesDataFormGroup.get('venues') as FormArray;
     this.venues.push(this.adduserVenuAndProcter());
   }
 
+  onEventsNextBtnClick(){
 
-  onNextBtnClick() {
-    this.venues = this.eventCreationForm.get('venues') as FormArray;
+    console.log(this.eventsDataFormGroup.value.parishName);
+    this.apiService.getProctorData(this.eventsDataFormGroup.value.parishName).subscribe(res => {
+      this.proctorData = res.data.metaData.proctorData;
+      console.log("this.proctorData",this.proctorData);
+     });
+  }
+
+  onVenuesNextBtnClick() {
+    this.venues = this.venuesDataFormGroup.get('venues') as FormArray;
     this.newVenues = this.venues.value;
 
     for (let i = 0; i < this.venuesList.length; i++) {
@@ -121,34 +140,28 @@ export class EventCreationComponent implements OnInit {
       }
     }
     console.log(this.newVenues);
-    // if(this.venuesList){
-    //   if(this.newVenues)
-    // }
-    //.push(this.eventCreationForm.value.venues);
   }
 
   onaddbtncategory() {
-    this.categories = this.eventCreationForm.get('categories') as FormArray;
+    this.categories = this.categoriesDataFormGroup.get('categories') as FormArray;
     this.categories.push(this.addeventCategory());
   }
 
   onaddbtnclick1() {
-    this.questionnaire = this.eventCreationForm.get('questionnaire') as FormArray;
+    this.questionnaire = this.questionnaireDataFormGroup.get('questionnaire') as FormArray;
     this.questionnaire.push(this.adduserquestionary());
   }
 
-
-
   onremovebtnclickVenu(index: any) {
-    (<FormArray>this.eventCreationForm.get('venues').removeAt(index));
+    (<FormArray>this.venuesDataFormGroup.get('venues').removeAt(index));
   }
 
   onremovebtnclickQuestion(index: any) {
-    (<FormArray>this.eventCreationForm.get('questionnaire').removeAt(index));
+    (<FormArray>this.questionnaireDataFormGroup.get('questionnaire').removeAt(index));
   }
 
   removeEventCategory(index: any) {
-    (<FormArray>this.eventCreationForm.get('categories').removeAt(index));
+    (<FormArray>this.categoriesDataFormGroup.get('categories').removeAt(index));
   }
 
   adduserquestionary(): FormGroup {
@@ -179,13 +192,12 @@ export class EventCreationComponent implements OnInit {
       name: '',
       schoolGradeFrom: '',
       schoolGradeTo: '',
-      judge1: '',
-      judge2: '',
-      judge3: '',
+      judge1: 1,
+      judge2: 2,
+      judge3: 3,
       venueId: ''
     });
   }
-
 
   setEventCategory(eventcategorydata: any): FormArray {
     const formArray = new FormArray([]);
@@ -204,16 +216,18 @@ export class EventCreationComponent implements OnInit {
     return formArray;
   }
 
-
   createEvent() {
-    this.eventCreationForm.value.orgId = this.orgId;
+    let eventCreationForm : any = {};
+    eventCreationForm = {...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value}
+    console.log("this.eventCreationForm", eventCreationForm);
+    this.eventsDataFormGroup.value.orgId = this.orgId;
     //this.eventCreationForm.value.venues.proctorId = this.userId;
-    this.apiService.insertevents({ data: this.eventCreationForm.value }).subscribe(res => {
+    this.apiService.insertevents({ data: eventCreationForm }).subscribe(res => {
       console.log("res", JSON.stringify(res));
       console.log("Event created successfully!");
-      this.uiCommonUtils.showSnackBar("Event created successfully!", "Dismiss", 4000);
+      this.uiCommonUtils.showSnackBar("Event created successfully!", "Success", 4000);
     });
-    console.log("FormValues:", JSON.stringify(this.eventCreationForm.value));
+    console.log("FormValues:", JSON.stringify(eventCreationForm));
   }
 
 
