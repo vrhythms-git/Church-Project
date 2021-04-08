@@ -168,6 +168,10 @@ export class AuthService {
           this.uiCommonUtils.showSnackBar('Password reset link has been sent to your email.','success',5000)
         }).catch((error) => {
           console.log('Error occured while resetting password as : ' + error); 
+          if(error.code == 'auth/user-not-found')
+          this.uiCommonUtils.showSnackBar('User does not exist in system.','error',5000)
+          else
+          this.uiCommonUtils.showSnackBar('Something went wrong.','error',5000);
         })
     }
 

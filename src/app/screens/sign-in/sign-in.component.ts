@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service'
-
+declare let $: any;
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
@@ -47,6 +47,7 @@ export class SignInComponent implements OnInit {
       return;
     else
        this.authService.forgotPassword(emailAdd);
+       $("#myModal").modal("hide");
       this.router.navigate(['signin'])
   }
 
