@@ -107,27 +107,24 @@
           </mat-form-field>
 
           <mat-form-field class="col-md">
-            <mat-label>State/Province</mat-label>
-            <input required id="state" matInput formControlName="state" placeholder="Enter State" />
-    </mat-form-field>
+              <mat-label>Parish</mat-label>
+              <input id="parish" matInput formControlName="parish" readonly />
+      </mat-form-field>
   </div>
   <div class="row">
                   
-          <mat-form-field class="col-md">
+          <mat-form-field class="col-md-6">
                   <mat-label>Country</mat-label>
-                  <select matNativeControl required id="country" formControlName="country" placeholder="Enter Country">
-                          <option value="USA">USA</option>
-                          <option value="India">India</option>
+                  <select matNativeControl required id="country" formControlName="country" placeholder="Select Country" [(ngModel)]="selectedCountry" (change)="changeCountry($event)">
+                          <option *ngFor="let country of countries" [value]="country.countryName">{{country.countryName}}</option>
                   </select>
           </mat-form-field>
-
-          <mat-form-field class="col-md-6">
-            <mat-label>Parish</mat-label>
-            <select matNativeControl formControlName="parish">
-                    <option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</option>
-            </select>
-    </mat-form-field>
-
+          <mat-form-field class="col-md-6"> 
+                  <mat-label>State/Province</mat-label>
+                  <select matNativeControl required id="state" formControlName="state" placeholder="Select State/Province" >
+                          <option *ngFor="let state of states" [value]="state">{{state}}</option>
+                  </select>
+                          </mat-form-field>
   </div>
 
   <div class="row">
@@ -271,23 +268,16 @@
                           <input required id="emailId" matInput formControlName="emailId" placeholder="Enter Email Address" />                 
                         </mat-form-field>
                       </div>
-  
                       </div>
-      
                   </div>
-      
               </fieldset> 
-
               <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
               </mat-divider>
 
             </div>
 
-  
-
   <div class="row" style="padding-top: 1%;">
           <div class="col text-center">
-
                   <button mat-button type="submit" mat-button class="mbutton" (change)="isDirty = false" (click)="updateUserProfile()">
                           Update</button>
           </div>

@@ -30,9 +30,8 @@ export class ApprovalRequestsComponent implements OnInit {
   states! : any[];
   selectedCountry:any;
 
-
   constructor(private apiService: ApiService, private formBuilder: FormBuilder,
-    private uiCommonUtils: uiCommonUtils, private router: Router) { }
+  private uiCommonUtils: uiCommonUtils, private router: Router) { }
 
   agInit(params: any) {
     this.params = params;
@@ -85,7 +84,8 @@ export class ApprovalRequestsComponent implements OnInit {
     this.loggedInUser = this.userMetaData.userId;
     this.getUnapprovedUserData();
 
-    this.apiService.getCountryStates().subscribe( res => {
+    this.apiService.getCountryStates().subscribe( (res:any) => {
+      console.log(res.data.countryState)
       this.countries = res.data.countryState;
       console.log("Countries", this.countries);
   })

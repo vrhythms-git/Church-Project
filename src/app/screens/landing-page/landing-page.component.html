@@ -77,10 +77,10 @@
                                                         </mat-form-field>
                                                 </div>
                                                 <div class="row">
-                                                        <mat-form-field class="col-md-4">
-                                                                <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
-                                                                <input id="mobileNo" matInput formControlName="mobileNo"  ng2TelInput length="10" placeholder="Enter Mobile Number" />
-                                                        </mat-form-field>
+                                                                <mat-form-field class="col-md-4">
+                                                                                <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
+                                                                                <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" ng2TelInput  (intlTelInputObject)="telInputObject($event)" length="10"/>                 
+                                                                              </mat-form-field>
                                                         <mat-form-field class="col-md-4">
                                                                 <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
                                                                 <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput length="10" placeholder="Enter Home Phone Number" />
@@ -121,28 +121,20 @@
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-4">
                                                                 <mat-label>Parish</mat-label>
-                                                                <select matNativeControl required formControlName="parish">
-                                                                        <option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</option>
-                                                                </select>
+                                                                <input id="parish" matInput formControlName="parish" readonly />
+
                                                         </mat-form-field>
                                                 </div>
                                                 <div class="row">
-
                                                         <mat-form-field class="col-md-6">
                                                                 <mat-label>Country</mat-label>
                                                                 <select matNativeControl required id="country" formControlName="country" placeholder="Select Country" [(ngModel)]="selectedCountry" (change)="changeCountry($event)">
-                                                                        <!-- <option value="USA">USA</option>
-                                                                        <option value="India">India</option> -->
                                                                         <option *ngFor="let country of countries" [value]="country.countryName">{{country.countryName}}</option>
                                                                 </select>
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-6">
                                                                 <mat-label>State/Province</mat-label>
                                                                 <select matNativeControl required id="state" formControlName="state" placeholder="Select State/Province" >
-                                                                                                                                              
-                                                                        <!-- <option value="USA">USA</option>
-                                                                        <option value="India">India</option>  -->
-
                                                                         <option *ngFor="let state of states" [value]="state">{{state}}</option>
                                                                 </select>
                                                                         </mat-form-field>

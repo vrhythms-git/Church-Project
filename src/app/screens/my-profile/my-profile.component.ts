@@ -35,6 +35,9 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
   orgId: any;
   parishList!: any[];
   memberDetailsData!: any[];
+  countries!: any[];
+  states! : any[];
+  selectedCountry:any;
 
   ngOnInit(): void {
     this.myprofileform = this.formBuilder.group({
@@ -65,6 +68,8 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
       orgId: new FormControl('')
     });
 
+   
+
     this.alluserdata = this.uiCommonUtils.getUserMetaDataJson();
     this.userId = this.alluserdata.userId;
     this.fbUid = this.alluserdata.fbUid;
@@ -72,6 +77,8 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
     this.orgId = this.alluserdata.orgId;
     this.memberDetailsData = this.alluserdata.memberDetails;
     this.myprofileform.setControl('memberDetails', this.setMemberDetails(this.memberDetailsData));
+
+    
 
     this.hasAddMemPerm = this.uiCommonUtils.hasPermissions("add_member");
 
@@ -88,9 +95,14 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
       console.log(this.parishList);
     });
 
+    this.apiService.getCountryStates().subscribe(( res:any) => {
+      this.countries = res.data.countryState;
+      console.log("Countries", this.countries);
+      this.patchCountryState(this.alluserdata.country);
+  })
 
-    
     this.myprofileform.patchValue({
+      country: this.alluserdata.country,
       title: this.alluserdata.title,
       firstName: this.alluserdata.firstName,
       middleName: this.alluserdata.middleName,
@@ -107,16 +119,15 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
       city: this.alluserdata.city,
       postalCode: this.alluserdata.postalCode,
       state: this.alluserdata.state,
-      country: this.alluserdata.country,
-      parish: this.alluserdata.parish,
+      parish: this.alluserdata.orgName,
       //memberDetails: this.alluserdata.memberDetails,
       maritalStatus: this.alluserdata.maritalStatus,
       dateofMarriage: this.alluserdata.dateofMarriage,
       aboutYourself: this.alluserdata.aboutYourself,
       userId: this.alluserdata.userId,
     });
-  }
-
+    
+      }
 
   setMemberDetails(memberDetailsData: any): FormArray {
     const formArray = new FormArray([]);
@@ -184,4 +195,22 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
     });
     console.log("FormValues:", JSON.stringify(this.myprofileform.value));
   }
+
+  changeCountry(country:any){
+    for (let i = 0; i < this.countries.length; i++) {
+      if (this.countries[i].countryName == country.target.value) {
+        console.log(this.countries[i].states);
+        this.states = this.countries[i].states;
+      }
+    }
+  }
+
+  patchCountryState(country:any){
+    for (let i = 0; i < this.countries.length; i++) {
+      if (this.countries[i].countryName == country) {
+        console.log(this.countries[i].states);
+        this.states = this.countries[i].states;
+      }
+    }
+}
 }

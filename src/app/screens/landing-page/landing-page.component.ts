@@ -86,7 +86,7 @@ export class LandingPageComponent implements OnInit {
       postalCode: new FormControl('', Validators.required),
       state: new FormControl('', Validators.required),
       country: new FormControl('', Validators.required),
-      parish: new FormControl('', Validators.required),
+      parish: new FormControl(''),
       maritalStatus: new FormControl('', Validators.required),
       dateofMarriage: new FormControl(''),
       about_urself: new FormControl(''),
@@ -131,7 +131,7 @@ export class LandingPageComponent implements OnInit {
       console.log("Roles Data:", this.orgs);
     })
 
-    this.apiService.getCountryStates().subscribe( res => {
+    this.apiService.getCountryStates().subscribe( (res:any) => {
         this.countries = res.data.countryState;
         console.log("Countries", this.countries);
     })
@@ -174,6 +174,7 @@ export class LandingPageComponent implements OnInit {
       console.log(this.parishList);
     })
 
+
     this.updateuserinfo.patchValue({
       title:this.selectedUserData.title,
       firstName: this.selectedUserData.firstName,
@@ -192,7 +193,7 @@ export class LandingPageComponent implements OnInit {
       postalCode: this.selectedUserData.postalCode,
       state: this.selectedUserData.state,
       country: this.selectedUserData.country,
-      parish: this.selectedUserData.parish,
+      parish: this.selectedUserData.parish_name,
       maritalStatus: this.selectedUserData.maritalStatus,
       dateofMarriage: this.selectedUserData.dateofMarriage,
       about_urself: this.selectedUserData.about_urself,
@@ -202,6 +203,9 @@ export class LandingPageComponent implements OnInit {
       //  accesslvlid : selectedUserData.roles[0].orgId  
       // roles: selectedUserData.roles
     })
+  
+   this.patchCountryState(this.selectedUserData.country);
+
     this.selectedUserRole = this.selectedUserData.roles;
     console.log("selectedUserRole", this.selectedUserRole)
 
@@ -219,6 +223,10 @@ export class LandingPageComponent implements OnInit {
     });
     
     this.updateuserinfo.setControl('roles', this.setRoles(this.selectedUserRole));
+  }
+
+  telInputObject(obj:any) {
+    obj.intlTelInput('setNumber', this.selectedUserData.mobileNo);
   }
 
   setRoles(selectedUserRole: any): FormArray {
@@ -325,7 +333,7 @@ export class LandingPageComponent implements OnInit {
         this.uiCommonUtils.showSnackBar('User Profile Updated..', 'Dismiss', 3000)
       //  }
       this.getUserData();
-      })
+      })  
       this.updateuserinfo.reset();
       $("#imagemodal").modal("hide");
       
@@ -373,4 +381,13 @@ export class LandingPageComponent implements OnInit {
       }
     }
   }
+  patchCountryState(country:any){
+    //this.states = this.countries.find((cntry: any) => cntry.name == country.target.value).states;
+    for (let i = 0; i < this.countries.length; i++) {
+      if (this.countries[i].countryName == country) {
+        console.log(this.countries[i].states);
+        this.states = this.countries[i].states;
+      }
+    }
+}
 }
