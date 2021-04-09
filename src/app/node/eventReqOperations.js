@@ -39,7 +39,7 @@ async function updateEvent(eventsData) {
                 eventsData.orgId,
                 eventsData.eventId
             ];
-             await client.query(updateEvent, updateEventValues);
+            await client.query(updateEvent, updateEventValues);
             /********************** t_event_venue************************************************************************************/
             let existingVenue = [];
             let newlyAddedVenue = [];
@@ -59,7 +59,7 @@ async function updateEvent(eventsData) {
                 let deleteVenueQuery = `UPDATE t_event_venue SET is_deleted = true where event_venue_id not in (${existingVenueString});`
                 await client.query(deleteVenueQuery);
             }
-             //Insert new venus 
+            //Insert new venus 
             if (newlyAddedVenue.length > 0) {
                 for (let venue of eventsData.venues) {
                     let insertNewVenus = `INSERT INTO t_event_venue (event_id, venue_id, proctor_id, is_deleted)
@@ -87,52 +87,52 @@ async function updateEvent(eventsData) {
             // }
 
             for (let eveCatMap of eventsData.categories) {
-              
+
                 // to update t_event_category_map table mapping.
                 let updateEveCatMapping = `UPDATE t_event_category_map
                                             SET event_id=$1, event_category_id=$2, venue_id=$3
                                             WHERE event_cat_map_id = $4`;
-                
+
                 let updateEveCatMappingValues = [
                     eventsData.eventId,
                     eveCatMap.eventCategoryID,
                     eveCatMap.venueId,
                     eveCatMap.eventCatMapId
-                ];                    
+                ];
                 await client.query(updateEveCatMapping, updateEveCatMappingValues);
 
                 //To update t_event_cat_staff_map table mapping
-              let updateEveCatStaffMapping =  `UPDATE t_event_cat_staff_map
+                let updateEveCatStaffMapping = `UPDATE t_event_cat_staff_map
                                                SET event_id=$1, event_category_id=$2, user_id=$3, role_type=$4,
                                                is_deleted=$5, updated_by=$6, updated_date=$7
                                                WHERE event_cat_staff_map_id=$8;`
 
-                 // Judge 1 row                             
-                let updateEveCatStaffMappingValues = [eventsData.eventId, eveCatMap.eventCategoryID, 
-                                                 eveCatMap.judge1, 'Judge', false, eventsData.updatedBy,
-                                                  new Date().toUTCString(), eveCatMap.eventCatStaffMapId1 ]
+                // Judge 1 row                             
+                let updateEveCatStaffMappingValues = [eventsData.eventId, eveCatMap.eventCategoryID,
+                eveCatMap.judge1, 'Judge', false, eventsData.updatedBy,
+                new Date().toUTCString(), eveCatMap.eventCatStaffMapId1]
 
-                  await client.query(updateEveCatStaffMapping, updateEveCatStaffMappingValues);
+                await client.query(updateEveCatStaffMapping, updateEveCatStaffMappingValues);
 
-                  // Judge 2 row
-                   updateEveCatStaffMappingValues = [eventsData.eventId, eveCatMap.eventCategoryID, 
-                                                      eveCatMap.judge2, 'Judge', false, eventsData.updatedBy,
-                                                      new Date().toUTCString(),  eveCatMap.eventCatStaffMapId2 ]
-                                                    
-                 await client.query(updateEveCatStaffMapping, updateEveCatStaffMappingValues); 
-                 
-                 // Judge 3 row
-                 updateEveCatStaffMappingValues = [eventsData.eventId, eveCatMap.eventCategoryID, 
-                    eveCatMap.judge3, 'Judge', false, eventsData.updatedBy,
-                    new Date().toUTCString(),  eveCatMap.eventCatStaffMapId3 ]
-                  
-                await client.query(updateEveCatStaffMapping, updateEveCatStaffMappingValues); 
-                 
-                 
+                // Judge 2 row
+                updateEveCatStaffMappingValues = [eventsData.eventId, eveCatMap.eventCategoryID,
+                eveCatMap.judge2, 'Judge', false, eventsData.updatedBy,
+                new Date().toUTCString(), eveCatMap.eventCatStaffMapId2]
+
+                await client.query(updateEveCatStaffMapping, updateEveCatStaffMappingValues);
+
+                // Judge 3 row
+                updateEveCatStaffMappingValues = [eventsData.eventId, eveCatMap.eventCategoryID,
+                eveCatMap.judge3, 'Judge', false, eventsData.updatedBy,
+                new Date().toUTCString(), eveCatMap.eventCatStaffMapId3]
+
+                await client.query(updateEveCatStaffMapping, updateEveCatStaffMappingValues);
+
+
             }
 
             /********************** t_event_questionnaire ************************************************************************************/
-           
+
             let existingQue = [];
             let newlyAddedQue = [];
             for (let question of eventsData.questionnaire) {
@@ -145,8 +145,8 @@ async function updateEvent(eventsData) {
             }
 
 
-             //Delete existing questions 
-             if (existingQue.length > 0) {
+            //Delete existing questions 
+            if (existingQue.length > 0) {
                 let existingQueIdenueString = existingQue.join(',');
                 console.log('Deleting venus from t_event_questionnaire table excet :' + existingQueIdenueString);
                 let deleteQueQuery = `UPDATE t_event_questionnaire SET 
@@ -155,7 +155,7 @@ async function updateEvent(eventsData) {
                                          where question_id not in (${existingQueIdenueString});`
                 await client.query(deleteQueQuery);
             }
-             //Insert new questions 
+            //Insert new questions 
             if (newlyAddedQue.length > 0) {
                 for (let question of eventsData.questionnaire) {
                     let insertNewQue = `INSERT INTO t_event_questionnaire
@@ -171,7 +171,7 @@ async function updateEvent(eventsData) {
                     await client.query(insertNewQue, insertNewQues);
                 }
             }
-           
+
             client.end()
             console.log("Before commit");
             await client.query("COMMIT");
@@ -185,7 +185,7 @@ async function updateEvent(eventsData) {
         }
         catch (err) {
             await client.query("ROLLBACK");
-            console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`)
+            console.error(`eventReqOperations.js::UpdateEvent() --> error : ${JSON.stringify(err)}`)
             console.log("Transaction ROLLBACK called");
             return (errorHandling.handleDBError('transactionError'));
         }
@@ -196,6 +196,46 @@ async function updateEvent(eventsData) {
     }
 }
 
+async function getVenues(venueData) {
+
+    let client = dbConnections.getConnection();
+    await client.connect();
+    try {
+
+        let condition = ''
+        if (venueData.parishIds.length != 0) {
+            let venueString = venueData.parishIds.join(',');
+            condition = ` and to2.org_id in (${venueString})  `;
+        }
+
+        let getVenuesQuery = `select jsonb_build_object( 'venueId' , tv.venue_id, 'venueName', tv."name") as res_row
+                            from t_organization to2 , t_venue tv 
+                            where parent_org_id = ${venueData.regionId} 
+                            ${condition} and tv.org_id = to2.org_id;`;
+
+        let res = await client.query(getVenuesQuery);
+        let consolidatedData = [];
+        if (res && res.rowCount > 0) {
+            for (let row of res.rows)
+                consolidatedData.push(row.res_row);
+        }
+
+        return ({
+            data: {
+                status: 'success',
+                venueList: consolidatedData
+            }
+        })
+
+    } catch (error) {
+        client.end();
+        console.error(`eventReqOperations.js::getVenues() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    }
+
+}
+
 module.exports = {
-    updateEvent
+    updateEvent,
+    getVenues
 }

@@ -322,6 +322,24 @@ app.get('/api/getProctorData', function (req, res) {
   }
 });
 
+app.post('/api/getVenues', function (req, res) {
+  console.log("getVenues called with : " + JSON.stringify(req.body.data));
+  try {
+    processEventRequest.getVenues(req.body.data)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getVenues as : ' + error)
+  }
+});
+
 
 
 
