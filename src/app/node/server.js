@@ -129,6 +129,25 @@ app.get('/api/getEventCategory', function (req, res) {
   }
 });
 
+
+app.get('/api/getEventData',function(req,res){
+  console.log("getEventData called with : " + JSON.stringify(req.query.fbuid));
+  try{
+    processRequest.getEventData()
+    .then((data) => {
+      console.log(`Returning with response : ${JSON.stringify(data)}`)
+      res.send(data);
+      res.end();
+    }).catch((error) => {
+      console.log(`Returning with response : ${error}`)
+      res.send(error);
+      res.end();
+    })
+  }catch(error){
+    console.log(`Error in getEventData as : ` + error)
+  }
+});
+
 app.get('/api/getParishData', function (req, res) {
   console.log("getParishData called with : " + JSON.stringify(req.query.fbuid));
   try {

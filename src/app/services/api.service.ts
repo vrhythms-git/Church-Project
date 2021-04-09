@@ -109,6 +109,16 @@ getEventCategoryData():Observable<any>{
   return this.http.get(`${this._baseUrl}/getEventCategory` );   
 }
 
+getEventsData(): Observable<any> {
+  console.log(`calling the getEventData()`);
+  let headerObj = new HttpHeaders({
+                  'Authorization': localStorage.getItem('chUserToken')!,
+                  'Content-Type' : 'application/json'
+                });
+  console.log( 'Events Data data is : ' + this.http.get(`${this._baseUrl}/getEventData`));
+  return this.http.get(`${this._baseUrl}/getEventData` );   
+}
+
 approveOrRejReq(reqData : any){
   console.log("update User Profile Called..")
   let headerObj = new HttpHeaders({

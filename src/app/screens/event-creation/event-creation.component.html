@@ -1,15 +1,19 @@
 
-<div class="container mt-4">
-<h1 style="margin-top:1%; margin-bottom: 4%;">Create Event</h1>
+    <div class="container mt-4">
+        <h1 style="margin-top:1%; margin-bottom: 4%;">Create Event</h1>
     
-<mat-vertical-stepper [linear]="true" #stepper>
 
-            <mat-step [stepControl]="eventsDataFormGroup">
+        <!-- <button mat-raised-button (click)="isLinear = !isLinear" id="toggle-linear">
+            {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}
+          </button> -->
+
+<mat-vertical-stepper [linear]="false" #stepper>
+            <mat-step [stepControl]="eventCreationForm">
 
             <!--Expansion pannel content goes here-->
             <div class="container">
                 
-                    <form [formGroup]="eventsDataFormGroup">
+                    <form [formGroup]="eventCreationForm">
                         <ng-template matStepLabel>Fill out events data</ng-template>
                         <div class="form-container">
                                  <!-- Header Name -->
@@ -31,13 +35,13 @@
                                     </div>
                                     <div class="col-md-6">
                                         <mat-form-field class="col-md-12">
+                            
                                             <mat-select required id="parishName" formControlName="parishName"  placeholder="Parish Name">
                                                 <mat-option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</mat-option>
                                             </mat-select>
                                         </mat-form-field>
                                     </div>
                                 </div>
-                    
                                 
                                 <div class="row">
                                     <div class="col-md-6">
@@ -140,7 +144,7 @@
                       </div>
 
                       <div>
-                        <button mat-button matStepperNext (click)="onEventsNextBtnClick()">Next</button>
+                        <button mat-button matStepperNext>Next</button>
                       </div>
             
                         </div>
@@ -149,12 +153,23 @@
             </div>
       
 
-            </mat-step>
-      
-            <mat-step [stepControl]="venuesDataFormGroup">
+    </mat-step>
+
+
+        <!-- <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Venue And Procter
+                </mat-panel-title>
+
+                <mat-panel-description>
+                    <mat-icon style="margin-left: 95%;">location_on</mat-icon>
+                  </mat-panel-description>
+            </mat-expansion-panel-header> -->
+            <mat-step [stepControl]="eventCreationForm">
             <div class="container">
                 
-                <form [formGroup]="venuesDataFormGroup">
+                <form [formGroup]="eventCreationForm">
                     <ng-template matStepLabel>Fill out venue and proctor data</ng-template>
                     <div class="form-container">
 
@@ -167,7 +182,7 @@
                         <fieldset>
 
                             <div class="row" formArrayName="venues"
-                                    *ngFor="let item of venuesDataFormGroup.get('venues')['controls']; let i = index;">
+                                    *ngFor="let item of eventCreationForm.get('venues')['controls']; let i = index;">
                                     
                                    <div class="container" style="padding-left: 2%;" [formGroupName]="i">
                                        
@@ -189,11 +204,10 @@
 
                                       <mat-form-field class="col-md-6">
                                         <mat-label>Proctor</mat-label>
-                                        <mat-select required formControlName="proctorId">
-                                            <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
-                                        </mat-select>
+                                        <select matNativeControl formControlName="proctorId">
+                                                <!-- <option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</option> -->
+                                        </select>
                                       </mat-form-field>
-
     
                                         <div class=" row col-md-3 col text-left" style="margin-left: 87%;">
                                             <button (click)="onremovebtnclickVenu(i)" mat-button>
@@ -213,26 +227,40 @@
                     </div>
 
                     <div>
-                        <button mat-button matStepperNext (click)="onVenuesNextBtnClick()">Next</button>
+                        <button mat-button matStepperNext (click)="onNextBtnClick()">Next</button>
                       </div>
                 </form>
             </div>
-            </mat-step>
+        </mat-step>
 
-            <mat-step [stepControl]="categoriesDataFormGroup">
+        <!-- </mat-expansion-panel> -->
+
+        <!-- <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                        Categories
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon style="margin-left: 95%;">category</mat-icon>
+                </mat-panel-description>
+        </mat-expansion-panel-header> -->
+            <!--Expansion pannel content for categories goes here-->
+
+            <mat-step [stepControl]="eventCreationForm">
             <div class="container">
                 
-                <form [formGroup]="categoriesDataFormGroup">
+                <form [formGroup]="eventCreationForm">
                     <ng-template matStepLabel>Fill out categories data</ng-template>
                     <div class="form-container">
                         
                         <fieldset>
                             <div class="row" formArrayName="categories" 
-                            *ngFor="let item of categoriesDataFormGroup.get('categories')['controls']; let i = index;">
+                            *ngFor="let item of eventCreationForm.get('categories')['controls']; let i = index;">
 
                                 <div class="container" style="padding-left: 2%;" [formGroupName]="i">
                                 
-                                    <div class="row">
+
+                                    <div class="row" style="margin-top: 3%;">
                                         <div class="col-md-4">
                                              <mat-form-field class="col-md-12">
                                                     <input matInput id="name" 
@@ -261,7 +289,9 @@
                                             <mat-form-field class="col-md-12">
                                 
                                                 <mat-select required id="eventCategoryJudgeOne" formControlName="judge1"  placeholder="Judge One">
-                                                    <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
+                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
+                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
+                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
                                                 </mat-select>
                                             </mat-form-field>
                                         </div>
@@ -269,7 +299,9 @@
                                             <mat-form-field class="col-md-12">
                                 
                                                 <mat-select required id="eventCategoryJudgeTwo" formControlName="judge2"  placeholder="Judge Two">
-                                                    <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
+                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
+                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
+                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
                                                 </mat-select>
                                             </mat-form-field>
                                         </div>
@@ -277,7 +309,9 @@
                                             <mat-form-field class="col-md-12">
                                 
                                                 <mat-select required id="eventCategoryJudgeThree" formControlName="judge3"  placeholder="Judge Three">
-                                                    <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
+                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
+                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
+                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
                                                 </mat-select>
                                             </mat-form-field>
                                         </div>
@@ -318,16 +352,29 @@
             
                 </form>
             </div>
-            </mat-step>
+        </mat-step>
        
-            <mat-step [stepControl]="questionnaireDataFormGroup">
+        <!-- </mat-expansion-panel> -->
+
+        <!-- <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                        Questionaries
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon style="margin-left: 95%;">question_answer</mat-icon>
+                </mat-panel-description>
+        </mat-expansion-panel-header> -->
+            <!--Expansion pannel content for Questionaries goes here-->
+
+            <mat-step [stepControl]="eventCreationForm">
             <div class="container">
-                <form [formGroup]="questionnaireDataFormGroup">
+                <form [formGroup]="eventCreationForm">
                     <ng-template matStepLabel>Fill out questionaries data</ng-template>
                     <div class="form-container">
                         <fieldset>
                             <div class="row" formArrayName="questionnaire"
-                                *ngFor="let item of questionnaireDataFormGroup.get('questionnaire')['controls']; let i = index;">
+                                *ngFor="let item of eventCreationForm.get('questionnaire')['controls']; let i = index;">
                             
                                 <div class="container" style="padding-left: 2%;" [formGroupName]="i">
                                     <div class="row">
@@ -381,9 +428,16 @@
 
                 </form>
             </div>
-            </mat-step>
-       
-</mat-vertical-stepper>
+        </mat-step>
+        <!-- </mat-expansion-panel> -->
+
+
+    </mat-vertical-stepper>
    
-  
+
+    
+
+   
+
+    
 </div>

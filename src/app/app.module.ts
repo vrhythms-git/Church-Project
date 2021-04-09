@@ -57,7 +57,7 @@ import {customSnackBar} from './common/uiCommonUtils'
 import { ReqRendererComponent } from './screens/renderers/req-renderer/req-renderer.component';
 import { ApprovalRequestsComponent } from './screens/approval-requests/approval-requests.component';
 import {MatStepperModule} from '@angular/material/stepper';
-
+import {EventDataService } from './screens/events/event.dataService'
 
 
 
@@ -125,7 +125,7 @@ import {MatStepperModule} from '@angular/material/stepper';
     NgxSpinnerModule,
     MatStepperModule
   ],
-  providers: [AuthService,  { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },],
+  providers: [AuthService,  { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },EventDataService],
   bootstrap: [AppComponent],
   schemas:[CUSTOM_ELEMENTS_SCHEMA ]
 })

@@ -689,8 +689,47 @@ async function getParishData() {
     });
 }
 
+/* .............get events Data from database.................. */
+async function getEventData(){
+    let client = dbConnections.getConnection();
+    await client.connect();
+    try{
+        let metadata = {};
+        let getEventData = `select * from t_event`;
+        let res = await client.query(getEventData);
+            if(res && res.rowCount > 0){
+                console.log("In Event response : " + res);
+                let eventData = [];
+                for(let row of res.rows){
+                    let events = {};
+                    events.event_Id = row.event_id;
+                    events.name = row.name;
+                    events.event_type = row.event_type;
+                    events.description = row.description;
+                    events.startDate = row.start_date;
+                    events.endDate = row.end_date;
+                    events.registrationStartDate = row.registration_start_date;
+                    events.registrationEndDate = row.registration_end_date;
+                    events.orgId = row.org_id;
+                    eventData.push(events);
+                }
+                metadata.eventData = eventData;
+                client.end()
+            }
+            return({
+                data : {
+                    status : 'success',
+                    metaData : metadata
+                    
+                }
+            })
 
-
+    }catch(error){
+        client.end();
+        console.log(`reqOperations.js::getEventData() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    }
+}
 async function insertEvents(eventsData) {
 
 
@@ -1315,5 +1354,6 @@ module.exports = {
     getEventCategory,
     getParishData,
     insertEvents,
-    deleteUsers
+    deleteUsers,
+    getEventData
 }
