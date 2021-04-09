@@ -362,10 +362,10 @@ async function getuserRecords(userType, loggedInUser) {
                         vu.date_of_marriage,
                         vu.about_yourself,
                         vu.role_id,
-                        vu.org_id,
-                        vu.org_type,
+                        vu.user_org_id org_id,
+                        vu.user_org_type org_type,
                         membership_type,
-                        (select name from t_organization where org_id = vu.org_id) parish_name
+                        vu.user_org parish_name
                     FROM  v_user vu
                     WHERE ${condition} vu.user_org_id IN ( WITH recursive child_orgs 
                                  AS (
