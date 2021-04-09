@@ -260,7 +260,8 @@
 
                         <mat-form-field class="col-md-4">
                           <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
-                          <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" ng2TelInput length="10"/>                 
+                          <!-- <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" ng2TelInput length="10"/>                  -->
+                          <input matInput type="text" ng2TelInput formControlName="mobileNo" id="mobileNo" maxLength="10" minLength="10"  required style="width: fit-content;"/>
                         </mat-form-field>
 
                         <mat-form-field class="col-md-4" style="padding-right: 2%;">

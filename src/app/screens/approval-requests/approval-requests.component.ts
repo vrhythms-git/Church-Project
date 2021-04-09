@@ -18,6 +18,7 @@ export class ApprovalRequestsComponent implements OnInit {
   params: any;
   columnDefs: any;
   rowData: any;
+  term: any;
   userRecords!: any[];
   selectedUserData: any;
   approveReqForm: any;

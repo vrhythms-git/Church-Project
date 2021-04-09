@@ -17,3 +17,7 @@ mat-form-field{
     font-family: poppins;
     letter-spacing: 0.18px;
 }
+.search:focus{
+    border-color: grey;
+    box-shadow: none;
+  }

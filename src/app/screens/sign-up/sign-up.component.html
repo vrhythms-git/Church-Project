@@ -55,7 +55,8 @@
                 </div>
                 <div class="row">
                     <mat-form-field class="form-field col col-md">
-                        <input matInput type="text" ng2TelInput (ng2TelOutput)="getNumber($event)" formControlName="mobileNo" id="mobileNo" length="10" required style="width: fit-content;"/>
+                        <mat-label style="padding-left: 23%;">Mobile Number</mat-label>
+                        <input matInput type="text" ng2TelInput (ng2TelOutput)="getNumber($event)" formControlName="mobileNo" id="mobileNo" maxLength="10" (keypress)="keyPress($event)" required style="width: fit-content;"/>
                         <mat-error *ngIf="signUpForm.controls.mobileNo.touched && signUpForm.controls.mobileNo.invalid">
                             <span *ngIf="signUpForm.controls.mobileNo.errors.required">This field is mandatory.</span>
                             <span *ngIf="signUpForm.controls.mobileNo.errors.pattern">Enter 10 digit number.</span>
@@ -71,7 +72,6 @@
                             <span *ngIf="signUpForm.controls.dob.errors.pattern">This field is invalid.</span>
                         </mat-error>
                     </mat-form-field>
-
                                    </div>
 <!-- 
                 <div class="form-group row justify-content-center">
@@ -108,7 +108,7 @@
                                 </mat-select>
                         </mat-form-field>
                         <mat-form-field class="form-field col-md" >
-                                <mat-select id="orgId" formControlName = "orgId" placeholder="Select Parish" required>
+                                <mat-select id="orgId" formControlName = "orgId" placeholder="Parish" required>
                                   <mat-option *ngFor = "let parish of parishList" [value]=parish.id>{{parish.name}} </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -123,7 +123,7 @@
 
                 <div class="form-group text-right">
                     <button mat-button type="submit" routerLinkActive="active" class="mbutton mr-1" (click)="cancel()">Cancel</button>
-                    <button mat-button id="signInBtn" type="submit" routerLinkActive="active" class="mbutton" (click)="signUp()">Register</button>
+                    <button mat-button id="signInBtn" type="submit" [disabled]="!signUpForm.valid" routerLinkActive="active" class="mbutton" (click)="signUp()">Register</button>
                 </div>
             </form>
         </div>

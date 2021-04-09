@@ -1,10 +1,10 @@
 <div class="container mt-3" style="overflow: hidden;">
 
     <div class="form-group form-inline row m-0 p-0">
-        <input type="text" class="form-control col-12 search" placeholder="Search Here">
+        <input type="text" class="form-control col-12 search" placeholder="Search Here" [(ngModel)]="term">
     </div>
 
-    <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" [rowData]="rowData " [columnDefs]="columnDefs"
+    <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
         [pagination]="true" rowSelection='multiple' [checkboxSelection]="true" (rowClicked)='onRowClicked($event)'>
     </ag-grid-angular>
 </div>

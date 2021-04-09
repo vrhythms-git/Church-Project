@@ -72,6 +72,20 @@ export class SignUpComponent implements OnInit {
      this.signUpForm.reset();
   }
 
+  isStateDataSet = false;
+  keyPress(event: any) {
+    this.isStateDataSet = false;
+    const pattern = /[0-9\+\-\ ]/;
+
+    let inputChar = String.fromCharCode(event.charCode);
+    if (event.keyCode != 5 && !pattern.test(inputChar)) {
+      event.preventDefault();
+      if (event.keyCode == 13){
+//this.change(event);
+    console.log("keyCode == 13");
+      }
+    } 
+  }
 
   cancel() {
     this.router.navigate(['/signin']);

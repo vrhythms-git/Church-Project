@@ -51,6 +51,7 @@ export class LandingPageComponent implements OnInit {
   countries!: any[];
   states! : any[];
   selectedCountry:any;
+  contactNo: any;
 
   constructor(private apiService: ApiService, private uiCommonUtils :uiCommonUtils,
     private http: HttpClient, private formBuilder: FormBuilder) { }
@@ -91,18 +92,18 @@ export class LandingPageComponent implements OnInit {
       dateofMarriage: new FormControl(''),
       about_urself: new FormControl(''),
       isFamilyHead : new FormControl(''),
-      roles: this.formBuilder.array([this.adduserroles()]),
+      roles: this.formBuilder.array([this.adduserroles()],[Validators.required]),
     });
 
     this.columnDefs = [
       { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
       { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
       { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
-      { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
+      { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 200 },
       { headerName: 'City', field: 'city', sortable: true, filter: true, width:150 },
       { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
-      { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
-      { headerName: 'Actions', field: 'action', cellRendererFramework: ButtonRendererComponent, width: 160,
+      { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 140 },
+      { headerName: 'Actions', field: 'action', cellRendererFramework: ButtonRendererComponent, width: 140,
         cellRendererParams: function (params: any) {
           // onClick: this.openModal.bind(this),
           // label: 'Click'
@@ -149,6 +150,26 @@ export class LandingPageComponent implements OnInit {
     };
   }
 
+  isStateDataSet = false;
+  keyPress(event: any) {
+    this.isStateDataSet = false;
+    const pattern = /[0-9\+\-\ ]/;
+
+    let inputChar = String.fromCharCode(event.charCode);
+    if (event.keyCode != 5 && !pattern.test(inputChar)) {
+      event.preventDefault();
+      if (event.keyCode == 13){
+//this.change(event);
+    console.log("keyCode == 13");
+      }
+    } 
+  }
+
+  getNumber(event: any) {
+    console.log(event);
+    this.contactNo = event;
+  }
+  
   resetForm(){
     this.updateuserinfo.reset();
   }
@@ -327,11 +348,11 @@ export class LandingPageComponent implements OnInit {
       this.updateuserinfo.value.updatedBy = this.loggedInUser;
       let dob = this.updateuserinfo.value.dob;
       console.log(dob);
-      this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe(res => {
+      this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe((res:any) => {
         console.log("User Profile Updated.")
-      //  if(res.data.status ="success"){
+        if(res.data.status ="success"){
         this.uiCommonUtils.showSnackBar('User Profile Updated..', 'Dismiss', 3000)
-      //  }
+        }
       this.getUserData();
       })  
       this.updateuserinfo.reset();
@@ -363,10 +384,10 @@ export class LandingPageComponent implements OnInit {
         "deleteUser" : this.deleteUser 
         }
       } 
-    this.apiService.deleteUser(payload).subscribe(res => {
-     // if(res.data.status = "success"){
+    this.apiService.deleteUser(payload).subscribe((res:any) => {
+      if(res.data.status = "success"){
         this.uiCommonUtils.showSnackBar('User Record Deleted..', 'Dismiss', 3000)
-     // }
+      }
     })
     this.getUserData();
     console.log("Records Deleted...");
