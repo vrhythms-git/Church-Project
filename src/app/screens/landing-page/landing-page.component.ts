@@ -343,9 +343,13 @@ export class LandingPageComponent implements OnInit {
     if (this.updateuserinfo.invalid) {
       return
     }
-    else {
+    else if(this.updateuserinfo.value.roles.length == 0){
+      this.uiCommonUtils.showSnackBar('User should have atleast one Role', 'Dismiss', 3000);
+    }
+    else{
       this.updateuserinfo.value.userId = this.userId;
       this.updateuserinfo.value.updatedBy = this.loggedInUser;
+      this.updateuserinfo.value.orgId = this.selectedUserData.orgId;
       let dob = this.updateuserinfo.value.dob;
       console.log(dob);
       this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe((res:any) => {
