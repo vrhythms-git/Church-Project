@@ -156,5 +156,11 @@ insertevents(eventsData  : any){
     console.log( 'getProctorData is : ' + this.http.get(`${this._baseUrl}/getProctorData`), userData);
     return this.http.get(`${this._baseUrl}/getProctorData?userData=`+ userData );   
   }
+
+  getRegionAndParish(){
+    console.log(`calling the getRegionAndParish()`);
+    
+    return this.http.get(`${this._baseUrl}/getRegionAndParish` );   
+  }
 }
 

@@ -54,3 +54,7 @@ h2{
   margin-left: 8px;
 }
 
+.shadow{
+  box-shadow: 7px 7px 22px grey;
+  }
+

@@ -171,7 +171,7 @@ app.get('/api/getParishData', function (req, res) {
 app.post('/api/insertEvents', function (req, res) {
   console.log("insertevents called with : " + JSON.stringify(req.body));
   try {
-    processRequest.insertEvents(req.body.data)
+    processEventRequest.insertEvents(req.body.data)
       .then((data) => {
         console.log(`Returning with resonse : ${data}`)
         res.send(data);
@@ -307,7 +307,7 @@ app.post('/api/updateEvent', function (req, res) {
 app.get('/api/getProctorData', function (req, res) {
   console.log("getProctorData called with : " + JSON.stringify(req.query.fbuid));
   try {
-    processRequest.getProctorData(req.query.userData)
+    processEventRequest.getProctorData(req.query.userData)
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
@@ -337,6 +337,24 @@ app.post('/api/getVenues', function (req, res) {
       })
   } catch (error) {
     console.error('Error in getVenues as : ' + error)
+  }
+});
+
+app.get('/api/getRegionAndParish', function (req, res) {
+  console.log("getRegionAndParish called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processEventRequest.getRegionAndParish()
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getRegionAndParish as : ' + error)
   }
 });
 

@@ -1,20 +1,17 @@
 
-    <div class="container mt-4">
-        <h1 style="margin-top:1%; margin-bottom: 4%;">Create Event</h1>
+<div class="container mt-4">
+    <mat-card class="shadow">
+<h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;">Create Event</h1>
     
-
-        <!-- <button mat-raised-button (click)="isLinear = !isLinear" id="toggle-linear">
-            {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}
-          </button> -->
-
 <mat-vertical-stepper [linear]="false" #stepper>
-            <mat-step [stepControl]="eventCreationForm">
+
+            <mat-step [stepControl]="eventsDataFormGroup">
 
             <!--Expansion pannel content goes here-->
             <div class="container">
                 
-                    <form [formGroup]="eventCreationForm">
-                        <ng-template matStepLabel>Fill out events data</ng-template>
+                    <form [formGroup]="eventsDataFormGroup">
+                        <ng-template matStepLabel>Events</ng-template>
                         <div class="form-container">
                                  <!-- Header Name -->
                                  <!--
@@ -23,8 +20,7 @@
                                 </div>
                                 -->
                                 <div class="row" style="margin-top: 3%;">
-                                    <div class="col-md-6">
-                                        <mat-form-field class="col-md-12">
+                                        <mat-form-field class="col-md-6">
                                    
                                             <input required id="eventName" 
                                                    matInput
@@ -32,21 +28,8 @@
                                                   
                                                    placeholder="Event Name" />
                                           </mat-form-field>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <mat-form-field class="col-md-12">
-                            
-                                            <mat-select required id="parishName" formControlName="parishName"  placeholder="Parish Name">
-                                                <mat-option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                    
-                                        <mat-form-field class="col-md-12">
+
+                                        <mat-form-field class="col-md-6">
                             
                                             <mat-select required id="eventType" formControlName="eventType"  placeholder="Event Type">
                                                 <mat-option value="CWC"> CWC </mat-option>
@@ -54,18 +37,31 @@
                                                 <mat-option value="option3">Option 3</mat-option>
                                             </mat-select>
                                         </mat-form-field>
-                                    </div>
-                                <div class="col-md-6">
-                                   
-                                </div>
+                                
                             </div>
+
+                            
+                            <div class="row">
+                                   
+                                <mat-form-field class="col-md-6">
+                                    <mat-select required id="eventRegion" (selectionChange)="changeRegion($event)" formControlName="eventRegion"  placeholder="Event Region">
+                                        <mat-option *ngFor="let region of regionList" [value]="region.regionId">{{region.regionName}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>   
+                                
+                                <mat-form-field class="col-md-6">
+                                    <mat-select id="parishName" formControlName="parishName"  placeholder="Event Parish(s)" multiple>
+                                        <mat-option *ngFor="let parish of parishList" [value]="parish.parishId">{{parish.parishName}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field> 
+
+                        </div>
             
                             
                                 
                             <div class="row">
-                                <div class="col-md-6">
                                 
-                                    <mat-form-field class="col-md-12">
+                                    <mat-form-field class="col-md-6">
                         
                                        <!-- <input matInput type="date" required  id="start_date" formControlName="start_date" placeholder="Event Start Date">-->
                                        <mat-label>Event Start Date</mat-label>
@@ -77,10 +73,8 @@
                                         <mat-datepicker #startatpicker></mat-datepicker>
                                        
                                     </mat-form-field>
-                                </div>
-                            <div class="col-md-6">
                                 
-                                <mat-form-field class="col-md-12">
+                                <mat-form-field class="col-md-6">
                         
                                     <!-- <input matInput type="date" required  id="end_date" formControlName="end_date" placeholder="Event End Date">-->
                                         <mat-label>Event End Date</mat-label>
@@ -93,16 +87,14 @@
                                     
                                 </mat-form-field>
                                 
-                            </div>
                         </div>
             
                         <div class="row">
-                            <div class="col-md-6">
                             
-                                <mat-form-field class="col-md-12">
+                                <mat-form-field class="col-md-6">
                     
                                    <!-- <input matInput type="date" required  id="registration_start_date" formControlName="registration_start_date" placeholder="Regisrtation Start Date">-->
-                                   <mat-label>Regisrtation Start Date</mat-label>
+                                   <mat-label>Registration Start Date</mat-label>
                                    <input matInput id="registrationStartDate" formControlName="registrationStartDate"
                                           [matDatepicker]="registrationStartatpicker">
                                    <mat-datepicker-toggle matSuffix [for]="registrationStartatpicker">
@@ -111,13 +103,12 @@
                                    <mat-datepicker #registrationStartatpicker></mat-datepicker>
                                    
                                 </mat-form-field>
-                            </div>
-                        <div class="col-md-6">
+
                             
-                            <mat-form-field class="col-md-12">
+                            <mat-form-field class="col-md-6">
                     
                                 <!-- <input matInput type="date" required  id="registration_end_date" formControlName="registration_end_date" placeholder="Regisrtation End Date"> -->
-                                <mat-label>Regisrtation End Date</mat-label>
+                                <mat-label>Registration End Date</mat-label>
                                    <input matInput id="registrationEndDate" formControlName="registrationEndDate"
                                           [matDatepicker]="registrationEndatpicker">
                                    <mat-datepicker-toggle matSuffix [for]="registrationEndatpicker">
@@ -127,11 +118,9 @@
                                 
                             </mat-form-field>
                             
-                        </div>
                     </div>
             
                         <div class="row">
-                            <div class="col-md-12">
                                 <mat-form-field class="col-md-12">
                               
                                     <textarea required id="description"
@@ -140,11 +129,10 @@
                                                 
                                               placeholder="Event Description"></textarea>
                                   </mat-form-field>
-                            </div>
                       </div>
 
                       <div>
-                        <button mat-button matStepperNext>Next</button>
+                        <button mat-raised-button matStepperNext (click)="onEventsNextBtnClick()">Next</button>
                       </div>
             
                         </div>
@@ -153,28 +141,17 @@
             </div>
       
 
-    </mat-step>
-
-
-        <!-- <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Venue And Procter
-                </mat-panel-title>
-
-                <mat-panel-description>
-                    <mat-icon style="margin-left: 95%;">location_on</mat-icon>
-                  </mat-panel-description>
-            </mat-expansion-panel-header> -->
-            <mat-step [stepControl]="eventCreationForm">
+            </mat-step>
+      
+            <mat-step [stepControl]="venuesDataFormGroup">
             <div class="container">
                 
-                <form [formGroup]="eventCreationForm">
-                    <ng-template matStepLabel>Fill out venue and proctor data</ng-template>
+                <form [formGroup]="venuesDataFormGroup">
+                    <ng-template matStepLabel>Venues and Proctor</ng-template>
                     <div class="form-container">
 
                         <div style="margin-left: 91%;" >
-                            <button mat-button class="ml-auto border"  (click)="onaddbtnclick()">
+                            <button mat-raised-button  (click)="onaddbtnclick()">
                                 <mat-icon>add</mat-icon>
                                 <span >Add</span>
                             </button>
@@ -182,7 +159,7 @@
                         <fieldset>
 
                             <div class="row" formArrayName="venues"
-                                    *ngFor="let item of eventCreationForm.get('venues')['controls']; let i = index;">
+                                    *ngFor="let item of venuesDataFormGroup.get('venues')['controls']; let i = index;">
                                     
                                    <div class="container" style="padding-left: 2%;" [formGroupName]="i">
                                        
@@ -204,13 +181,14 @@
 
                                       <mat-form-field class="col-md-6">
                                         <mat-label>Proctor</mat-label>
-                                        <select matNativeControl formControlName="proctorId">
-                                                <!-- <option *ngFor="let parish of parishList" [value]="parish.id">{{parish.name}}</option> -->
-                                        </select>
+                                        <mat-select required formControlName="proctorId">
+                                            <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
+                                        </mat-select>
                                       </mat-form-field>
+
     
                                         <div class=" row col-md-3 col text-left" style="margin-left: 87%;">
-                                            <button (click)="onremovebtnclickVenu(i)" mat-button>
+                                            <button mat-raised-button (click)="onremovebtnclickVenu(i)" mat-button>
                                                 <mat-icon>delete</mat-icon><span>Delete</span>
                                             </button>
                                         </div>
@@ -227,40 +205,28 @@
                     </div>
 
                     <div>
-                        <button mat-button matStepperNext (click)="onNextBtnClick()">Next</button>
+                        <button mat-raised-button matStepperNext (click)="onVenuesNextBtnClick()">Next</button>
                       </div>
                 </form>
             </div>
-        </mat-step>
+            </mat-step>
 
-        <!-- </mat-expansion-panel> -->
-
-        <!-- <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                        Categories
-                </mat-panel-title>
-                <mat-panel-description>
-                    <mat-icon style="margin-left: 95%;">category</mat-icon>
-                </mat-panel-description>
-        </mat-expansion-panel-header> -->
-            <!--Expansion pannel content for categories goes here-->
-
-            <mat-step [stepControl]="eventCreationForm">
+            <mat-step [stepControl]="categoriesDataFormGroup">
             <div class="container">
                 
-                <form [formGroup]="eventCreationForm">
-                    <ng-template matStepLabel>Fill out categories data</ng-template>
+                <form [formGroup]="categoriesDataFormGroup">
+                    <ng-template matStepLabel>Categories</ng-template>
                     <div class="form-container">
                         
                         <fieldset>
                             <div class="row" formArrayName="categories" 
-                            *ngFor="let item of eventCreationForm.get('categories')['controls']; let i = index;">
+                            *ngFor="let item of categoriesDataFormGroup.get('categories')['controls']; let i = index;">
 
                                 <div class="container" style="padding-left: 2%;" [formGroupName]="i">
                                 
-
-                                    <div class="row" style="margin-top: 3%;">
+                                    <br>
+                                  
+                                    <div class="row">
                                         <div class="col-md-4">
                                              <mat-form-field class="col-md-12">
                                                     <input matInput id="name" 
@@ -289,9 +255,7 @@
                                             <mat-form-field class="col-md-12">
                                 
                                                 <mat-select required id="eventCategoryJudgeOne" formControlName="judge1"  placeholder="Judge One">
-                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
-                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
-                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
+                                                    <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
                                                 </mat-select>
                                             </mat-form-field>
                                         </div>
@@ -299,9 +263,7 @@
                                             <mat-form-field class="col-md-12">
                                 
                                                 <mat-select required id="eventCategoryJudgeTwo" formControlName="judge2"  placeholder="Judge Two">
-                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
-                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
-                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
+                                                    <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
                                                 </mat-select>
                                             </mat-form-field>
                                         </div>
@@ -309,9 +271,7 @@
                                             <mat-form-field class="col-md-12">
                                 
                                                 <mat-select required id="eventCategoryJudgeThree" formControlName="judge3"  placeholder="Judge Three">
-                                                    <mat-option value="Judge 1"> Judge 1 </mat-option>
-                                                    <mat-option value="Judge 2"> Judge 2 </mat-option>
-                                                    <mat-option value="Judge 3"> Judge 3 </mat-option>
+                                                    <mat-option *ngFor="let proctor of proctorData" [value]="proctor.userId">{{proctor.name}}</mat-option>
                                                 </mat-select>
                                             </mat-form-field>
                                         </div>
@@ -319,17 +279,23 @@
 
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <mat-form-field class="col-md-12">
-                                          
-                                                <mat-select required id="eventCategoryVenue" formControlName="venueId"  placeholder="Venue">
+                                            <mat-form-field class="col-md-12">       
+                                                <mat-select required multiple id="eventCategoryVenue" formControlName="venueId"  placeholder="Venue">
                                                     <mat-option *ngFor="let venue of newVenues" [value]="venue.venueId">{{venue.name}}</mat-option>
                                                 </mat-select>
                                               </mat-form-field>
                                         </div>
                                     </div>
 
+                                    <!-- <mat-form-field appearance="fill">
+                                        <mat-label>Toppings</mat-label>
+                                        <mat-select [formControl]="toppings" multiple>
+                                          <mat-option *ngFor="let venue of newVenues" [value]="venue.venueId">{{venue.name}}</mat-option>
+                                        </mat-select>
+                                      </mat-form-field> -->
+
                                     <div style="margin-left: 89%;">
-                                        <button (click)="removeEventCategory(i)" mat-button>
+                                        <button mat-raised-button (click)="removeEventCategory(i)">
                                             <mat-icon>delete</mat-icon><span>Delete</span>
                                         </button>
                                     </div>  
@@ -347,65 +313,56 @@
                     </div>
 
                     <div>
-                        <button mat-button matStepperNext>Next</button>
+                        <button mat-raised-button matStepperNext>Next</button>
                       </div>
             
                 </form>
             </div>
-        </mat-step>
+            </mat-step>
        
-        <!-- </mat-expansion-panel> -->
-
-        <!-- <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                        Questionaries
-                </mat-panel-title>
-                <mat-panel-description>
-                    <mat-icon style="margin-left: 95%;">question_answer</mat-icon>
-                </mat-panel-description>
-        </mat-expansion-panel-header> -->
-            <!--Expansion pannel content for Questionaries goes here-->
-
-            <mat-step [stepControl]="eventCreationForm">
+            <mat-step [stepControl]="questionnaireDataFormGroup">
             <div class="container">
-                <form [formGroup]="eventCreationForm">
-                    <ng-template matStepLabel>Fill out questionaries data</ng-template>
+                <form [formGroup]="questionnaireDataFormGroup">
+                    <ng-template matStepLabel>Questionaries</ng-template>
                     <div class="form-container">
                         <fieldset>
                             <div class="row" formArrayName="questionnaire"
-                                *ngFor="let item of eventCreationForm.get('questionnaire')['controls']; let i = index;">
+                                *ngFor="let item of questionnaireDataFormGroup.get('questionnaire')['controls']; let i = index;">
                             
                                 <div class="container" style="padding-left: 2%;" [formGroupName]="i">
-                                    <div class="row">
-                                        <button mat-button (click)="onaddbtnclick1()"> 
+                                    <div style="margin-left: 91%; padding-bottom: 1%;" class="row">
+                                        <button mat-raised-button (click)="onaddbtnclick1()"> 
                                             <mat-icon>add</mat-icon>
-                                            <span>Add</span>s
+                                            <span>Add</span>
                                         </button>
                                     </div>
 
                                     <div class="row">
-                                        <mat-form-field class="col-md-7">
+                                        <mat-form-field class="col-md-6">
                                             <input matNativeControl required id="question" matInput
                                                     formControlName="question" 
                                                     placeholder="Enter Question" />
                                         </mat-form-field>
-                                        <mat-form-field class="col-md-3">
-                                                    
+
+                                        <mat-form-field class="col-md-6">                       
                                             <mat-select matNativeControl required id="responseType" 
                                                         formControlName="responseType"
                                                         placeholder="Select response Type">
                                                 <mat-option value="Yes/No">Yes/No</mat-option>
                                                 <mat-option value="Text">Text</mat-option>
+                                                <mat-option value="Date Range">Date Range</mat-option>
                                             </mat-select>
                                         </mat-form-field>
-
-                                        <div class="col-md-2">
-                                            <button (click)="onremovebtnclickQuestion(i)" mat-button>
-                                                <mat-icon>delete</mat-icon><span>Delete</span>
-                                            </button>
-                                        </div>
                                     </div>
+                                    
+                                <div class="row">
+                                    
+                                    <div class="col-md-2" style="margin-left: 87%;">
+                                        <button mat-raised-button (click)="onremovebtnclickQuestion(i)">
+                                            <mat-icon>delete</mat-icon><span>Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
 
                                    
                                     <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 4%;margin-bottom: 3%;">
@@ -421,23 +378,16 @@
 
                       <div class="row" style="padding-top: 1%;">
                         <div class="col text-center">
-                                <button mat-button type="submit" mat-button class="mbutton"  (click)="createEvent()">
+                                <button mat-raised-button type="submit" class="mbutton"  (click)="createEvent()">
                                         Create Event</button>
                         </div>
                 </div>
 
                 </form>
             </div>
-        </mat-step>
-        <!-- </mat-expansion-panel> -->
-
-
-    </mat-vertical-stepper>
+            </mat-step>
+       
+</mat-vertical-stepper>
+    </mat-card>
    
-
-    
-
-   
-
-    
 </div>

@@ -9,6 +9,10 @@ font-family: poppins;
     float: right;
 }
 
+mat-sidenav{
+    width: 13%;
+}
+
 .menu-spacer{flex: 1 1 auto; }
 mat-content {
     background-color: #bc451d;
@@ -29,9 +33,9 @@ mat-sidenav-container{
 }
 
 
-mat-sidenav,mat-sidenav-content{
+/* mat-sidenav,mat-sidenav-content{
     padding: 15px;
-}
+} */
 
 .mat-list-item{
     color: black;
