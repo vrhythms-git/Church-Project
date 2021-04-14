@@ -41,11 +41,12 @@ export class SignInComponent implements OnInit {
     if (this.signInForm.invalid) {
       return
     }
-    else if(this.isFamilyHead == true){
-      this.router.navigate(['/loginAccList']);
-    }
     else {
       this.authService.SignIn({ data: this.signInForm.value })
+
+      if(this.isFamilyHead == false){
+        this.router.navigate(['/loginAccList']);
+      }
       // this.router.navigate(['/dashboard']);
     }
   }
