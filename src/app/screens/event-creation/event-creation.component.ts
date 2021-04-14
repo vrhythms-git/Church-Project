@@ -87,7 +87,7 @@ export class EventCreationComponent implements OnInit {
       console.log(this.venuesdataOfdata[1].name);
       //this.eventCreationForm.setControl('venues',this.setuserVenuAndProcter(this.venuesdataOfdata));
 
-      this.venuesList = this.venuesdataOfdata;
+      //this.venuesList = this.venuesdataOfdata;
     });
 
    
@@ -95,6 +95,10 @@ export class EventCreationComponent implements OnInit {
       this.regionList = res.data.metaData.regions;
       console.log("regionList", this.regionList);
     });
+
+
+
+    
     
   }
 
@@ -131,8 +135,20 @@ export class EventCreationComponent implements OnInit {
       this.proctorData = res.data.metaData.proctorData;
       console.log("this.proctorData",this.proctorData);
      });
-  }
 
+
+    
+    let venuesDatanew : any = {};
+  
+    venuesDatanew.regionId = this.eventsDataFormGroup.value.eventRegion;
+    venuesDatanew.parishIds = this.eventsDataFormGroup.value.parishName;
+    //venuesDatanew.push(parish);
+
+    this.apiService.getVenues({ data: venuesDatanew }).subscribe( (res:any) => {
+      this.venuesList = res.data.metaData;
+      console.log("venuesList", this.regionList);
+    });
+  }
   
 
   onVenuesNextBtnClick() {

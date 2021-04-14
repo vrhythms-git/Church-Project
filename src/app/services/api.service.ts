@@ -162,5 +162,18 @@ insertevents(eventsData  : any){
     
     return this.http.get(`${this._baseUrl}/getRegionAndParish` );   
   }
+
+  getVenues(userData: any):Observable<any>{
+    console.log(`calling the getVenues()`);
+    let headerObj = new HttpHeaders({
+                    'Authorization': localStorage.getItem('chUserToken')!,
+                    'Content-Type' : 'application/json'
+                  });
+    console.log( 'getVenues is : ' + this.http.get(`${this._baseUrl}/getVenues`), userData);
+    return this.http.post(`${this._baseUrl}/getVenues`, userData);   
+  }
+
+
+  
 }
 

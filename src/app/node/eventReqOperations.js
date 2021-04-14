@@ -411,22 +411,32 @@ async function getRegionAndParish() {
             order by region_name, parish_name;`
         let res = await client.query(getRegionAndParish);
         if (res && res.rowCount > 0) {
-            console.log("In response" + res);
             regionId = null;
             parishes = [];
             region = {};
             for (let row of res.rows) {
 
+
+
                 if (regionId != row.region_id) {
-                    region = {};
-                    //parishs = {};
-                    parishes = [];
-                    region.regionName = row.region_name;
-                    region.regionId = row.region_id;
+
+                    console.log("row.region_id" , row.region_id);
+
+                   
+
                     if (regionId != null) {
+                        console.log("regionId" , regionId);
+
                         region.parishes = parishes;
                         regions.push(region);                  
                     }
+
+                    region = {};
+                    //parishs = {};
+                    parishes = [];
+
+                    region.regionName = row.region_name;
+                    region.regionId = row.region_id;
                     regionId = row.region_id;
                     console.log("regions", regions);
                 }
