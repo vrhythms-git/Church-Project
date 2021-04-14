@@ -16,27 +16,38 @@ export class SignInComponent implements OnInit {
     private router: Router,
     private authService: AuthService) { }
 
+    columnDefs!: any[];
+    rowData: any;
+    isFamilyHead = false;
 
   ngOnInit(): void {
     this.signInForm = this.formBuilder.group({
-      username: new FormControl('', [Validators.required, Validators.email, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]),
-      password: new FormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[@])(?=.*?[0-9]).{8,}$')])
+      username: new FormControl('',
+     //  [Validators.required, Validators.email, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$")]
+      ),
+      password: new FormControl('', 
+     // [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[@])(?=.*?[0-9]).{8,}$')]
+    )
     });
     this.forgotPwdForm = this.formBuilder.group({
       email: new FormControl('', [Validators.required, Validators.email])
     })
+
+    
   }
 
   logIn() {
+   
     if (this.signInForm.invalid) {
       return
+    }
+    else if(this.isFamilyHead == true){
+      this.router.navigate(['/loginAccList']);
     }
     else {
       this.authService.SignIn({ data: this.signInForm.value })
       // this.router.navigate(['/dashboard']);
     }
-   
-
   }
   goToSignUp() {
     this.router.navigate(['/signup']);
@@ -50,6 +61,7 @@ export class SignInComponent implements OnInit {
        $("#myModal").modal("hide");
       this.router.navigate(['signin'])
   }
+
 
 }
 

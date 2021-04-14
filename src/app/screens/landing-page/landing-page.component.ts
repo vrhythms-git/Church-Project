@@ -51,7 +51,8 @@ export class LandingPageComponent implements OnInit {
   countries!: any[];
   states! : any[];
   selectedCountry:any;
-  contactNo: any;
+  mobileNumber: any;
+  homePhoneNumber : any;
 
   constructor(private apiService: ApiService, private uiCommonUtils :uiCommonUtils,
     private http: HttpClient, private formBuilder: FormBuilder) { }
@@ -165,9 +166,13 @@ export class LandingPageComponent implements OnInit {
     } 
   }
 
-  getNumber(event: any) {
+  getMobileNumber(event: any) {
     console.log(event);
-    this.contactNo = event;
+    this.mobileNumber = event;
+  }
+
+  getHomePhoneNumber(event: any){
+    this.homePhoneNumber = event;
   }
   
   resetForm(){
@@ -202,7 +207,7 @@ export class LandingPageComponent implements OnInit {
       middleName: this.selectedUserData.middleNmae,
       lastName: this.selectedUserData.lastName,
       nickName: this.selectedUserData.nickName,
-      batismalName: this.selectedUserData.batismalName,
+      batismalName: this.selectedUserData.baptismalNname,
       dob: this.selectedUserData.dob,
       mobileNo: this.selectedUserData.mobileNo,
       homePhoneNo: this.selectedUserData.homePhoneNo,
@@ -217,7 +222,7 @@ export class LandingPageComponent implements OnInit {
       parish: this.selectedUserData.parish_name,
       maritalStatus: this.selectedUserData.maritalStatus,
       dateofMarriage: this.selectedUserData.dateofMarriage,
-      about_urself: this.selectedUserData.about_urself,
+      about_urself: this.selectedUserData.aboutYourself,
       isFamilyHead : this.selectedUserData.isFamilyHead,
       //  role : selectedUserData.roles[0].roleId,
       //  accesslvltype : selectedUserData.roles[0].orgType,
@@ -350,6 +355,8 @@ export class LandingPageComponent implements OnInit {
       this.updateuserinfo.value.userId = this.userId;
       this.updateuserinfo.value.updatedBy = this.loggedInUser;
       this.updateuserinfo.value.orgId = this.selectedUserData.orgId;
+      this.updateuserinfo.value.mobileNo = this.mobileNumber;
+      this.updateuserinfo.value.homePhoneNo = this.homePhoneNumber;
       let dob = this.updateuserinfo.value.dob;
       console.log(dob);
       this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe((res:any) => {

@@ -18,3 +18,7 @@ h1{
   .forgotpwd{
     border:none;background-color: white;cursor: pointer;
   }
+  mat-form-field{
+    font-family: poppins;
+    letter-spacing: 0.18px;
+}

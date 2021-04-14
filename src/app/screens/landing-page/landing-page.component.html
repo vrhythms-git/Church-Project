@@ -79,11 +79,11 @@
                                                 <div class="row">
                                                                 <mat-form-field class="col-md-4">
                                                                                 <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
-                                                                                <input matInput type="text" ng2TelInput (ng2TelOutput)="getNumber($event)" formControlName="mobileNo" id="mobileNo" maxLength="10" minLength="10" (keypress)="keyPress($event)" required style="width: fit-content;"/>
+                                                                                <input matInput type="text" ng2TelInput (ng2TelOutput)="getMobileNumber($event)" formControlName="mobileNo" id="mobileNo" maxLength="10" minLength="10" (keypress)="keyPress($event)" required style="width: fit-content;"/>
                                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-4">
                                                                 <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
-                                                                <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput length="10" placeholder="Enter Home Phone Number" />
+                                                                <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput (ng2TelOutput)="getHomePhoneNumber($event)" length="10" placeholder="Enter Home Phone Number" />
                                                         </mat-form-field>
 
                                                         <mat-form-field class="col-md-4">

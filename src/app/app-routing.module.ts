@@ -12,11 +12,13 @@ import { EventCreationComponent } from './screens/event-creation/event-creation.
 import { MyProfileComponent } from './screens/my-profile/my-profile.component';
 import { DirtycheckGuard } from './dirtycheck.guard';
 import { ApprovalRequestsComponent } from './screens/approval-requests/approval-requests.component';
+import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.component';
 
 
 const routes: Routes = [
   { path: 'signup', component: SignUpComponent },
   { path: 'signin', component: SignInComponent},
+  { path: 'loginAccList', component: LoginAccListComponent},
   { path: '', component:HomePageComponent},
   { path: 'landingpage', component:LandingPageComponent},
   { path: 'dashboard', component:UserProfileComponent,

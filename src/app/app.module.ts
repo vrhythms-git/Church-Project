@@ -57,7 +57,8 @@ import {customSnackBar} from './common/uiCommonUtils'
 import { ReqRendererComponent } from './screens/renderers/req-renderer/req-renderer.component';
 import { ApprovalRequestsComponent } from './screens/approval-requests/approval-requests.component';
 import {MatStepperModule} from '@angular/material/stepper';
-import {EventDataService } from './screens/events/event.dataService'
+import {EventDataService } from './screens/events/event.dataService';
+import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.component'
 
 
 
@@ -78,7 +79,7 @@ import {EventDataService } from './screens/events/event.dataService'
     MyProfileComponent,
     ApprovalRequestsComponent,
     ReqRendererComponent,  
-    customSnackBar
+    customSnackBar, LoginAccListComponent
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],

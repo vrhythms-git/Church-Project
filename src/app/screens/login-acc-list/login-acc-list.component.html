@@ -1,0 +1,11 @@
+<div class="container-fluid d-flex row col align-items-center">
+    <div class="container col-md-5 col-sm-5 border rounded-lg box-shadow p-3">
+
+<h3 class="text-center" >Choose an account you want to Login with</h3>
+            <ag-grid-angular style="width: auto; height: 300px;" class="ag-theme-alpine mt-3" [rowData]="rowData" [columnDefs]="columnDefs"
+            rowSelection='single' (rowClicked)='onRowClicked($event)'>
+       </ag-grid-angular>
+
+
+    </div>
+</div>

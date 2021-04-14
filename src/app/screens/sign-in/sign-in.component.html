@@ -1,9 +1,9 @@
 <div class="container-fluid d-flex row col align-items-center m-0 p-0">
-        <div class="container col-md-4 col-sm-4 border rounded-lg box-shadow">
+    <div class="container col-md-4 col-sm-4 border rounded-lg box-shadow">
 
         <div class="row" style="background-color: #bd34069e;">
             <button mat-button class="col mbutton m-1" style="background-color: #bd34069e">
-                <mat-icon  style="margin-top:-4px">person</mat-icon>Login</button>
+                <mat-icon style="margin-top:-4px">person</mat-icon>Login</button>
             <button mat-button class="col mbutton m-1" style="color:white" (click)="goToSignUp()" style="background-color: transparent;border-color: transparent;">
                 <mat-icon style="margin-top:-4px">person_add</mat-icon>Register</button>
         </div>
@@ -35,7 +35,7 @@
 
 
                 <div class="form-group text-center">
-                    <button mat-button id="signInBtn" type="submit" class="mbutton" (click)="logIn()">LOG IN</button>
+                    <button mat-button id="signInBtn" type="submit" class="mbutton" [disabled]="!signInForm.valid" (click)="logIn()">LOG IN</button>
                 </div>
 
 
@@ -45,7 +45,7 @@
                         <a routerLink="/signup" id="hyperlink">Sign Up</a>
                     </h4>
                     <button type="button" class="forgotpwd mb-3" id="hyperlink" data-toggle="modal" data-target="#myModal">Forgot Password?</button>
-                   
+
                 </div>
             </form>
         </div>
@@ -65,7 +65,7 @@
                         <div class="row col-md-12 h6">
                             <b>Enter your email to reset password.</b>
                         </div>
-                       
+
                         <form [formGroup]="forgotPwdForm" class="">
 
                             <div class="form-group row">
@@ -87,6 +87,7 @@
 
                 </div>
             </div>
-        </div>
+        </div>      
+
     </div>
 </div>
