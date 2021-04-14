@@ -408,7 +408,7 @@ async function getRegionAndParish() {
             from t_organization to2, t_organization to3 
             where to2.org_type = 'Parish'
             and to3.org_id = to2.parent_org_id 
-            order by region_name, parish_name;`
+            order by region_id, parish_name;`
         let res = await client.query(getRegionAndParish);
         if (res && res.rowCount > 0) {
             regionId = null;
