@@ -40,21 +40,21 @@ export class LandingPageComponent implements OnInit {
   rowId: any;
   selectedUserRole!: any[];
   agGrid: any;
-  userMetaData : any;
-  deleteUser : any[] = new Array();
-  hasRolePermission : Boolean = false;
-  hasDeletePermission : Boolean = true;
-  hasEditPermission : boolean = false;
+  userMetaData: any;
+  deleteUser: any[] = new Array();
+  hasRolePermission: Boolean = false;
+  hasDeletePermission: Boolean = true;
+  hasEditPermission: boolean = false;
   inputObj: any;
   selectedUserData: any;
-  loggedInUser : any;
+  loggedInUser: any;
   countries!: any[];
-  states! : any[];
-  selectedCountry:any;
+  states!: any[];
+  selectedCountry: any;
   mobileNumber: any;
-  homePhoneNumber : any;
+  homePhoneNumber: any;
 
-  constructor(private apiService: ApiService, private uiCommonUtils :uiCommonUtils,
+  constructor(private apiService: ApiService, private uiCommonUtils: uiCommonUtils,
     private http: HttpClient, private formBuilder: FormBuilder) { }
   // this.gridOptions = <GridOptions>{};
 
@@ -66,9 +66,9 @@ export class LandingPageComponent implements OnInit {
 
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
     this.loggedInUser = this.userMetaData.userId;
-       this.hasRolePermission = this.uiCommonUtils.hasPermissions("assign_role");
-      
-      this.hasDeletePermission = this.uiCommonUtils.hasPermissions("delete_user");
+    this.hasRolePermission = this.uiCommonUtils.hasPermissions("assign_role");
+
+    this.hasDeletePermission = this.uiCommonUtils.hasPermissions("delete_user");
 
     this.updateuserinfo = this.formBuilder.group({
       title: new FormControl('', Validators.required),
@@ -92,8 +92,8 @@ export class LandingPageComponent implements OnInit {
       maritalStatus: new FormControl('', Validators.required),
       dateofMarriage: new FormControl(''),
       about_urself: new FormControl(''),
-      isFamilyHead : new FormControl(''),
-      roles: this.formBuilder.array([this.adduserroles()],[Validators.required]),
+      isFamilyHead: new FormControl(''),
+      roles: this.formBuilder.array([this.adduserroles()], [Validators.required]),
     });
 
     this.columnDefs = [
@@ -101,10 +101,11 @@ export class LandingPageComponent implements OnInit {
       { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
       { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
       { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 200 },
-      { headerName: 'City', field: 'city', sortable: true, filter: true, width:150 },
+      { headerName: 'City', field: 'city', sortable: true, filter: true, width: 150 },
       { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
       { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 140 },
-      { headerName: 'Actions', field: 'action', cellRendererFramework: ButtonRendererComponent, width: 140,
+      {
+        headerName: 'Actions', field: 'action', cellRendererFramework: ButtonRendererComponent, width: 140,
         cellRendererParams: function (params: any) {
           // onClick: this.openModal.bind(this),
           // label: 'Click'
@@ -113,18 +114,18 @@ export class LandingPageComponent implements OnInit {
       }
     ];
 
-      this.getUserData();
+    this.getUserData();
 
     this.max_date = new Date;
 
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
 
-   this.hasRolePermission = this.uiCommonUtils.hasPermissions("assign_role");
-  
-  this.hasDeletePermission = this.uiCommonUtils.hasPermissions("delete_user");
-// if(this.hasDeletePermission == true){
-//   this.hasDeletePermission = false;
-// }
+    this.hasRolePermission = this.uiCommonUtils.hasPermissions("assign_role");
+
+    this.hasDeletePermission = this.uiCommonUtils.hasPermissions("delete_user");
+    // if(this.hasDeletePermission == true){
+    //   this.hasDeletePermission = false;
+    // }
 
     this.apiService.getUserRoleData().subscribe(res => {
       console.log("User Role Data : ", res.data.metadata);
@@ -133,9 +134,9 @@ export class LandingPageComponent implements OnInit {
       console.log("Roles Data:", this.orgs);
     })
 
-    this.apiService.getCountryStates().subscribe( (res:any) => {
-        this.countries = res.data.countryState;
-        console.log("Countries", this.countries);
+    this.apiService.getCountryStates().subscribe((res: any) => {
+      this.countries = res.data.countryState;
+      console.log("Countries", this.countries);
     })
 
     this.gridOptions = {
@@ -159,11 +160,11 @@ export class LandingPageComponent implements OnInit {
     let inputChar = String.fromCharCode(event.charCode);
     if (event.keyCode != 5 && !pattern.test(inputChar)) {
       event.preventDefault();
-      if (event.keyCode == 13){
-//this.change(event);
-    console.log("keyCode == 13");
+      if (event.keyCode == 13) {
+        //this.change(event);
+        console.log("keyCode == 13");
       }
-    } 
+    }
   }
 
   getMobileNumber(event: any) {
@@ -171,11 +172,11 @@ export class LandingPageComponent implements OnInit {
     this.mobileNumber = event;
   }
 
-  getHomePhoneNumber(event: any){
+  getHomePhoneNumber(event: any) {
     this.homePhoneNumber = event;
   }
-  
-  resetForm(){
+
+  resetForm() {
     this.updateuserinfo.reset();
   }
 
@@ -202,7 +203,7 @@ export class LandingPageComponent implements OnInit {
 
 
     this.updateuserinfo.patchValue({
-      title:this.selectedUserData.title,
+      title: this.selectedUserData.title,
       firstName: this.selectedUserData.firstName,
       middleName: this.selectedUserData.middleNmae,
       lastName: this.selectedUserData.lastName,
@@ -223,14 +224,14 @@ export class LandingPageComponent implements OnInit {
       maritalStatus: this.selectedUserData.maritalStatus,
       dateofMarriage: this.selectedUserData.dateofMarriage,
       about_urself: this.selectedUserData.aboutYourself,
-      isFamilyHead : this.selectedUserData.isFamilyHead,
+      isFamilyHead: this.selectedUserData.isFamilyHead,
       //  role : selectedUserData.roles[0].roleId,
       //  accesslvltype : selectedUserData.roles[0].orgType,
       //  accesslvlid : selectedUserData.roles[0].orgId  
       // roles: selectedUserData.roles
     })
-  
-   this.patchCountryState(this.selectedUserData.country);
+
+    this.patchCountryState(this.selectedUserData.country);
 
     this.selectedUserRole = this.selectedUserData.roles;
     console.log("selectedUserRole", this.selectedUserRole)
@@ -247,11 +248,11 @@ export class LandingPageComponent implements OnInit {
         this.rolesArr.push(e);
       }
     });
-    
+
     this.updateuserinfo.setControl('roles', this.setRoles(this.selectedUserRole));
   }
 
-  telInputObject(obj:any) {
+  telInputObject(obj: any) {
     obj.intlTelInput('setNumber', this.selectedUserData.mobileNo);
   }
 
@@ -287,8 +288,8 @@ export class LandingPageComponent implements OnInit {
 
     for (let i = 0; i < this.orgs.length; i++) {
       if (this.orgs[i].orgtype == this.selectedOrg) {
-          this.rolesArr[orgIndex].orgDetails = this.orgs[i].details;
-          this.orgDetails = this.orgs[i].details;
+        this.rolesArr[orgIndex].orgDetails = this.orgs[i].details;
+        this.orgDetails = this.orgs[i].details;
       }
     }
 
@@ -303,12 +304,12 @@ export class LandingPageComponent implements OnInit {
     if (this.rolesArr.length == 0)
       return this.orgDetails
     else {
-      if (i > (this.rolesArr.length - 1)){
-      //  console.log('Returning []');
+      if (i > (this.rolesArr.length - 1)) {
+        //  console.log('Returning []');
         return []
       }
-      else{
-      //  console.log('Returning ' + this.rolesArr[i].orgDetails)
+      else {
+        //  console.log('Returning ' + this.rolesArr[i].orgDetails)
         return this.rolesArr[i].orgDetails;
       }
     }
@@ -334,10 +335,10 @@ export class LandingPageComponent implements OnInit {
     (<FormArray>this.updateuserinfo.get('roles').removeAt(index));
   }
 
-  getUserData(){  
-     
+  getUserData() {
+
     //this.userRecords.loggedInUser = this.loggedInUser;
-    this.apiService.getUsersData( this.loggedInUser ).subscribe((res) => {
+    this.apiService.getUsersData(this.loggedInUser).subscribe((res) => {
       console.log('These are users from database : ');
       console.log(res.data.metaData);
       this.rowData = res.data.metaData;
@@ -348,10 +349,10 @@ export class LandingPageComponent implements OnInit {
     if (this.updateuserinfo.invalid) {
       return
     }
-    else if(this.updateuserinfo.value.roles.length == 0){
+    else if (this.updateuserinfo.value.roles.length == 0) {
       this.uiCommonUtils.showSnackBar('User should have atleast one Role', 'Dismiss', 3000);
     }
-    else{
+    else {
       this.updateuserinfo.value.userId = this.userId;
       this.updateuserinfo.value.updatedBy = this.loggedInUser;
       this.updateuserinfo.value.orgId = this.selectedUserData.orgId;
@@ -359,44 +360,44 @@ export class LandingPageComponent implements OnInit {
       this.updateuserinfo.value.homePhoneNo = this.homePhoneNumber;
       let dob = this.updateuserinfo.value.dob;
       console.log(dob);
-      this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe((res:any) => {
+      this.apiService.updateUserProfile({ data: this.updateuserinfo.value }).subscribe((res: any) => {
         console.log("User Profile Updated.")
-        if(res.data.status ="success"){
-        this.uiCommonUtils.showSnackBar('User Profile Updated..', 'Dismiss', 3000)
+        if (res.data.status = "success") {
+          this.uiCommonUtils.showSnackBar('User Profile Updated..', 'Dismiss', 3000)
         }
-      this.getUserData();
-      })  
+        this.getUserData();
+      })
       this.updateuserinfo.reset();
       $("#imagemodal").modal("hide");
-      
-    }  
+
+    }
   }
 
-  onGridReady(params:any) {
+  onGridReady(params: any) {
     this.gridApi = params.api;
   }
 
-  onSelectionChanged(event:any){
+  onSelectionChanged(event: any) {
     var selectedRows = this.gridApi.getSelectedRows();
   }
 
   onDelete() {
 
     let selectedRows = this.gridApi.getSelectedRows();
-    for(let i=0; i < selectedRows.length;i++){
-      console.log("Users for Delete",selectedRows[i].userId);
+    for (let i = 0; i < selectedRows.length; i++) {
+      console.log("Users for Delete", selectedRows[i].userId);
       this.deleteUser.push(selectedRows[i].userId);
       //this.deleteUser = selectedRows[i].userId;
     }
 
     console.log("Users for Delete", this.deleteUser);
-    let payload =    {
-      "data" : {
-        "deleteUser" : this.deleteUser 
-        }
-      } 
-    this.apiService.deleteUser(payload).subscribe((res:any) => {
-      if(res.data.status = "success"){
+    let payload = {
+      "data": {
+        "deleteUser": this.deleteUser
+      }
+    }
+    this.apiService.deleteUser(payload).subscribe((res: any) => {
+      if (res.data.status = "success") {
         this.uiCommonUtils.showSnackBar('User Record Deleted..', 'Dismiss', 3000)
       }
     })
@@ -404,7 +405,7 @@ export class LandingPageComponent implements OnInit {
     console.log("Records Deleted...");
   }
 
-  changeCountry(country:any){
+  changeCountry(country: any) {
     //this.states = this.countries.find((cntry: any) => cntry.name == country.target.value).states;
     for (let i = 0; i < this.countries.length; i++) {
       if (this.countries[i].countryName == country.target.value) {
@@ -413,7 +414,7 @@ export class LandingPageComponent implements OnInit {
       }
     }
   }
-  patchCountryState(country:any){
+  patchCountryState(country: any) {
     //this.states = this.countries.find((cntry: any) => cntry.name == country.target.value).states;
     for (let i = 0; i < this.countries.length; i++) {
       if (this.countries[i].countryName == country) {
@@ -421,5 +422,8 @@ export class LandingPageComponent implements OnInit {
         this.states = this.countries[i].states;
       }
     }
-}
+  }
+
+
+
 }

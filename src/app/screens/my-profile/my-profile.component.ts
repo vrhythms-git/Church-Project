@@ -188,7 +188,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate{
             this.uiCommonUtils.showSnackBar("Profile updated successfully!","Dismiss",4000);
 
             //let abc =  localStorage.getItem('chUserFbUid' + "");
-            this.apiService.callGetService(`getUserMetaData?fbuid=${this.fbUid}`).subscribe((data)=>{
+            this.apiService.callGetService(`getUserMetaData?uid=${this.userId}`).subscribe((data)=>{
             localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData));
           });
       //  }

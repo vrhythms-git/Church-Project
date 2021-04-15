@@ -44,9 +44,8 @@ export class SignInComponent implements OnInit {
     else {
       this.authService.SignIn({ data: this.signInForm.value })
 
-      if(this.isFamilyHead == false){
-        this.router.navigate(['/loginAccList']);
-      }
+    //  if(this.isFamilyHead == false){
+      //}
       // this.router.navigate(['/dashboard']);
     }
   }

@@ -30,4 +30,11 @@ export class NavigationComponent implements OnInit {
   onmyProfileclick(){
     this.router.navigate(['/dashboard/myprofile']);
   }
+
+  handleLogoutBtnClick(){
+    localStorage.setItem('chUserToken', '');
+    localStorage.setItem('chUserFbId', '');
+    localStorage.setItem('chUserMetaData', '');
+    this.router.navigate(['/signin']);
+  }
 }

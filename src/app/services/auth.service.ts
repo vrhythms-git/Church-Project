@@ -57,17 +57,20 @@ export class AuthService {
           this.signedInUser = result.user;
           this.ngZone.run(() => {
             result.user?.getIdToken().then((token: string) => {
-              localStorage.setItem('chUserToken', token)
-            })
-            this.apiService.callGetService(`getUserMetaData?fbuid=${result.user?.uid}`).subscribe((data) => {
+              localStorage.setItem('chUserToken', token);
+              localStorage.setItem('chUserFbId', result.user?.uid);
+            this.router.navigate(['/loginAccList']);
 
-              if (data.data.status == 'failed') {
-                this.uiCommonUtils.showSnackBar(data.data.errorMessage, 'error', 3000);
-              } else {
-                localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
-                this.router.navigate(['/dashboard']);
-              }
             })
+            // this.apiService.callGetService(`getUserMetaData?fbuid=${result.user?.uid}`).subscribe((data) => {
+
+            //   if (data.data.status == 'failed') {
+            //     this.uiCommonUtils.showSnackBar(data.data.errorMessage, 'error', 3000);
+            //   } else {
+            //     localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
+            //     //this.router.navigate(['/dashboard']);
+            //   }
+            // })
           });
        // }
         this.SetUserData(result.user);

@@ -94,9 +94,9 @@ app.get('/api/getRoleMetadata', function (req, res) {
 });
 
 app.get('/api/getUserMetaData', function (req, res) {
-  console.log("signUp called with : " + JSON.stringify(req.query.fbuid));
+  console.log("signUp called with : " + JSON.stringify(req.query.uid));
   try {
-    processRequest.processGetUserMetaDataRequest(req.query.fbuid)
+    processRequest.processGetUserMetaDataRequest(req.query.uid)
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
@@ -359,6 +359,23 @@ app.get('/api/getRegionAndParish', function (req, res) {
 });
 
 
+app.get('/api/getMembers', function (req, res) {
+  console.log("getMembers called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processMiscRequest.getMembers(req.query.fbuid)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getMembers as : ' + error)
+  }
+});
 
 
 
