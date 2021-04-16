@@ -304,10 +304,10 @@ app.post('/api/updateEvent', function (req, res) {
 });
 
 
-app.get('/api/getProctorData', function (req, res) {
+app.post('/api/getProctorData', function (req, res) {
   console.log("getProctorData called with : " + JSON.stringify(req.query.fbuid));
   try {
-    processEventRequest.getProctorData(req.query.userData)
+    processEventRequest.getProctorData(req.body.data)
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
@@ -355,6 +355,24 @@ app.get('/api/getRegionAndParish', function (req, res) {
       })
   } catch (error) {
     console.error('Error in getRegionAndParish as : ' + error)
+  }
+});
+
+app.get('/api/getEventType', function (req, res) {
+  console.log("getEventType called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processEventRequest.getEventType()
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getEventType as : ' + error)
   }
 });
 

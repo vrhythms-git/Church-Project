@@ -154,7 +154,7 @@ insertevents(eventsData  : any){
                     'Content-Type' : 'application/json'
                   });
     console.log( 'getProctorData is : ' + this.http.get(`${this._baseUrl}/getProctorData`), userData);
-    return this.http.get(`${this._baseUrl}/getProctorData?userData=`+ userData );   
+    return this.http.post(`${this._baseUrl}/getProctorData`, userData );   
   }
 
   getRegionAndParish(){
@@ -172,7 +172,12 @@ insertevents(eventsData  : any){
     console.log( 'getVenues is : ' + this.http.get(`${this._baseUrl}/getVenues`), userData);
     return this.http.post(`${this._baseUrl}/getVenues`, userData);   
   }
-
+  
+  getEventType(){
+    console.log(`calling the getEventType()`);
+    
+    return this.http.get(`${this._baseUrl}/getEventType` );   
+  }
 
   
 }

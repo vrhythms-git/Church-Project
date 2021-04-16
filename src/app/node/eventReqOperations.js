@@ -269,10 +269,11 @@ async function insertEvents(eventsData) {
 
             for(let parish of eventsData.parishName){
                 console.log("parish", parish);
-                const insertParishData = `INSERT INTO t_event_organization(org_type, org_id) VALUES($1, $2);`
+                const insertParishData = `INSERT INTO t_event_organization(org_type, org_id, event_id) VALUES($1, $2, $3);`
                 insertParishDataValues = [
                     'Parish',
-                     parish
+                     parish,
+                     this.eventId
                 ];
                 await client.query(insertParishData, insertParishDataValues);
             }
@@ -338,7 +339,7 @@ async function insertEvents(eventsData) {
 
                 console.log("6");
                 console.log("category", category);
-                const insertCatUserMap = `INSERT INTO  t_event_cat_staff_map(event_id, event_category_id, user_id, role_type)
+                const insertCatUserMap = `INSERT INTO  t_event_cat_staff_map(event_id, event_category_map_id, user_id, role_type)
                     VALUES ($1, $2, $4, $3),($1, $2, $5, $3),($1, $2, $6, $3);`
 
                 insertCatUserMap_values = [
@@ -468,14 +469,91 @@ async function getRegionAndParish() {
     }
 }
 
+
+
+async function getEventType() {
+
+    let client = dbConnections.getConnection();
+    await client.connect();
+    try {
+        let metadata = {};
+        let eventType = [];
+
+        let getEventType = `select * from t_event_category;`
+        let res = await client.query(getEventType);
+
+        if (res && res.rowCount > 0) {
+            type = null;
+            eventName = [];
+            eventTypes = {};
+
+            for (let row of res.rows) {
+
+                if (type != row.type) {
+
+                    if (type != null) {
+                        eventTypes.eventName = eventName;
+                        eventType.push(eventTypes);  
+                    }
+                    eventTypes = {};
+                    eventName = [];
+                    eventTypes.eventType = row.type;
+                    type = row.type;
+                }
+
+                eventNames = {};
+                eventNames.id = row.event_category_id;
+                eventNames.name = row.name;
+                eventNames.description = row.description;
+                eventNames.schoolGradeFrom = row.school_grade_from;
+                eventNames.schoolGradeTo = row.school_grade_to;
+
+                eventName.push(eventNames);
+            }
+
+            eventTypes.eventName = eventName;
+            eventType.push(eventTypes);    
+
+        }
+
+        metadata.eventType = eventType;
+
+        return ({
+            data: {
+                status: 'success',
+                metaData: metadata
+            }
+        })
+
+    } catch (error) {
+        client.end();
+        console.error(`reqOperations.js::getEventType() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    }
+}
+
+
 async function getProctorData(userData) {
 
     let client = dbConnections.getConnection();
     await client.connect();
     try {
         let metadata = {};
-        console.log("userData", userData);
-        let getProctorData = `select user_id, CONCAT(first_name, ' ',last_name) as name from v_user where user_org_id = ${userData};`
+        console.log("userData", JSON.stringify(userData));
+        let rolesData = [];
+        //rolesData = userData.rolesData.join(',');
+
+        console.log("this.rolesData", rolesData);
+
+        var roles = "'" + userData.rolesData.join("','") + "'";
+
+        console.log("roles", roles);
+
+
+        let getProctorData = `select distinct user_id, concat(first_name ,' ', last_name) as name 
+        from v_user 
+        where role_name  in (${roles});`
+        
         let res = await client.query(getProctorData);
         if (res && res.rowCount > 0) {
             console.log("In response" + res);
@@ -515,5 +593,6 @@ module.exports = {
     getProctorData,
     insertEvents,
     getRegionAndParish,
-    getProctorData
+    getProctorData,
+    getEventType
 }
