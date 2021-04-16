@@ -1,0 +1,34 @@
+<div class="container mt-3" style="overflow: hidden;">
+
+    <div class="form-group form-inline row m-0 p-0">
+
+        <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
+        
+    </div>
+    
+    <ag-grid-angular style="width: auto; height: 500px;" class="ag-theme-alpine mt-3" 
+                    [rowData]="rowData|filter:term" [columnDefs]="columnDefs"
+                    (gridReady)="onGridReady($event)" (rowClicked)='onRowClicked($event)'
+            [pagination]="true" rowSelection='multiple' [checkboxSelection]="true" [gridOptions]="gridOptions">
+            
+            <!--<app-child [childToMaster]=rowData.name (childToParent)="onRowClicked($event)"></app-child> -->
+    </ag-grid-angular>
+    
+    <!-- <app-event-creation #child [parentValue]='parentValue' (childValue)='childValue = $event'></app-event-creation> -->
+    <!--<app-event-creation #child [childPosts]='parentPosts' (childValue)='childValue = $event'></app-event-creation> -->
+    
+
+    
+    <!--
+    <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" 
+                    [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
+                    [pagination]="true" rowSelection='multiple' 
+                    (selectionChanged)="onSelectionChanged($event)" 
+                    (gridReady)="onGridReady($event)"
+                    [checkboxSelection]="true" [gridOptions]="gridOptions" >
+    </ag-grid-angular>
+    -->
+    <!-- <app-event-creation></app-event-creation> -->
+    
+</div>
+

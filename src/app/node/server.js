@@ -397,8 +397,42 @@ app.get('/api/getMembers', function (req, res) {
 
 
 
+app.get('/api/getEventQuestionnaireData',function(req,res){
+  console.log("getEventQuestionnaireData called with : " + JSON.stringify(req.body.data));
+  try{
+    processEventRequest.getEventQuestionnaireData()
+    .then((data) => {
+      console.log(`Returning with response : ${JSON.stringify(data)}`)
+      res.send(data);
+      res.end();
+    }).catch((error) => {
+      console.log(`Returning with response : ${error}`)
+      res.send(error);
+      res.end();
+    })
+  }catch(error){
+    console.log(`Error in getEventQuestionnaireData as : ` + error)
+  }
+});
 
 
+app.get('/api/getEventForRegistration',function(req,res){
+  console.log("getEventForRegistration called with : " + JSON.stringify(req.query.fbuid));
+  try{
+    processEventRequest.getEventForRegistration()
+    .then((data) => {
+      console.log(`Returning with response : ${JSON.stringify(data)}`)
+      res.send(data);
+      res.end();
+    }).catch((error) => {
+      console.log(`Returning with response : ${error}`)
+      res.send(error);
+      res.end();
+    })
+  }catch(error){
+    console.log(`Error in getEventForRegistration as : ` + error)
+  }
+});
 
 
 

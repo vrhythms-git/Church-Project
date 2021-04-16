@@ -179,6 +179,28 @@ insertevents(eventsData  : any){
     return this.http.get(`${this._baseUrl}/getEventType` );   
   }
 
+  /** Get questionnire data from database */
+  getEventQuestionnaireData(): Observable<any> {
+    console.log(`calling the getEventQuestionnaireData()`);
+    let headerObj = new HttpHeaders({
+                    'Authorization': localStorage.getItem('chUserToken')!,
+                    'Content-Type' : 'application/json'
+                  });
+    console.log( 'getEventQuestionnaireData Data data is : ' + this.http.get(`${this._baseUrl}/getEventQuestionnaireData`));
+    return this.http.get(`${this._baseUrl}/getEventQuestionnaireData` );   
+  }
+
+  /**.........get events data from v_events for registration for the user */
+  getEventForRegistration(): Observable<any>{
+    console.log(`calling the getEventDataForRegistrationData()`);
+    let headerObj = new HttpHeaders({
+                    'Authorization': localStorage.getItem('chUserToken')!,
+                    'Content-Type' : 'application/json'
+                  });
+    console.log( 'getEventForRegistration Data data is : ' + this.http.get(`${this._baseUrl}/getEventForRegistration`));
+    return this.http.get(`${this._baseUrl}/getEventForRegistration` );   
+  }
+
   
 }
 

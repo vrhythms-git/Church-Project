@@ -1,0 +1,18 @@
+.example-margin {
+    margin: 0 12px;
+  }
+  .container{
+    font-family: 'poppins'!important;
+    width: 100%;
+	padding-bottom: 2%;
+	justify-content: center;
+	letter-spacing: 0.18px;
+	
+ }
+ .mat-radio-button ~ .mat-radio-button {
+  margin-left: 16px;
+}
+h2{
+  font-family: 'poppins'!important;
+
+}

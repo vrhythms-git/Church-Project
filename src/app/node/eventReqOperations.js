@@ -585,6 +585,82 @@ async function getProctorData(userData) {
 }
 
 
+async function getEventQuestionnaireData(){
+    let client = dbConnections.getConnection();
+    await client.connect();
+    try{
+        let metadata = {};
+        let getEventQuestionnaireData = `select * from t_event_questionnaire`;
+        let res = await client.query(getEventQuestionnaireData);
+        if(res && res.rowCount >0) {
+            console.log("In Question response : "+res);
+            let questionData =[];
+            for(let row of res.rows){
+                let questions = {};
+                questions.questionId = row.question_id;
+                questions.eventId = row.event_id;
+                questions.question = row.question;
+                questions.answerType = row.answer_type;
+                questionData.push(questions);
+            }
+            metadata.questionData = questionData;
+            client.end();
+        }
+        return({
+            data : {
+                status : 'success',
+                metaData : metadata
+            }
+        })
+
+    }catch(error){
+        client.end();
+        console.log(`reqOperations.js::getEventQuestionnaireData() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    }
+}
+/*............get all Events from db for registration purpose........*/
+async function getEventForRegistration(){
+    let client = dbConnections.getConnection();
+    await client.connect();
+    try{
+        let metadata = {};
+        let getEventForRegistration = `select * from v_event`;
+        let res = await client.query(getEventForRegistration);
+        if(res && res.rowCount > 0){
+            console.log("In Event response : " + res);
+            let eventData = [];
+            for(let row of res.rows){
+                let events = {};
+                events.event_Id = row.event_id;
+                events.name = row.event_name;
+                events.event_type = row.event_type;
+                events.description = row.event_desciption;
+                events.startDate = row.event_start_date;
+                events.endDate = row.event_end_date;
+                events.registrationStartDate = row.registration_start_date;
+                events.registrationEndDate = row.registration_end_date;
+                events.orgId = row.org_id;
+                eventData.push(events);
+            }
+            metadata.eventData = eventData;
+            client.end()
+        }
+        return({
+            data : {
+                status : 'success',
+                metaData : metadata
+                
+            }
+        })
+
+    }catch(error){
+        client.end();
+        console.log(`reqOperations.js::getEventForRegistration() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    }
+}
+
 
 
 module.exports = {
@@ -594,5 +670,7 @@ module.exports = {
     insertEvents,
     getRegionAndParish,
     getProctorData,
-    getEventType
+    getEventType,
+    getEventQuestionnaireData,
+    getEventForRegistration
 }

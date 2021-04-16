@@ -13,6 +13,8 @@ import { MyProfileComponent } from './screens/my-profile/my-profile.component';
 import { DirtycheckGuard } from './dirtycheck.guard';
 import { ApprovalRequestsComponent } from './screens/approval-requests/approval-requests.component';
 import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.component';
+import { CwcregistrationComponent } from './screens/cwcregistration/cwcregistration.component';
+import { EventRegistrationComponent } from './screens/event-registration/event-registration.component';
 
 
 const routes: Routes = [
@@ -28,7 +30,9 @@ const routes: Routes = [
     { path: 'events', component: EventsComponent},
     { path: 'requests', component:ApprovalRequestsComponent},
     {path : 'myprofile', component:MyProfileComponent, canDeactivate:[DirtycheckGuard]},
-    { path : 'createevent', component: EventCreationComponent }
+    { path : 'createevent', component: EventCreationComponent },
+    { path : 'cwcregistration', component :CwcregistrationComponent},
+    { path : 'eventRegistration', component:EventRegistrationComponent}
     // { path: 'testEvent',component:UserProfileComponent},
   ]
 },

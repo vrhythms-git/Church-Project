@@ -58,8 +58,11 @@ import { ReqRendererComponent } from './screens/renderers/req-renderer/req-rende
 import { ApprovalRequestsComponent } from './screens/approval-requests/approval-requests.component';
 import {MatStepperModule} from '@angular/material/stepper';
 import {EventDataService } from './screens/events/event.dataService';
-import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.component'
-
+import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.component';
+import { CwcregistrationComponent } from './screens/cwcregistration/cwcregistration.component';
+import { EventRegistrationComponent } from './screens/event-registration/event-registration.component'
+//import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 
 
@@ -79,7 +82,7 @@ import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.c
     MyProfileComponent,
     ApprovalRequestsComponent,
     ReqRendererComponent,  
-    customSnackBar, LoginAccListComponent
+    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],
@@ -124,7 +127,8 @@ import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.c
     MatExpansionModule,
     AgGridModule.withComponents([ButtonRendererComponent]),
     NgxSpinnerModule,
-    MatStepperModule
+    MatStepperModule,
+    NgxDaterangepickerMd.forRoot()
   ],
   providers: [AuthService,  { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },EventDataService],
   bootstrap: [AppComponent],
