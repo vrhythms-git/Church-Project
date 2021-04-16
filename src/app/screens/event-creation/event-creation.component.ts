@@ -6,6 +6,7 @@ import { MatAccordion } from '@angular/material/expansion';
 import { GridOptions, GridApi } from "ag-grid-community";
 import { HttpClient } from '@angular/common/http';
 import { uiCommonUtils } from 'src/app/common/uiCommonUtils';
+import { EventDataService } from '../events/event.dataService';
 
 @Component({
   selector: 'app-event-creation',
@@ -44,11 +45,17 @@ export class EventCreationComponent implements OnInit {
   //items!: FormArray
   ISCategory!: any[];
   newVenues!: any[];
+  selectedRowJson:any ={};
   constructor(private apiService: ApiService,
-    private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils) { }
+    private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils, private eventDataService:EventDataService) { }
 
   ngOnInit(): void {
 
+    if( this.eventDataService.getSelectedRowData() != undefined )
+    {
+      this.selectedRowJson = this.eventDataService.getSelectedRowData();
+      console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson))
+    }
     this.alluserdata = this.uiCommonUtils.getUserMetaDataJson();
     this.orgId = this.alluserdata.orgId;
     this.userId = this.alluserdata.userId;
