@@ -50,29 +50,62 @@ export class AuthService {
     console.log(`Attempting to sign in with email: ${data.data.username} and password: ${data.data.password}`)
     this.afAuth.auth.signInWithEmailAndPassword(data.data.username, data.data.password)
       .then((result: any) => {
-       // if (result.user?.emailVerified == false) {
-          // this.uiCommonUtils.showSnackBar('Please verify your email.', 'error', 3000)
-          // return;
+        // if (result.user?.emailVerified == false) {
+        // this.uiCommonUtils.showSnackBar('Please verify your email.', 'error', 3000)
+        // return;
         //} else {
-          this.signedInUser = result.user;
-          this.ngZone.run(() => {
-            result.user?.getIdToken().then((token: string) => {
-              localStorage.setItem('chUserToken', token);
-              localStorage.setItem('chUserFbId', result.user?.uid);
-            this.router.navigate(['/loginAccList']);
+        this.signedInUser = result.user;
+        this.ngZone.run(() => {
+          result.user?.getIdToken().then((token: string) => {
+            localStorage.setItem('chUserToken', token);
+            localStorage.setItem('chUserFbId', result.user?.uid);
 
+            this.apiService.callGetService(`getUserApprovalStatus?fbuid=${result.user?.uid}`).subscribe((data) => {
+
+              if(data == null){
+                try{  
+                result.user?.delete();
+                this.uiCommonUtils.showSnackBar('No such account exist!','error',3000)
+                return;
+              }catch(error){
+                console.log('Error while deleting User.');
+              }
+              }
+              
+                if (data.data.status == 'failed') {
+                this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
+              } else {
+                if (data.data.isapproved == false) {
+                  this.apiService.callGetService(`getUserMetaData?uid=${data.data.user}`).subscribe((data) => {
+
+                    if (data.data.status == 'failed') {
+                      this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
+                    } else {
+                      localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
+                      this.router.navigate(['/dashboard']);
+                      //this.router.navigate(['/dashboard']);
+                    }
+                  })
+                }
+                else
+                  this.router.navigate(['/loginAccList']);
+              }
             })
-            // this.apiService.callGetService(`getUserMetaData?fbuid=${result.user?.uid}`).subscribe((data) => {
 
-            //   if (data.data.status == 'failed') {
-            //     this.uiCommonUtils.showSnackBar(data.data.errorMessage, 'error', 3000);
-            //   } else {
-            //     localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
-            //     //this.router.navigate(['/dashboard']);
-            //   }
-            // })
-          });
-       // }
+
+
+          })
+          // this.apiService.callGetService(`getUserMetaData?uid=${userId}`).subscribe((data) => {
+
+          //   if (data.data.status == 'failed') {
+          //     this.uiCommonUtils.showSnackBar(data.data.errorMessage, 'error', 3000);
+          //   } else {
+          //     localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
+          //     //this.router.navigate(['/dashboard']);
+          //   }
+          // })
+        });
+        // }
         this.SetUserData(result.user);
       }).catch((error: any) => {
         this.uiCommonUtils.showSnackBar(error.message, 'Dismiss', 4000)
@@ -95,7 +128,7 @@ export class AuthService {
             }).catch((error: any) => {
               console.log(`Error while updating the username as : ${error}`);
             }).then((res: any) => {
-             // result.user?.sendEmailVerification();
+              // result.user?.sendEmailVerification();
             })
             this.router.navigate(['/signin']);
             this.uiCommonUtils.showSnackBar('Sign up complete, Please check your inbox to verify your email address', 'Dismiss', 5000);
@@ -163,20 +196,20 @@ export class AuthService {
 
   }
 
-    // Reset Forggot password
-    forgotPassword(passwordResetEmail: string) {
-      return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail)
-        .then(() => {
-         // window.alert('Password reset email sent, check your inbox.');
-          this.uiCommonUtils.showSnackBar('Password reset link has been sent to your email.','success',5000)
-        }).catch((error) => {
-          console.log('Error occured while resetting password as : ' + error); 
-          if(error.code == 'auth/user-not-found')
-          this.uiCommonUtils.showSnackBar('User does not exist in system.','error',5000)
-          else
-          this.uiCommonUtils.showSnackBar('Something went wrong.','error',5000);
-        })
-    }
+  // Reset Forggot password
+  forgotPassword(passwordResetEmail: string) {
+    return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail)
+      .then(() => {
+        // window.alert('Password reset email sent, check your inbox.');
+        this.uiCommonUtils.showSnackBar('Password reset link has been sent to your email.', 'success', 5000)
+      }).catch((error) => {
+        console.log('Error occured while resetting password as : ' + error);
+        if (error.code == 'auth/user-not-found')
+          this.uiCommonUtils.showSnackBar('User does not exist in system.', 'error', 5000)
+        else
+          this.uiCommonUtils.showSnackBar('Something went wrong.', 'error', 5000);
+      })
+  }
 
   // Sign out
   SignOut() {
@@ -186,4 +219,9 @@ export class AuthService {
     })
   }
 
+deleteUserFromFirebase(){
+  this.afAuth.user.subscribe(data=>{
+    data?.delete()
+  })
+}
 }

@@ -28,11 +28,11 @@ export class ApprovalRequestsComponent implements OnInit {
   loggedInUser: any;
   parishList!: any[];
   countries!: any[];
-  states! : any[];
-  selectedCountry:any;
+  states!: any[];
+  selectedCountry: any;
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder,
-  private uiCommonUtils: uiCommonUtils, private router: Router) { }
+    private uiCommonUtils: uiCommonUtils, private router: Router) { }
 
   agInit(params: any) {
     this.params = params;
@@ -45,7 +45,7 @@ export class ApprovalRequestsComponent implements OnInit {
       firstName: new FormControl('', Validators.required),
       middleName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
-      nickName: new FormControl('', ),
+      nickName: new FormControl('',),
       batismalName: new FormControl(''),
       dob: new FormControl('', [Validators.required]),
       mobileNo: new FormControl('', [Validators.required]),
@@ -69,33 +69,51 @@ export class ApprovalRequestsComponent implements OnInit {
       comment: new FormControl('', Validators.required)
     })
 
-
-    this.columnDefs = [
-      { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
-      { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
-      { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
-      { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
-      { headerName: 'City', field: 'city', sortable: true, filter: true, width:150 },
-      { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
-      { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
-      { headerName: 'Actions', field: 'action', cellRendererFramework: ReqRendererComponent, width: 170 }
-    ]
-
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
     this.loggedInUser = this.userMetaData.userId;
-    this.getUnapprovedUserData();
+    this.getUnapprovedUserData('approval_requests');
 
-    this.apiService.getCountryStates().subscribe( (res:any) => {
-      console.log(res.data.countryState)
-      this.countries = res.data.countryState;
-      console.log("Countries", this.countries);
-  })
+    // this.apiService.getCountryStates().subscribe((res: any) => {
+    //   console.log(res.data.countryState)
+    //   this.countries = res.data.countryState;
+    //   console.log("Countries", this.countries);
+    // })
 
   }
 
-  getUnapprovedUserData() {
-    this.apiService.getUnapprovedUserData(this.loggedInUser).subscribe((res) => {
-      console.log('These are unapproved users from database : ');
+
+  onFilteringRadioButtonChange(event: any) {
+    console.log(event)
+    this.getUnapprovedUserData(event.value);
+
+  }
+  getUnapprovedUserData(usertype:string) {
+    this.apiService.getUnapprovedUserData(this.loggedInUser, usertype).subscribe((res) => {
+      // console.log('These are unapproved users from database : ');
+
+      if(usertype == 'approval_requests'){
+        this.columnDefs = [
+          { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
+          { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
+          { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
+          { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
+          { headerName: 'City', field: 'city', sortable: true, filter: true, width: 150 },
+          { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
+          { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
+          { headerName: 'Actions', field: 'action', cellRendererFramework: ReqRendererComponent, width: 170 }
+        ]
+      }else if(usertype == 'rejected'){
+        this.columnDefs = [
+          { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
+          { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
+          { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
+          { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
+          { headerName: 'City', field: 'city', sortable: true, filter: true, width: 150 },
+          { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
+          { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
+          ]
+      }
+      
       console.log(res.data.metaData);
       this.rowData = res.data.metaData;
     });
@@ -111,7 +129,7 @@ export class ApprovalRequestsComponent implements OnInit {
 
     this.reqDisableForm.disable();
 
-      this.reqDisableForm.patchValue({
+    this.reqDisableForm.patchValue({
       title: this.selectedUserData.title,
       firstName: this.selectedUserData.firstName,
       middleName: this.selectedUserData.middleNmae,
@@ -150,7 +168,7 @@ export class ApprovalRequestsComponent implements OnInit {
     console.log(this.approveReqForm.value);
     this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe(res => {
       console.log(res);
-      this.getUnapprovedUserData();
+     // this.getUnapprovedUserData();
       $("#imagemodal").modal("hide");
     })
   }
@@ -162,12 +180,12 @@ export class ApprovalRequestsComponent implements OnInit {
     console.log(this.approveReqForm.value);
     this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe(res => {
       console.log(res);
-      this.getUnapprovedUserData();
+    //  this.getUnapprovedUserData();
       $("#imagemodal").modal("hide");
     })
   }
 
-  changeCountry(country:any){
+  changeCountry(country: any) {
     //this.states = this.countries.find((cntry: any) => cntry.name == country.target.value).states;
     for (let i = 0; i < this.countries.length; i++) {
       if (this.countries[i].countryName == country.target.value) {

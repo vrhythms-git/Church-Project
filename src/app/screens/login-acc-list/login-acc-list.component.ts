@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '../../../../node_modules/@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
+import { uiCommonUtils } from '../../common/uiCommonUtils'
 
 @Component({
   selector: 'app-login-acc-list',
@@ -11,34 +12,39 @@ import { ApiService } from '../../services/api.service';
 export class LoginAccListComponent implements OnInit {
   columnDefs: any;
   rowData: any;
-  showgrid:boolean = false;
+  showgrid: boolean = false;
 
-  constructor(private router: Router, private apiService: ApiService) { }
+  constructor(private router: Router, private apiService: ApiService, private uiCommonUtils: uiCommonUtils) { }
 
   ngOnInit(): void {
 
-    if (localStorage.getItem('chUserToken') == '' && 
-        localStorage.getItem('chUserFbId') == '' &&
-        localStorage.getItem('chUserMetaData') == '') {
+    if (localStorage.getItem('chUserToken') == '' &&
+      localStorage.getItem('chUserFbId') == '' &&
+      localStorage.getItem('chUserMetaData') == '') {
       this.router.navigate(['/signin']);
     } else {
       this.apiService.callGetService(`getMembers?fbuid=${localStorage.getItem('chUserFbId')}`).subscribe((res) => {
 
-        if (res.data.memberCount > 0) {
-          this.showgrid = true;
-          this.rowData = res.data.members;
+        if (res.data.status == 'success') {
+          if (res.data.memberCount > 0) {
+            this.showgrid = true;
+            this.rowData = res.data.members;
+          } else {
+            //localStorage.setItem('chloggedInUserId', res.data.userId)
+            this.navigateToDashBoard(res.data.userId)
+            //this.router.navigate(['/dashboard']);
+          }
         } else {
-          //localStorage.setItem('chloggedInUserId', res.data.userId)
-          this.navigateToDashBoard(res.data.userId)
-          //this.router.navigate(['/dashboard']);
+          this.router.navigate(['/signin']);
+          this.uiCommonUtils.showSnackBar(res.data.errorMessage, 'error', 4000);
         }
-    })
-  }
+      })
+    }
 
 
     this.columnDefs = [
-      { headerName: 'First Name', field: 'firstName'},
-      { headerName: 'Last Name', field: 'lastName'},
+      { headerName: 'First Name', field: 'firstName' },
+      { headerName: 'Last Name', field: 'lastName' },
       { headerName: 'Role', field: 'role' },
     ];
 
@@ -65,7 +71,8 @@ export class LoginAccListComponent implements OnInit {
   navigateToDashBoard(userId: number) {
     this.apiService.callGetService(`getUserMetaData?uid=${userId}`).subscribe((data) => {
       if (data.data.status == 'failed') {
-        //  this.uiCommonUtils.showSnackBar(data.data.errorMessage, 'error', 3000);
+        this.router.navigate(['/signin']);
+        this.uiCommonUtils.showSnackBar(data.data.errorMessage, 'error', 3000);
       } else {
         localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData))
         this.router.navigate(['/dashboard']);

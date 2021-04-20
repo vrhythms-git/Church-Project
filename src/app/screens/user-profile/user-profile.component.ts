@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HostListener } from '@angular/core';
 import { Router } from "@angular/router";
+import { uiCommonUtils } from "../../common/uiCommonUtils"
 
 @Component({
   selector: 'app-user-profile',
@@ -9,9 +10,14 @@ import { Router } from "@angular/router";
 })
 export class UserProfileComponent implements OnInit {
 
-  constructor( public router: Router) { }
+  constructor( public router: Router, private uiCommonUtils:uiCommonUtils) { }
 
   ngOnInit(): void {
+
+    let userMetaData =  this.uiCommonUtils.getUserMetaDataJson()
+
+    if(userMetaData.isApproved == false) 
+        this.uiCommonUtils.showSnackBar("Your account has not been approved yet!",'error', 4000)
   }
 
 

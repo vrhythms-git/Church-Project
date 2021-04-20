@@ -52,7 +52,7 @@ function getCountryStates() {
     });
 }
 
-async function getMembers(fireBaseId){
+async function getMembers(fireBaseId) {
 
     return new Promise((resolve, reject) => {
         try {
@@ -62,7 +62,7 @@ async function getMembers(fireBaseId){
             let noOfFamilyMembers = `select count(family_member_id) member_count from t_person_relationship tpr
             where family_head_id = 
                 (select user_id from t_user tu 
-                        where firebase_id = '${fireBaseId}')`;
+                        where firebase_id = '${fireBaseId}') and is_deleted !=true;`;
 
             client.query(noOfFamilyMembers, (err, res) => {
                 if (err) {
@@ -70,93 +70,114 @@ async function getMembers(fireBaseId){
                     reject(errorHandling.handleDBError('queryExecutionError'));
                 }
 
-              //  console.log('Res:--->' + JSON.stringify(res))
-               // let respJSON = { status: 'success'};
+                //  console.log('Res:--->' + JSON.stringify(res))
+                // let respJSON = { status: 'success'};
                 if (res) {
-                 //   respJSON.memberCount  =  res.rows[0].member_count;
-                  
-                      if(res.rows[0].member_count > 0){
-                           
-                        let fetchAllMembersData = `select 
-                        jsonb_agg(
-                          jsonb_build_object(
-                            'userId', res.user_id, 'title', res.title, 
-                            'firstName', res.first_name, 'lastName', 
-                            res.last_name,  'role', res.role_name 
-                          )
-                        ) member_list
-                      from 
-                        (
-                          select 
-                            distinct user_id, 
-                            title, 
-                            first_name, 
-                            last_name,
-                            role_name 
-                          from 
-                            v_user 
-                          where 
-                            user_id in(
-                              select 
-                                family_member_id 
-                              from 
-                                t_person_relationship tpr 
-                              where 
-                                family_head_id = (
-                                  select 
-                                    user_id 
-                                  from 
-                                    t_user 
-                                  where 
-                                    firebase_id = '${fireBaseId}'
-                                ) and is_deleted = false
-                            ) 
-                            or firebase_id = '${fireBaseId}'
-                        ) res;`
+                    //   respJSON.memberCount  =  res.rows[0].member_count;
 
-                    client.query(fetchAllMembersData,(err, result) => {
+                    if (res.rows[0].member_count > 0) {
 
-                        if (err) {
-                            console.error(`miscReqOperations.js::getMembers() --> error while fetching fetchAllMembersData results : ${err}`)
-                            reject(errorHandling.handleDBError('queryExecutionError'));
-                        }
-        
-                        client.end();
+                        //   let fetchAllMembersData = `select 
+                        //   jsonb_agg(
+                        //     jsonb_build_object(
+                        //       'userId', res.user_id, 'title', res.title, 
+                        //       'firstName', res.first_name, 'lastName', 
+                        //       res.last_name,  'role', res.role_name 
+                        //     )
+                        //   ) member_list
+                        // from 
+                        //   (
+                        //     select 
+                        //       distinct user_id, 
+                        //       title, 
+                        //       first_name, 
+                        //       last_name,
+                        //       role_name 
+                        //     from 
+                        //       v_user 
+                        //     where 
+                        //       user_id in(
+                        //         select 
+                        //           family_member_id 
+                        //         from 
+                        //           t_person_relationship tpr 
+                        //         where 
+                        //           family_head_id = (
+                        //             select 
+                        //               user_id 
+                        //             from 
+                        //               t_user 
+                        //             where 
+                        //               firebase_id = '${fireBaseId}'
+                        //           ) and is_deleted = false
+                        //       ) 
+                        //       or firebase_id = '${fireBaseId}'
+                        //   ) res;`
 
-                        resolve({
-                            data: {
-                                status: 'success',
-                                memberCount:  res.rows[0].member_count,
-                                members: result.rows[0].member_list
+
+                        let fetchAllMembersData = `select jsonb_agg(
+                        jsonb_build_object(
+                          'userId', res.user_id, 'title', res.title, 
+                          'firstName', res.first_name, 'lastName', 
+                          res.last_name,  'role', res.role_name 
+                        ) 
+                      ) member_list from (
+                   select distinct user_id, title, first_name, last_name, role_name
+                      from v_user tu2 where user_id in(
+                   select distinct family_member_id from t_person_relationship tpr where family_member_id in 
+                (select user_id from t_user tu where email_id =
+                      (select distinct email_id from t_user where firebase_id = '${fireBaseId}'))
+                     and is_deleted != true
+                     union 
+       		select distinct user_id  from v_user tu3 where firebase_id = '${fireBaseId}' and role_name = 'Family Head'
+                     )
+                     ) res`;
+
+                        client.query(fetchAllMembersData, (err, result) => {
+
+                            if (err) {
+                                console.error(`miscReqOperations.js::getMembers() --> error while fetching fetchAllMembersData results : ${err}`)
+                                reject(errorHandling.handleDBError('queryExecutionError'));
                             }
-                        })
 
-                      });
-            }else{
-                    //client.end();
+                            if (result.rows[0].member_list == null)
 
-                let getUserIdByFirebase = `select user_id from t_user tu where firebase_id = '${fireBaseId}';`
-                client.query(getUserIdByFirebase,(err, result) => {
+                                client.end();
 
-                    if (err) {
-                        console.error(`miscReqOperations.js::getMembers() --> error while fetching fetchAllMembersData results : ${err}`)
-                        reject(errorHandling.handleDBError('queryExecutionError'));
+                            resolve({
+                                data: {
+                                    status: 'success',
+                                    memberCount: res.rows[0].member_count,
+                                    members: result.rows[0].member_list
+                                }
+                            })
+
+                        });
+                    } else {
+                        //client.end();
+
+                        let getUserIdByFirebase = `select user_id from t_user tu where firebase_id = '${fireBaseId}';`
+                        client.query(getUserIdByFirebase, (err, result) => {
+
+                            if (err) {
+                                console.error(`miscReqOperations.js::getMembers() --> error while fetching fetchAllMembersData results : ${err}`)
+                                reject(errorHandling.handleDBError('queryExecutionError'));
+                            }
+
+                            client.end();
+
+                            resolve({
+                                data: {
+                                    status: 'success',
+                                    userId: result.rows[0].user_id,
+                                    memberCount: res.rows[0].member_count,
+                                }
+                            })
+
+                        });
+
                     }
-    
-                    client.end();
-
-                    resolve({
-                        data: {
-                            status: 'success',
-                            userId: result.rows[0].user_id,
-                            memberCount:  res.rows[0].member_count,
-                        }
-                    })
-
-                  });
-
                 }
-            }
             });
 
         } catch (error) {
@@ -167,9 +188,41 @@ async function getMembers(fireBaseId){
 
 }
 
+async function getUserApprovalStatus(fbuid) {
+
+    try {
+        let client = dbConnections.getConnection();
+        client.connect();
+
+        let userApprovedStatus = `select 
+                                case when is_approved = true then true else false end as approved,
+                                user_id as userid
+                                from 
+                                    t_user tu 
+                                where 
+                                    firebase_id = '${fbuid}';`;
+
+        let result  = await client.query(userApprovedStatus)
+
+        return{
+            data :{
+                status : 'success',
+                isapproved : result.rows[0].approved,
+                user: result.rows[0].userid
+            }
+        }
+              
+
+    } catch (error) {
+        console.error(`miscReqOperations.js::getUserApprovalStatus() --> error while fetching results : ${error}`)
+        reject(errorHandling.handleDBError('connectionError'));
+    }
+
+}
 
 module.exports = {
     getCountryStates,
-    getMembers
+    getMembers,
+    getUserApprovalStatus
 }
 

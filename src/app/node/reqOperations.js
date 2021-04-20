@@ -162,30 +162,30 @@ async function processGetUserMetaDataRequest(uid) {
     await client.connect();
 
     //Validate user, if not valid then respond him back with appropriate request
-    try {
-        //console.log('Validating user approval and his deleted status.')
-        const userValidationQuery = `SELECT  CASE WHEN tu.is_approved = false THEN false
-                                            WHEN tu.is_approved = true THEN true
-                                            ELSE false
-                                    end as is_approved,
-                                    
-                                    CASE WHEN tu.is_deleted = false THEN false
-                                            WHEN tu.is_deleted = true THEN true
-                                            ELSE false
-                                    end as is_deleted
-                                    FROM t_user tu where user_id = '${uid}' ;`;
+    // try {
+    //     //console.log('Validating user approval and his deleted status.')
+    //     const userValidationQuery = `SELECT  CASE WHEN tu.is_approved = false THEN false
+    //                                         WHEN tu.is_approved = true THEN true
+    //                                         ELSE false
+    //                                 end as is_approved,
 
-        let result = await client.query(userValidationQuery);
-        console.log(`for user ${uid} is_approved : ${result.rows[0].is_approved} and is_deleted : ${result.rows[0].is_deleted}`)
-        if (result.rows[0].is_approved == false)
-            return errorHandling.handleDBError('not_approved')
-        if (result.rows[0].is_deleted == true)
-            return errorHandling.handleDBError('account_deleted')
+    //                                 CASE WHEN tu.is_deleted = false THEN false
+    //                                         WHEN tu.is_deleted = true THEN true
+    //                                         ELSE false
+    //                                 end as is_deleted
+    //                                 FROM t_user tu where user_id = '${uid}' ;`;
 
-    } catch (error) {
-        console.error('reqOperations::processGetUserMetaDataRequest() ---> error occured : ' + error)
-        return errorHandling.handleDBError('connectionError')
-    }
+    //     let result = await client.query(userValidationQuery);
+    //     console.log(`for user ${uid} is_approved : ${result.rows[0].is_approved} and is_deleted : ${result.rows[0].is_deleted}`)
+    //     if (result.rows[0].is_approved == false)
+    //         return errorHandling.handleDBError('not_approved')
+    //     if (result.rows[0].is_deleted == true)
+    //         return errorHandling.handleDBError('account_deleted')
+
+    // } catch (error) {
+    //     console.error('reqOperations::processGetUserMetaDataRequest() ---> error occured : ' + error)
+    //     return errorHandling.handleDBError('connectionError')
+    // }
 
 
     try {
@@ -210,7 +210,10 @@ async function processGetUserMetaDataRequest(uid) {
                 vu.icon_path menu_icon,
                  vu.perm_name, 
                  vu.user_org org_name, 
-                 vu.user_org_id org_id, vu.is_family_head 
+                 vu.user_org_id org_id,
+                 vu.is_family_head,
+                 vu.is_approved,
+                 vu.membership_type   
                 from v_user vu where user_id = '${uid}';`
 
 
@@ -229,58 +232,67 @@ async function processGetUserMetaDataRequest(uid) {
             let memberDetails = [];
             let menus = [];
 
+            metaData.isApproved = res.rows[0].is_approved;
             metaData.userId = res.rows[0].user_id;
             metaData.fbUid = res.rows[0].fbuid;
             metaData.emailId = res.rows[0].email_id;
             metaData.title = res.rows[0].title;
             metaData.firstName = res.rows[0].first_name;
-            metaData.middleName = res.rows[0].middle_name;
             metaData.lastName = res.rows[0].last_name;
-            metaData.nickName = res.rows[0].nick_name;
             metaData.dob = res.rows[0].dob;
-            metaData.mobile_no = res.rows[0].mobile_no;
-            metaData.addressLine1 = res.rows[0].address_line1;
-            metaData.addressLine2 = res.rows[0].address_line2;
-            metaData.addressLine3 = res.rows[0].address_line3;
-            metaData.city = res.rows[0].city;
-            metaData.state = res.rows[0].state;
-            metaData.postalCode = res.rows[0].postal_code;
-            metaData.country = res.rows[0].country;
-            metaData.homePhoneNo = res.rows[0].home_phone_no;
-            metaData.baptismalName = res.rows[0].baptismal_name;
-            metaData.maritalStatus = res.rows[0].marital_status;
-            metaData.dateOfMarriage = res.rows[0].date_of_marriage;
             metaData.aboutYourself = res.rows[0].about_yourself;
-            metaData.userRole = res.rows[0].role_name;
             metaData.orgName = res.rows[0].org_name;
             metaData.orgId = res.rows[0].org_id;
-            metaData.isFamilyHead = res.rows[0].is_family_head;
+            metaData.membershipType = res.rows[0].membership_type
 
-            for (let row of res.rows) {
+            if (res.rows[0].is_approved == true) {
+                metaData.middleName = res.rows[0].middle_name;
+                metaData.nickName = res.rows[0].nick_name;
+                metaData.mobile_no = res.rows[0].mobile_no;
+                metaData.addressLine1 = res.rows[0].address_line1;
+                metaData.addressLine2 = res.rows[0].address_line2;
+                metaData.addressLine3 = res.rows[0].address_line3;
+                metaData.city = res.rows[0].city;
+                metaData.state = res.rows[0].state;
+                metaData.postalCode = res.rows[0].postal_code;
+                metaData.country = res.rows[0].country;
+                metaData.homePhoneNo = res.rows[0].home_phone_no;
+                metaData.baptismalName = res.rows[0].baptismal_name;
+                metaData.maritalStatus = res.rows[0].marital_status;
+                metaData.dateOfMarriage = res.rows[0].date_of_marriage;
+                metaData.userRole = res.rows[0].role_name;
+                metaData.orgName = res.rows[0].org_name;
+                metaData.orgId = res.rows[0].org_id;
+                metaData.isFamilyHead = res.rows[0].is_family_head;
 
-                let index = menus.findIndex((item => item.name == row.menu_name))
-                if (index == -1) {
-                    let tempJson = {
-                        name: row.menu_name,
-                        url: row.menu_url,
-                        icon: row.menu_icon
-                    };
-                    menus.push(tempJson);
+
+
+
+                for (let row of res.rows) {
+
+                    let index = menus.findIndex((item => item.name == row.menu_name))
+                    if (index == -1) {
+                        let tempJson = {
+                            name: row.menu_name,
+                            url: row.menu_url,
+                            icon: row.menu_icon
+                        };
+                        menus.push(tempJson);
+                    }
+
+                    // if (menus.indexOf(row.menu_name) < 0)
+                    //     menus.push(row.menu_name)
+                    if (permissions.indexOf(row.perm_name) < 0) {
+                        permissions.push(row.perm_name)
+                    }
+
                 }
+                metaData.permissions = permissions;
+                metaData.menus = menus;
 
-                // if (menus.indexOf(row.menu_name) < 0)
-                //     menus.push(row.menu_name)
-                if (permissions.indexOf(row.perm_name) < 0) {
-                    permissions.push(row.perm_name)
-                }
+                console.log("metaData.userId", metaData.userId);
 
-            }
-            metaData.permissions = permissions;
-            metaData.menus = menus;
-
-            console.log("metaData.userId", metaData.userId);
-
-            let query1 = `select distinct vu.user_id, vu.email_id, vu.title,
+                let query1 = `select distinct vu.user_id, vu.email_id, vu.title,
                     vu.first_name, vu.middle_name, vu.last_name,
 			    	vu.dob, vu.mobile_no, tpr.relationship,
                     tpr.relationship_id relationship_id
@@ -289,24 +301,25 @@ async function processGetUserMetaDataRequest(uid) {
                     and tpr.is_deleted = 'no'
                     and vu.user_id = tpr.family_member_id;`
 
-            let res1 = await client.query(query1);
+                let res1 = await client.query(query1);
 
-            for (row of res1.rows) {
-                let member = {};
-                member.userId = row.user_id;
-                member.emailId = row.email_id;
-                member.title = row.title;
-                member.firstName = row.first_name;
-                member.middleName = row.middle_name;
-                member.lastName = row.last_name;
-                member.dob = row.dob;
-                member.mobileNo = row.mobile_no;
-                member.relationship = row.relationship;
-                member.relationshipId = row.relationship_id;
-                memberDetails.push(member);
+                for (row of res1.rows) {
+                    let member = {};
+                    member.userId = row.user_id;
+                    member.emailId = row.email_id;
+                    member.title = row.title;
+                    member.firstName = row.first_name;
+                    member.middleName = row.middle_name;
+                    member.lastName = row.last_name;
+                    member.dob = row.dob;
+                    member.mobileNo = row.mobile_no;
+                    member.relationship = row.relationship;
+                    member.relationshipId = row.relationship_id;
+                    memberDetails.push(member);
+                }
+
+                metaData.memberDetails = memberDetails;
             }
-
-            metaData.memberDetails = memberDetails;
 
             client.end();
 
@@ -335,9 +348,13 @@ async function getuserRecords(userType, loggedInUser) {
 
         let condition = ' ';
 
-        if (userType == 'unapproved') {
+        if (userType == 'approval_requests') {
             condition = ' vu.is_approved = false AND '
+        } else if (userType == 'approved') {
+            condition = ' vu.is_approved = true AND '
         }
+
+
 
         let getuserRecords =
             `SELECT DISTINCT vu.user_id,
@@ -381,9 +398,37 @@ async function getuserRecords(userType, loggedInUser) {
                                     FROM       t_organization child_org
                                     INNER JOIN child_orgs c
                                     ON         c.org_id = child_org.parent_org_id ) SELECT *
-                                        FROM   child_orgs );`
+                                        FROM   child_orgs ) order by user_id desc;`
 
-        console.log('Executing query : ' + getuserRecords)
+        //console.log('Executing query : ' + getuserRecords)
+
+        if (userType == 'rejected') {
+
+            getuserRecords = ` select                      
+                                th.user_id, 
+                                th.title,
+                                th.first_name,
+                                th.last_name,
+                                tol.reason,
+                                (select "name" from t_organization to2 where org_id = th.org_id) parish_name,
+                                th.member_type  
+                                from t_user_history th inner join t_user_operation_log tol 
+                                on th.user_id = tol.user_id and operation_type = 'Request Rejected' WHERE th.org_id IN ( WITH recursive child_orgs 
+                                            AS (
+                                                SELECT org_id
+                                                FROM   t_organization parent_org 
+                                                WHERE  org_id IN
+                                                        (
+                                                                SELECT a.org_id
+                                                                FROM   t_user_role_context a,                                                                            t_user b
+                                                                WHERE  b.user_id = ${loggedInUser}        
+                                                                AND    a.user_id = b.user_id)                                                        UNION
+                                                SELECT     child_org.org_id child_id
+                                                FROM       t_organization child_org
+                                                INNER JOIN child_orgs c
+                                                ON         c.org_id = child_org.parent_org_id ) SELECT *
+                                                    FROM   child_orgs );`;
+        }
 
         let res = await client.query(getuserRecords);
 
@@ -412,6 +457,7 @@ async function getuserRecords(userType, loggedInUser) {
                     console.log("User id In IF Condition" + row.user_id);
 
                     user.userId = row.user_id;
+                    user.reason = row.reason
                     user.emailId = row.email_id;
                     user.title = row.title;
                     user.firstName = row.first_name;
@@ -741,15 +787,14 @@ async function processUpdateUserRoles(userData) {
         await client.query("BEGIN");
         // console.log("1");
 
-
-        if (userData.isFamilyHead == true) {
+        if (userData.isFamilyHead == true || userData.isFamilyHead == "true") {
 
             let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
-                (select ${userData.userId}, role_id from t_role where name = 'Family Head';)`
+                (select ${userData.userId}, role_id from t_role where name = 'Family Head');`
             await client.query(insertRoleMapping)
             console.log('User is family head gave him add member permission');
         }
-        if (userData.isFamilyHead == false) {
+        if (userData.isFamilyHead == false || userData.isFamilyHead == "false") {
 
             let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
                 select ${userData.userId}, role_id from t_role where name = 'Member';`
@@ -901,7 +946,7 @@ async function processUpdateUserRoles(userData) {
                     (condition1Result.rows[0].result == false) ? 'Yes' : 'No');
 
 
-                if (condition1Result.rows[0].result == false && condition2Result.rows[0].is_fm_id == false && condition2Result.rows[0].is_user == true) {
+                if (condition1Result.rows[0].result == false && condition2Result.rows[0].is_user == true) {
                     // In case where new member first name last name and email combination dosent exists in the system. 
                     // But only email id exists in the system
                     // then system should create new member user with same email but different first name and last name combination; 
@@ -945,13 +990,13 @@ async function processUpdateUserRoles(userData) {
                         console.log('t_person table populated!')
 
                         //Populating t_user_role_mapping table  
-                       
+
                         let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
                         select ${newUserId}, role_id from t_role where name = 'Member';`
                         await client.query(insertRoleMappingmember);
                         console.log('t_user_role_mapping table populated!')
 
-                          //Populating t_person_relationship table
+                        //Populating t_person_relationship table
                         insertPersonRelationshipValues = [
                             userData.userId,
                             newUserId,
@@ -1006,8 +1051,8 @@ async function processUpdateUserRoles(userData) {
                         console.log('Inserting records into t_user ....');
                         console.log('New member UID' + fbuid)
 
-                   
-                const insertuserTbl = `INSERT INTO public.t_user
+
+                        const insertuserTbl = `INSERT INTO public.t_user
                 (email_id, org_id, firebase_id, title, first_name, middle_name, last_name, created_by, created_date, member_type, is_approved )
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning user_id;`;
 
@@ -1104,19 +1149,19 @@ async function processUpdateUserRoles(userData) {
                                         left outer join t_person_relationship on family_member_id = user_id
                                         where email_id = '${details.emailId}';`
                     // console.log("selectEmail", selectEmail);
-                     let emailResults = await client.query(selectEmail);
-    
+                    let emailResults = await client.query(selectEmail);
+
 
                     if (condition1Result.rows[0].result == false && condition2Result.rows[0].result == true) {
 
-                       // console.log("details", details);
-                       // console.log("1");
+                        // console.log("details", details);
+                        // console.log("1");
 
                         let insertPersonRelationship = `INSERT INTO t_person_relationship(
                         family_head_id, family_member_id, relationship, updated_by, updated_date)
                           VALUES ($1, $2, $3, $4, $5);`
 
-                      //  console.log("2");
+                        //  console.log("2");
 
                         insertPersonRelationshipValues = [
                             userData.userId,
@@ -1129,7 +1174,7 @@ async function processUpdateUserRoles(userData) {
                         console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
 
                         await client.query(insertPersonRelationship, insertPersonRelationshipValues);
-                    }   
+                    }
                     else {
                         let updateRelationship = `UPDATE t_person_relationship SET is_deleted = false where family_member_id =${emailResults.rows[0].membercount};`
                         console.log("updateRelationship", updateRelationship);
@@ -1286,7 +1331,7 @@ async function deleteUsers(userData) {
             if (err)
                 console.log('Error occured : ' + err)
         });
-
+        await client.end();
         return ({
             data: {
                 status: 'success',
@@ -1323,6 +1368,7 @@ async function getProctorData(userData) {
             metadata.proctorData = proctorData;
         }
 
+        await client.end();
         return ({
             data: {
                 status: 'success',
@@ -1335,6 +1381,18 @@ async function getProctorData(userData) {
         console.error(`reqOperations.js::getProctorData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
     }
+}
+
+
+
+function generatePassword() {
+    var length = 10,
+        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        retVal = "";
+    for (var i = 0, n = charset.length; i < length; ++i) {
+        retVal += charset.charAt(Math.floor(Math.random() * n));
+    }
+    return retVal;
 }
 
 

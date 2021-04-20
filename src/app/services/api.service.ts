@@ -13,10 +13,10 @@ export class ApiService {
   }
 
   constructor(private http: HttpClient) { }
- // private _baseUrl = 'https://cormentis.herokuapp.com';
- private _baseUrl = 'http://localhost:8081/api';
+  // private _baseUrl = 'https://cormentis.herokuapp.com';
+  private _baseUrl = 'http://localhost:8081/api';
 
-  signUpNewUser(userData: any):Observable<any> {
+  signUpNewUser(userData: any): Observable<any> {
     console.log(`signUpNewUser called..`)
     // let headerObj = new HttpHeaders({
     //                                   'Authorization': localStorage.getItem('cormUserTokenId')!,
@@ -28,179 +28,190 @@ export class ApiService {
   }
 
 
-  callGetService(endPoint:string):Observable<any> {
+  callGetService(endPoint: string): Observable<any> {
     console.log(`callGetService called..`)
     let headerObj = new HttpHeaders({
-                                      'Authorization': localStorage.getItem('chUserToken')!,
-                                      'Content-Type' : 'application/json'
-                                    });
-    console.log('headers set to ' + JSON.stringify(headerObj))
-    return this.http.get(`${this._baseUrl}/${endPoint}`,{ headers: headerObj });
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+   // console.log('headers set to ' + JSON.stringify(headerObj))
+    return this.http.get(`${this._baseUrl}/${endPoint}`, { headers: headerObj });
   }
-  getUsersData(loggedInUserId: any):Observable<any>{
+
+  callPostService(endPoint: string, payload:any): Observable<any> {
+    console.log(`postService called`)
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this._baseUrl}/${endPoint}`,{data:payload},{ headers: headerObj });
+  }
+
+
+  getUsersData(loggedInUserId: any): Observable<any> {
     console.log(`calling the usesData()`);
     let headerObj = new HttpHeaders({
-                    'Authorization': localStorage.getItem('cormUserTokenId')!,
-                    'Content-Type' : 'application/json'
-                  });
-    console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords?loggedInUser=loggedInUserId`),loggedInUserId);
-    return this.http.get(`${this._baseUrl}/getuserRecords?loggedInUser=` +loggedInUserId);   
-}
-
-getUnapprovedUserData(loggedInUserId: any):Observable<any>{
-  console.log(`calling the getUnapprovedUserData()`);
-  let headerObj = new HttpHeaders({
-                  'Authorization': localStorage.getItem('cormUserTokenId')!,
-                  'Content-Type' : 'application/json'
-                });
-  console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords`),loggedInUserId);
-  return this.http.get(`${this._baseUrl}/getuserRecords?type=unapproved&loggedInUser=`+ loggedInUserId );  
-   
-}
-
-getUserRoleData():Observable<any>{
-  console.log(`calling the usersRoleData()`);
-  let headerObj = new HttpHeaders({
-                  'Authorization': localStorage.getItem('chUserToken')!,
-                  'Content-Type' : 'application/json'
-                });
-  console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
-  return this.http.get(`${this._baseUrl}/getRoleMetaData` );   
-}
-
-getParishListData():Observable<any>{
-  console.log(`calling the ParishListData()`);
-  // let headerObj = new HttpHeaders({
-  //                 'Authorization': localStorage.getItem('chUserToken')!,
-  //                 'Content-Type' : 'application/json'
-  //               });
-  // console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
-  return this.http.get(`${this._baseUrl}/getParishData` );   
-}
-
-deleteUser(userData : any){
-  console.log("Delete User Profile Called..")
-let headerObj = new HttpHeaders({
-                                    'Authorization': localStorage.getItem('chUserToken')!,
-                                    'Content-Type' : 'application/json'
-                                  });
- console.log('headers set to ' + JSON.stringify(headerObj))
- console.log(JSON.stringify(userData));
-return this.http.post(`${this._baseUrl}/deleteUsers`, JSON.stringify(userData),{ headers: headerObj } );
-}
-updateUserProfile(userData  : any){
-console.log("update User Profile Called..")
-let headerObj = new HttpHeaders({
-                                    'Authorization': localStorage.getItem('chUserToken')!,
-                                    'Content-Type' : 'application/json'
-                                  });
- console.log('headers set to ' + JSON.stringify(headerObj))
- console.log(JSON.stringify(userData));
-return this.http.post(`${this._baseUrl}/updateUserRoles`, JSON.stringify(userData),{ headers: headerObj } );
-}
-
-getEventCategoryData():Observable<any>{
-  console.log(`calling the getEventCategory()`);
-  let headerObj = new HttpHeaders({
-                  'Authorization': localStorage.getItem('chUserToken')!,
-                  'Content-Type' : 'application/json'
-                });
-  console.log( 'Event Category data is : ' + this.http.get(`${this._baseUrl}/getEventCategory`));
-  return this.http.get(`${this._baseUrl}/getEventCategory` );   
-}
-
-getEventsData(): Observable<any> {
-  console.log(`calling the getEventData()`);
-  let headerObj = new HttpHeaders({
-                  'Authorization': localStorage.getItem('chUserToken')!,
-                  'Content-Type' : 'application/json'
-                });
-  console.log( 'Events Data data is : ' + this.http.get(`${this._baseUrl}/getEventData`));
-  return this.http.get(`${this._baseUrl}/getEventData` );   
-}
-
-approveOrRejReq(reqData : any){
-  console.log("update User Profile Called..")
-  let headerObj = new HttpHeaders({
-                                      'Authorization': localStorage.getItem('chUserToken')!,
-                                      'Content-Type' : 'application/json'
-                                    });
-   console.log('headers set to ' + JSON.stringify(headerObj))
-   console.log(JSON.stringify(reqData));
-  return this.http.post(`${this._baseUrl}/setUserApprovalState`, JSON.stringify(reqData),{ headers: headerObj } );
-}
-
-getCountryStates(){
-  console.log(`calling the getCountryStates()`);
-  
-  return this.http.get(`${this._baseUrl}/getCountryStates` );   
-}
-
-insertevents(eventsData  : any){
-  console.log("update User Profile Called..")
-  let headerObj = new HttpHeaders({
-                                      'Authorization': localStorage.getItem('chUserToken')!,
-                                      'Content-Type' : 'application/json'
-                                    });
-   console.log('headers set to ' + JSON.stringify(headerObj))
-   console.log(JSON.stringify(eventsData));
-  return this.http.post(`${this._baseUrl}/insertevents`, JSON.stringify(eventsData),{ headers: headerObj } );
+      'Authorization': localStorage.getItem('cormUserTokenId')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords?loggedInUser=loggedInUserId`), loggedInUserId);
+    return this.http.get(`${this._baseUrl}/getuserRecords?type=approved&loggedInUser=` + loggedInUserId);
   }
 
-  getProctorData(userData: any):Observable<any>{
+  getUnapprovedUserData(loggedInUserId: any, userType: string): Observable<any> {
+    console.log(`calling the getUnapprovedUserData()`);
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('cormUserTokenId')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('user data is : ' + this.http.get(`${this._baseUrl}/getuserRecords`), loggedInUserId);
+    return this.http.get(`${this._baseUrl}/getuserRecords?type=${userType}&loggedInUser=` + loggedInUserId);
+
+  }
+
+  getUserRoleData(): Observable<any> {
+    console.log(`calling the usersRoleData()`);
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
+    return this.http.get(`${this._baseUrl}/getRoleMetaData`);
+  }
+
+  getParishListData(): Observable<any> {
+    console.log(`calling the ParishListData()`);
+    // let headerObj = new HttpHeaders({
+    //                 'Authorization': localStorage.getItem('chUserToken')!,
+    //                 'Content-Type' : 'application/json'
+    //               });
+    // console.log( 'user data is : ' + this.http.get(`${this._baseUrl}/getRoleMetaData`));
+    return this.http.get(`${this._baseUrl}/getParishData`);
+  }
+
+  deleteUser(userData: any) {
+    console.log("Delete User Profile Called..")
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('headers set to ' + JSON.stringify(headerObj))
+    console.log(JSON.stringify(userData));
+    return this.http.post(`${this._baseUrl}/deleteUsers`, JSON.stringify(userData), { headers: headerObj });
+  }
+  updateUserProfile(userData: any) {
+    console.log("update User Profile Called..")
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('headers set to ' + JSON.stringify(headerObj))
+    console.log(JSON.stringify(userData));
+    return this.http.post(`${this._baseUrl}/updateUserRoles`, JSON.stringify(userData), { headers: headerObj });
+  }
+
+  getEventCategoryData(): Observable<any> {
+    console.log(`calling the getEventCategory()`);
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('Event Category data is : ' + this.http.get(`${this._baseUrl}/getEventCategory`));
+    return this.http.get(`${this._baseUrl}/getEventCategory`);
+  }
+
+  getEventsData(): Observable<any> {
+    console.log(`calling the getEventData()`);
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('Events Data data is : ' + this.http.get(`${this._baseUrl}/getEventData`));
+    return this.http.get(`${this._baseUrl}/getEventData`);
+  }
+
+  approveOrRejReq(reqData: any) {
+    console.log("update User Profile Called..")
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('headers set to ' + JSON.stringify(headerObj))
+    console.log(JSON.stringify(reqData));
+    return this.http.post(`${this._baseUrl}/setUserApprovalState`, JSON.stringify(reqData), { headers: headerObj });
+  }
+
+  getCountryStates() {
+    console.log(`calling the getCountryStates()`);
+
+    return this.http.get(`${this._baseUrl}/getCountryStates`);
+  }
+
+  insertevents(eventsData: any) {
+    console.log("update User Profile Called..")
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('headers set to ' + JSON.stringify(headerObj))
+    console.log(JSON.stringify(eventsData));
+    return this.http.post(`${this._baseUrl}/insertevents`, JSON.stringify(eventsData), { headers: headerObj });
+  }
+
+  getProctorData(userData: any): Observable<any> {
     console.log(`calling the getProctorData()`);
     let headerObj = new HttpHeaders({
-                    'Authorization': localStorage.getItem('chUserToken')!,
-                    'Content-Type' : 'application/json'
-                  });
-    console.log( 'getProctorData is : ' + this.http.get(`${this._baseUrl}/getProctorData`), userData);
-    return this.http.post(`${this._baseUrl}/getProctorData`, userData );   
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('getProctorData is : ' + this.http.get(`${this._baseUrl}/getProctorData`), userData);
+    return this.http.post(`${this._baseUrl}/getProctorData`, userData);
   }
 
-  getRegionAndParish(){
+  getRegionAndParish() {
     console.log(`calling the getRegionAndParish()`);
-    
-    return this.http.get(`${this._baseUrl}/getRegionAndParish` );   
+
+    return this.http.get(`${this._baseUrl}/getRegionAndParish`);
   }
 
-  getVenues(userData: any):Observable<any>{
+  getVenues(userData: any): Observable<any> {
     console.log(`calling the getVenues()`);
     let headerObj = new HttpHeaders({
-                    'Authorization': localStorage.getItem('chUserToken')!,
-                    'Content-Type' : 'application/json'
-                  });
-    console.log( 'getVenues is : ' + this.http.get(`${this._baseUrl}/getVenues`), userData);
-    return this.http.post(`${this._baseUrl}/getVenues`, userData);   
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('getVenues is : ' + this.http.get(`${this._baseUrl}/getVenues`), userData);
+    return this.http.post(`${this._baseUrl}/getVenues`, userData);
   }
-  
-  getEventType(){
+
+  getEventType() {
     console.log(`calling the getEventType()`);
-    
-    return this.http.get(`${this._baseUrl}/getEventType` );   
+
+    return this.http.get(`${this._baseUrl}/getEventType`);
   }
 
   /** Get questionnire data from database */
   getEventQuestionnaireData(): Observable<any> {
     console.log(`calling the getEventQuestionnaireData()`);
     let headerObj = new HttpHeaders({
-                    'Authorization': localStorage.getItem('chUserToken')!,
-                    'Content-Type' : 'application/json'
-                  });
-    console.log( 'getEventQuestionnaireData Data data is : ' + this.http.get(`${this._baseUrl}/getEventQuestionnaireData`));
-    return this.http.get(`${this._baseUrl}/getEventQuestionnaireData` );   
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('getEventQuestionnaireData Data data is : ' + this.http.get(`${this._baseUrl}/getEventQuestionnaireData`));
+    return this.http.get(`${this._baseUrl}/getEventQuestionnaireData`);
   }
 
   /**.........get events data from v_events for registration for the user */
-  getEventForRegistration(): Observable<any>{
+  getEventForRegistration(): Observable<any> {
     console.log(`calling the getEventDataForRegistrationData()`);
     let headerObj = new HttpHeaders({
-                    'Authorization': localStorage.getItem('chUserToken')!,
-                    'Content-Type' : 'application/json'
-                  });
-    console.log( 'getEventForRegistration Data data is : ' + this.http.get(`${this._baseUrl}/getEventForRegistration`));
-    return this.http.get(`${this._baseUrl}/getEventForRegistration` );   
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('getEventForRegistration Data data is : ' + this.http.get(`${this._baseUrl}/getEventForRegistration`));
+    return this.http.get(`${this._baseUrl}/getEventForRegistration`);
   }
 
-  
+
 }
 

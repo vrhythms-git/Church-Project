@@ -54,7 +54,7 @@ app.post('/api/signUp', function (req, res) {
 });
 
 app.get('/api/getuserRecords', function (req, res) {
-  console.log("getuserRecords called with : " + req.query.type +' loggedInUser : ' + req.query.loggedInUser );
+  console.log("getuserRecords called with : " + req.query.type + ' loggedInUser : ' + req.query.loggedInUser);
 
   //console.log(`Header info : ${JSON.stringify(req.header('user-agent'))}`)
   try {
@@ -130,20 +130,20 @@ app.get('/api/getEventCategory', function (req, res) {
 });
 
 
-app.get('/api/getEventData',function(req,res){
+app.get('/api/getEventData', function (req, res) {
   console.log("getEventData called with : " + JSON.stringify(req.query.fbuid));
-  try{
+  try {
     processRequest.getEventData()
-    .then((data) => {
-      console.log(`Returning with response : ${JSON.stringify(data)}`)
-      res.send(data);
-      res.end();
-    }).catch((error) => {
-      console.log(`Returning with response : ${error}`)
-      res.send(error);
-      res.end();
-    })
-  }catch(error){
+      .then((data) => {
+        console.log(`Returning with response : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with response : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
     console.log(`Error in getEventData as : ` + error)
   }
 });
@@ -248,7 +248,7 @@ app.post('/api/deleteUsers', function (req, res) {
 app.post('/api/setUserApprovalState', function (req, res) {
   console.log("setUserApprovalState called with : " + JSON.stringify(req.body));
   try {
-   processUserRequest.setUserApprovalState(req.body.data)
+    processUserRequest.setUserApprovalState(req.body.data)
       .then((data) => {
         console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
@@ -397,44 +397,79 @@ app.get('/api/getMembers', function (req, res) {
 
 
 
-app.get('/api/getEventQuestionnaireData',function(req,res){
-  console.log("getEventQuestionnaireData called with : " + JSON.stringify(req.body.data));
-  try{
+app.get('/api/getEventQuestionnaireData', function (req, res) {
+  console.log("getEventQuestionnaireData called with : ");
+  try {
     processEventRequest.getEventQuestionnaireData()
-    .then((data) => {
-      console.log(`Returning with response : ${JSON.stringify(data)}`)
-      res.send(data);
-      res.end();
-    }).catch((error) => {
-      console.log(`Returning with response : ${error}`)
-      res.send(error);
-      res.end();
-    })
-  }catch(error){
+      .then((data) => {
+        console.log(`Returning with response : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with response : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
     console.log(`Error in getEventQuestionnaireData as : ` + error)
   }
 });
 
 
-app.get('/api/getEventForRegistration',function(req,res){
+app.get('/api/getEventForRegistration', function (req, res) {
   console.log("getEventForRegistration called with : " + JSON.stringify(req.query.fbuid));
-  try{
+  try {
     processEventRequest.getEventForRegistration()
-    .then((data) => {
-      console.log(`Returning with response : ${JSON.stringify(data)}`)
-      res.send(data);
-      res.end();
-    }).catch((error) => {
-      console.log(`Returning with response : ${error}`)
-      res.send(error);
-      res.end();
-    })
-  }catch(error){
+      .then((data) => {
+        console.log(`Returning with response : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with response : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
     console.log(`Error in getEventForRegistration as : ` + error)
   }
 });
 
 
+app.get('/api/getUserApprovalStatus', function (req, res) {
+  console.log("getUserApprovalStatus called with : " + JSON.stringify(req.query.fbuid));
+  try {
+    processMiscRequest.getUserApprovalStatus(req.query.fbuid)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getMembers as : ' + error)
+  }
+});
+
+app.post('/api/updateBasicProfile', function (req, res) {
+  console.log("updateBasicProfile called...");
+  try {
+    processUserRequest.updateUnApprovedUser(req.body.data)
+      .then((data) => {
+        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in updateBasicProfile as : ' + error)
+  }
+});
 
 // let client = dbConnections.getConnection();
 // try {
