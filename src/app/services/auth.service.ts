@@ -64,8 +64,8 @@ export class AuthService {
 
               if(data == null){
                 try{  
-                result.user?.delete();
-                this.uiCommonUtils.showSnackBar('No such account exist!','error',3000)
+               // result.user?.delete();
+                //this.uiCommonUtils.showSnackBar('No such account exist!','error',3000)
                 return;
               }catch(error){
                 console.log('Error while deleting User.');
