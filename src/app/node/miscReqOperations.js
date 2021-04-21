@@ -234,7 +234,7 @@ async function handleLogIn_LogOut(reqContextData) {
                             reqContextData.userId,
                             reqContextData.sessionId,
                             reqContextData.actType,
-                            new Date().toISOString(),
+                            new Date().toUTCString(),
                             reqContextData.ipAddr,
                             reqContextData.userAgent
                         ];

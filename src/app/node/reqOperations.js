@@ -216,8 +216,19 @@ async function processGetUserMetaDataRequest(uid) {
                  vu.membership_type   
                 from v_user vu where user_id = '${uid}';`
 
+         let lastLoggedIn =  `select 
+                                    action_timestamp as last_logged_in
+                                from 
+                                    t_audit_log 
+                                where 
+                                    user_id ='${uid}'
+                                    and "action" = 'LOG_IN' 
+                                order by 
+                                    audit_log_id desc FETCH FIRST 1 ROW ONLY;`       
+
 
         let res = await client.query(query);
+        let lastLoggedInRes = await client.query(lastLoggedIn);
 
 
         console.log("4", res.rowCount);
@@ -244,8 +255,21 @@ async function processGetUserMetaDataRequest(uid) {
             metaData.orgName = res.rows[0].org_name;
             metaData.orgId = res.rows[0].org_id;
             metaData.membershipType = res.rows[0].membership_type
+            metaData.lastLoggedIn = lastLoggedInRes.rows[0].last_logged_in 
+
 
             if (res.rows[0].is_approved == true) {
+
+
+                let isFamilyMember = `select 
+                                            case when count(family_head_id) > 0 then true else false end is_family_member 
+                                        from 
+                                            t_person_relationship 
+                                        where 
+                                            family_member_id = '${uid}';`
+
+                let isFamilyMemberRes = await client.query(isFamilyMember);                                            
+
                 metaData.middleName = res.rows[0].middle_name;
                 metaData.nickName = res.rows[0].nick_name;
                 metaData.mobile_no = res.rows[0].mobile_no;
@@ -264,9 +288,8 @@ async function processGetUserMetaDataRequest(uid) {
                 metaData.orgName = res.rows[0].org_name;
                 metaData.orgId = res.rows[0].org_id;
                 metaData.isFamilyHead = res.rows[0].is_family_head;
-
-
-
+                metaData.isFamilyMember = isFamilyMemberRes.rows[0].is_family_member;
+                
 
                 for (let row of res.rows) {
 
