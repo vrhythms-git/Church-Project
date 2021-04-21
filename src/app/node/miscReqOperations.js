@@ -203,7 +203,7 @@ async function getUserApprovalStatus(fbuid) {
                                     firebase_id = '${fbuid}';`;
 
         let result  = await client.query(userApprovedStatus)
-
+       await client.end();
         return{
             data :{
                 status : 'success',
@@ -220,9 +220,45 @@ async function getUserApprovalStatus(fbuid) {
 
 }
 
+async function handleLogIn_LogOut(reqContextData) {
+
+    try {
+        let client = dbConnections.getConnection();
+        client.connect();
+
+        let audLogEntry = `INSERT INTO t_audit_log
+                            (user_id, session_id, "action", action_timestamp, ip_address, additional_details)
+                           VALUES($1, $2, $3, $4 , $5, $6) returning audit_log_id;`;
+
+        let audLogEntryValues = [
+                            reqContextData.userId,
+                            reqContextData.sessionId,
+                            reqContextData.actType,
+                            new Date().toISOString(),
+                            reqContextData.ipAddr,
+                            reqContextData.userAgent
+                        ];
+
+        let result = await client.query(audLogEntry, audLogEntryValues);
+        console.log(`User ${reqContextData.userId}  ${ (reqContextData.actType == 'LOG_IN') ? ' logged in ' : ' logged out ' }, audit log entry id : ${result.rows[0].audit_log_id}`)
+        await client.end();
+        return{
+            data :{
+                status : 'success'
+            }
+        }
+              
+
+    } catch (error) {
+        console.error(`miscReqOperations.js::handleLogIn_LogOut() --> Error : ${error}`)
+        reject(errorHandling.handleDBError('connectionError'));
+    }
+
+}
+
 module.exports = {
     getCountryStates,
     getMembers,
-    getUserApprovalStatus
+    getUserApprovalStatus,
+    handleLogIn_LogOut
 }
-

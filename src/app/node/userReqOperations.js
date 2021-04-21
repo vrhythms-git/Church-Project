@@ -186,14 +186,15 @@ async function updateUnApprovedUser(userData) {
 
 
     let updatePersonTableStmt = `UPDATE t_person
-                              SET dob=$1, updated_by=$2, updated_date=$3, membership_type=$4
-                              WHERE user_id=$5;`;
+                              SET dob=$1, updated_by=$2, updated_date=$3, membership_type=$4, mobile_no=$5
+                              WHERE user_id=$6;`;
 
     let updatePersonTableValues = [
         userData.dob,
         userData.userId,
         new Date().toISOString(),
         userData.memberType,
+        userData.mobileNo,
         userData.userId
     ]
 

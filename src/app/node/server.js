@@ -8,6 +8,7 @@ const cors = require('cors')
 var app = express();
 var compression = require('compression')
 const path = require('path');
+const { ConsoleReporter } = require('jasmine');
 
 let port = 8081;
 
@@ -95,6 +96,15 @@ app.get('/api/getRoleMetadata', function (req, res) {
 
 app.get('/api/getUserMetaData', function (req, res) {
   console.log("signUp called with : " + JSON.stringify(req.query.uid));
+
+  let reqContextData = {
+    actType: 'LOG_IN',
+    sessionId: req.header('Authorization'),
+    ipAddr: req.connection.remoteAddress,
+    userAgent: req.get('User-Agent'),
+    userId: req.query.uid
+  }
+  processMiscRequest.handleLogIn_LogOut(reqContextData)
   try {
     processRequest.processGetUserMetaDataRequest(req.query.uid)
       .then((data) => {
@@ -468,6 +478,31 @@ app.post('/api/updateBasicProfile', function (req, res) {
       })
   } catch (error) {
     console.error('Error in updateBasicProfile as : ' + error)
+  }
+});
+
+
+app.get('/api/logout', function (req, res) {
+  console.log("logout called...");
+  try {
+
+    let reqContextData = {
+      actType: 'LOG_OUT',
+      sessionId: req.header('Authorization'),
+      ipAddr: req.connection.remoteAddress,
+      userAgent: req.get('User-Agent'),
+      userId: req.query.user
+    }
+    processMiscRequest.handleLogIn_LogOut(reqContextData)
+      .then((data) => {
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in logout as : ' + error)
   }
 });
 

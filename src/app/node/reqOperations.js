@@ -482,6 +482,7 @@ async function getuserRecords(userType, loggedInUser) {
                     user.orgId = row.org_id;
                     user.orgType = row.org_type;
                     user.memberType = row.membership_type;
+                    user.membershipType = row.member_type;
                     user.parish_name = row.parish_name;
 
                     // if(userid == 0){
