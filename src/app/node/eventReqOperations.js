@@ -196,22 +196,36 @@ async function updateEvent(eventsData) {
     }
 }
 
+
+
+
 async function getVenues(venueData) {
 
     let client = dbConnections.getConnection();
     await client.connect();
     try {
 
-        let condition = ''
-        if (venueData.parishIds.length != 0) {
-            let venueString = venueData.parishIds.join(',');
-            condition = ` and to2.org_id in (${venueString})  `;
-        }
+        let orgId = [];
+        orgId = venueData.orgId.join(',');
+        console.log("orgId", orgId);
 
-        let getVenuesQuery = `select jsonb_build_object( 'venueId' , tv.venue_id, 'venueName', tv."name") as res_row
-                            from t_organization to2 , t_venue tv 
-                            where parent_org_id = ${venueData.regionId} 
-                            ${condition} and tv.org_id = to2.org_id;`;
+
+        let getVenuesQuery = `select jsonb_build_object( 'venueId' , tv.venue_id, 
+                             'venueName', tv."name") as res_row
+                              from t_organization to2 , t_venue tv 
+                              where tv.org_id = to2.org_id and to2.org_id in
+                            (        
+	                            with recursive child_orgs as (
+	                            select parent_org.org_id org_id
+	                            from t_organization parent_org
+	                            where org_id in (${orgId}) 
+	                            and org_type = '${venueData.orgType}' 
+	                            union
+	                            select child_org.org_id child_id
+	                            from t_organization child_org
+	                            inner join child_orgs c on c.org_id = child_org.parent_org_id
+	                        )   select org_id from child_orgs
+                        );`;
 
         let res = await client.query(getVenuesQuery);
         let consolidatedData = [];
@@ -235,8 +249,6 @@ async function getVenues(venueData) {
 
 }
 
-
-
 async function insertEvents(eventsData) {
 
 
@@ -246,142 +258,156 @@ async function insertEvents(eventsData) {
     try {
         await client.query("BEGIN");
         try {
-            let eventId = 0;
-            console.log("1");
-            /********************** t_event*******************************************************************************************/
-            const insertevent = `INSERT INTO public.t_event(name, event_type, description, org_id, start_date, end_date, registration_start_date, registration_end_date) 
+            if (eventsData != null) {
+                let eventId = 0;
+                console.log("1");
+                /********************** t_event*******************************************************************************************/
+                const insertevent = `INSERT INTO public.t_event(name, event_type, description, start_date, end_date, registration_start_date, registration_end_date, event_url) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning event_id;`
-            const insertevent_values = [
-                eventsData.name,
-                eventsData.eventType,
-                eventsData.description,
-                eventsData.eventRegion,
-                eventsData.startDate,
-                eventsData.endDate,
-                eventsData.registrationStartDate,
-                eventsData.registrationEndDate,
-            ];
-            console.log("insertevent_values", insertevent_values);
-            let result = await client.query(insertevent, insertevent_values);
-            this.eventId = result.rows[0].event_id;
-            console.log("event id" + this.eventId);
-
-
-            for(let parish of eventsData.parishName){
-                console.log("parish", parish);
-                const insertParishData = `INSERT INTO t_event_organization(org_type, org_id, event_id) VALUES($1, $2, $3);`
-                insertParishDataValues = [
-                    'Parish',
-                     parish,
-                     this.eventId
+                const insertevent_values = [
+                    eventsData.name,
+                    eventsData.eventType,
+                    eventsData.description,
+                    eventsData.startDate,
+                    eventsData.endDate,
+                    eventsData.registrationStartDate,
+                    eventsData.registrationEndDate,
+                    eventsData.eventUrl
                 ];
-                await client.query(insertParishData, insertParishDataValues);
-            }
+                console.log("insertevent_values", insertevent_values);
+                let result = await client.query(insertevent, insertevent_values);
+                this.eventId = result.rows[0].event_id;
+                console.log("event id" + this.eventId);
 
 
 
-
-            /********************** t_event_venue************************************************************************************/
-            console.log("2");
-            const insertVenue = `INSERT INTO t_event_venue(event_id, venue_id, proctor_id)
-                    VALUES ($1, $2, $3);`
-
-            console.log("eventsData.venues", eventsData.venues);
-
-            for (let venue of eventsData.venues) {
-                //t_event_venue 
-                console.log(`Inserting venue ${JSON.stringify(venue)}`)
-                insertVenue_value =
-                    [
-                        this.eventId,
-                        venue.venueId,
-                        venue.proctorId
-                    ]
-                await client.query(insertVenue, insertVenue_value);
-            }
-
-
-            /********************** t_event_category_map,   t_event_cat_staff_map*******************************************************************************/
-            console.log("3");
-            console.log("eventsData.categories", eventsData.categories);
-
-            for (let category of eventsData.categories) {
-
-                console.log("4");
-
-                const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id)
-                VALUES ($1, $2) returning event_cat_map_id;`
-                console.log(`Inserting category ${JSON.stringify(category)}`);
-                insertCategory_value =
-                    [
-                        this.eventId,
-                        category.eventCategoryID
-                    ]
-                let result = await client.query(insertCategory, insertCategory_value);
-                this.eventCategoryID = result.rows[0].event_cat_map_id;
-                //this.venueId = result.rows[0].venue_id;
-
-
-
-                
-                console.log("5");
-                console.log("category.venueId", category.venueId);
-                for(let venue of category.venueId){
-                    const eventCatVenueMap = `INSERT INTO t_event_category_venue_map(event_cat_map_id, event_venue_id) VALUES ($1, $2);`
-                    eventCatVenueMapValues = [
-                        this.eventCategoryID,
-                        venue
-                    ]
-                    await client.query(eventCatVenueMap, eventCatVenueMapValues)
+                if (eventsData.orgId != null) {
+                    for (let org of eventsData.orgId) {
+                        console.log("org", org);
+                        const insertOrgTypeData = `INSERT INTO t_event_organization(event_id, org_type, org_id) VALUES($1, $2, $3);`
+                        insertOrgTypeDataValues = [
+                            this.eventId,
+                            eventsData.orgType,
+                            org
+                        ];
+                        console.log("insertOrgTypeDataValues", insertOrgTypeDataValues);
+                        await client.query(insertOrgTypeData, insertOrgTypeDataValues);
+                    }
                 }
 
-               
+
+
+
+                /********************** t_event_venue************************************************************************************/
+                console.log("2");
+                const insertVenue = `INSERT INTO t_event_venue(event_id, venue_id, proctor_id)
+                    VALUES ($1, $2, $3);`
+
+                console.log("eventsData.venues", eventsData.venues);
+
+                if (eventsData.venues != null) {
+                    for (let venue of eventsData.venues) {
+                        //t_event_venue 
+                        console.log(`Inserting venue ${JSON.stringify(venue)}`)
+                        insertVenue_value =
+                            [
+                                this.eventId,
+                                venue.venueId,
+                                venue.proctorId
+                            ]
+                        await client.query(insertVenue, insertVenue_value);
+                    }
+                }
+
+
+                /********************** t_event_category_map,   t_event_cat_staff_map*******************************************************************************/
+                console.log("3");
+                console.log("eventsData.categories", eventsData.categories);
+
+                if (eventsData.categories != null) {
+                    for (let category of eventsData.categories) {
+
+                        console.log("4");
+
+                        const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id)
+                VALUES ($1, $2) returning event_cat_map_id;`
+                        console.log(`Inserting category ${JSON.stringify(category)}`);
+                        insertCategory_value =
+                            [
+                                this.eventId,
+                                category.eventCategoryID
+                            ]
+                        let result = await client.query(insertCategory, insertCategory_value);
+                        this.eventCategoryID = result.rows[0].event_cat_map_id;
+                        //this.venueId = result.rows[0].venue_id;
+
+
+
+
+                        console.log("5");
+                        console.log("category.venueId", category.venueId);
+                        for (let venue of category.venueId) {
+                            const eventCatVenueMap = `INSERT INTO t_event_category_venue_map(event_cat_map_id, event_venue_id) VALUES ($1, $2);`
+                            eventCatVenueMapValues = [
+                                this.eventCategoryID,
+                                venue
+                            ]
+                            await client.query(eventCatVenueMap, eventCatVenueMapValues);
+                        }
+
+                        console.log("9");
+                        for (let judge of category.judges) {
+
+                            console.log("6");
+                            const insertCatUserMap = `INSERT INTO  t_event_cat_staff_map(event_id, event_category_map_id, role_type, user_id)
+                    VALUES ($1, $2, $3, $4);`
+
+                            insertCatUserMap_values = [
+                                this.eventId,
+                                this.eventCategoryID,
+                                'Judge',
+                                judge
+                            ]
+
+                            console.log("insertCatUserMap_values", insertCatUserMap_values);
+                            await client.query(insertCatUserMap, insertCatUserMap_values);
+
+                        }
+
+                    }
+                }
 
                 console.log("6");
-                console.log("category", category);
-                const insertCatUserMap = `INSERT INTO  t_event_cat_staff_map(event_id, event_category_map_id, user_id, role_type)
-                    VALUES ($1, $2, $4, $3),($1, $2, $5, $3),($1, $2, $6, $3);`
 
-                insertCatUserMap_values = [
-                    this.eventId,
-                    this.eventCategoryID,
-                    'Judge',
-                    category.judge1,
-                    category.judge2,
-                    category.judge3
-                ]
-
-                console.log("insertCatUserMap_values", insertCatUserMap_values);
-                await client.query(insertCatUserMap, insertCatUserMap_values);
-            }
-
-            console.log("6");
-
-            const insertQuestionare = `INSERT INTO t_event_questionnaire(event_id, question, answer_type)
+                const insertQuestionare = `INSERT INTO t_event_questionnaire(event_id, question, answer_type)
                     VALUES ($1, $2, $3);`
 
-            for (let question of eventsData.questionnaire) {
-                //t_event_venue 
-                console.log(`Inserting category ${JSON.stringify(question)}`);
-                insertQuestionareValue =
-                    [
-                        this.eventId,
-                        question.question,
-                        question.responseType
-                    ]
-                await client.query(insertQuestionare, insertQuestionareValue);
-            }
 
-            //client.end()
-            console.log("Before commit");
-            await client.query("COMMIT");
-            console.log("After commit");
-
-            return ({
-                data: {
-                    status: 'success'
+                if (eventsData.questionnaire != null) {
+                    for (let question of eventsData.questionnaire) {
+                        //t_event_venue 
+                        console.log(`Inserting category ${JSON.stringify(question)}`);
+                        insertQuestionareValue =
+                            [
+                                this.eventId,
+                                question.question,
+                                question.responseType
+                            ]
+                        await client.query(insertQuestionare, insertQuestionareValue);
+                    }
                 }
-            })
+
+                //client.end()
+                console.log("Before commit");
+                await client.query("COMMIT");
+                console.log("After commit");
+
+                return ({
+                    data: {
+                        status: 'success'
+                    }
+                })
+            }
 
         }
         catch (err) {
@@ -421,15 +447,15 @@ async function getRegionAndParish() {
 
                 if (regionId != row.region_id) {
 
-                    console.log("row.region_id" , row.region_id);
+                    console.log("row.region_id", row.region_id);
 
-                   
+
 
                     if (regionId != null) {
-                        console.log("regionId" , regionId);
+                        console.log("regionId", regionId);
 
                         region.parishes = parishes;
-                        regions.push(region);                  
+                        regions.push(region);
                     }
 
                     region = {};
@@ -449,7 +475,7 @@ async function getRegionAndParish() {
             }
 
             region.parishes = parishes;
-            regions.push(region);    
+            regions.push(region);
 
         }
 
@@ -469,8 +495,6 @@ async function getRegionAndParish() {
     }
 }
 
-
-
 async function getEventType() {
 
     let client = dbConnections.getConnection();
@@ -479,7 +503,11 @@ async function getEventType() {
         let metadata = {};
         let eventType = [];
 
-        let getEventType = `select * from t_event_category;`
+        let getEventType = `select tet.name event_type, tet.is_venue_required, tet.is_proctor_required, tet.is_judge_required, 
+        tec.event_category_id, tec.name event_category_name, tec.school_grade_from, tec.school_grade_to , tet.is_school_grade_required
+        from t_event_type tet , t_event_category tec 
+        where tet.is_deleted = false 
+        and tec.event_type_id = tet.event_type_id ;`
         let res = await client.query(getEventType);
 
         if (res && res.rowCount > 0) {
@@ -489,31 +517,34 @@ async function getEventType() {
 
             for (let row of res.rows) {
 
-                if (type != row.type) {
+                if (type != row.event_type) {
 
                     if (type != null) {
                         eventTypes.eventName = eventName;
-                        eventType.push(eventTypes);  
+                        eventType.push(eventTypes);
+
                     }
                     eventTypes = {};
                     eventName = [];
-                    eventTypes.eventType = row.type;
-                    type = row.type;
+                    eventTypes.eventType = row.event_type;
+                    eventTypes.isVenueRequired = row.is_venue_required;
+                    eventTypes.isProctorRequired = row.is_proctor_required;
+                    eventTypes.isJudgeRequired = row.is_judge_required;
+                    eventTypes.isSchoolGradeRequired = row.is_school_grade_required;
+                    type = row.event_type;
+
                 }
 
                 eventNames = {};
                 eventNames.id = row.event_category_id;
-                eventNames.name = row.name;
+                eventNames.name = row.event_category_name;
                 eventNames.description = row.description;
                 eventNames.schoolGradeFrom = row.school_grade_from;
                 eventNames.schoolGradeTo = row.school_grade_to;
-
                 eventName.push(eventNames);
             }
-
             eventTypes.eventName = eventName;
-            eventType.push(eventTypes);    
-
+            eventType.push(eventTypes);
         }
 
         metadata.eventType = eventType;
@@ -532,7 +563,6 @@ async function getEventType() {
     }
 }
 
-
 async function getProctorData(userData) {
 
     let client = dbConnections.getConnection();
@@ -541,22 +571,15 @@ async function getProctorData(userData) {
         let metadata = {};
         console.log("userData", JSON.stringify(userData));
         let rolesData = [];
-        //rolesData = userData.rolesData.join(',');
-
-        console.log("this.rolesData", rolesData);
 
         var roles = "'" + userData.rolesData.join("','") + "'";
-
-        console.log("roles", roles);
-
 
         let getProctorData = `select distinct user_id, concat(first_name ,' ', last_name) as name 
         from v_user 
         where role_name  in (${roles});`
-        
+
         let res = await client.query(getProctorData);
         if (res && res.rowCount > 0) {
-            console.log("In response" + res);
 
             let proctorData = [];
             for (let row of res.rows) {
@@ -583,6 +606,10 @@ async function getProctorData(userData) {
 
     }
 }
+
+
+
+
 
 
 async function getEventQuestionnaireData(){

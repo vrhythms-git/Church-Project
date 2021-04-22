@@ -28,7 +28,10 @@ export class EventCreationComponent implements OnInit {
   alluserdata: any;
   orgId: any;
   userId: any;
+  selectedOrg: any;
+  orgDetails!: any;
   
+  orgs!: any[];
   isLinear!: boolean;
   venuesdataOfdata!: any[];
   venuesList!: any[];
@@ -42,9 +45,12 @@ export class EventCreationComponent implements OnInit {
   categories: any;
   eventarray!: any[];
   eventCategoryForm!: FormGroup;
-  //items!: FormArray
   ISCategory!: any[];
   newVenues!: any[];
+  isVenueRequired: any;
+  isProctorRequired: any;
+  isJudgeRequired: any;
+  isSchoolGradeRequired: any;
   selectedRowJson:any ={};
   constructor(private apiService: ApiService,
     private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils, private eventDataService:EventDataService) { }
@@ -63,17 +69,18 @@ export class EventCreationComponent implements OnInit {
     this.eventsDataFormGroup = this.formBuilder.group({
       name: new FormControl('', Validators.required),
       eventType: new FormControl('', Validators.required),
-      eventRegion: new FormControl('', Validators.required),
-      parishName: new FormControl(''),
-      description: new FormControl('', Validators.required),
+      orgType: new FormControl('', Validators.required),
       orgId: new FormControl(''),
       startDate: new FormControl('', Validators.required),
       endDate: new FormControl('', Validators.required),
       registrationStartDate: new FormControl('', Validators.required),
       registrationEndDate: new FormControl('', Validators.required),
-      //venueId: new FormControl('', Validators.required),   
+      eventUrl: new FormControl('', Validators.required),
+      description: new FormControl('', Validators.required),
     });//,{validator: this.checkDates}); //to compare event registration dates
 
+
+    
 
      //to compare event dates
     //  this.eventsDataFormGroup.setValue({
@@ -92,6 +99,8 @@ export class EventCreationComponent implements OnInit {
       categories: this.formBuilder.array([this.addeventCategory()])
     });
 
+    
+
     this.questionnaireDataFormGroup = this.formBuilder.group({
       questionnaire: this.formBuilder.array([this.adduserquestionary()])
     });
@@ -107,9 +116,69 @@ export class EventCreationComponent implements OnInit {
       this.eventcategorydata = res.data.metaData.eventType;
     });
 
+    
+  this.apiService.getUserRoleData().subscribe(res => {
+    //console.log("User Role Data : ", res.data.metadata);
+    //this.roledata = res.data.metadata.roles;
+    this.orgs = res.data.metadata.orgs;
+    //console.log("Roles Data:", this.orgs);
+  });
 
+
+  
   }
 
+
+  
+  // getOrgDetailsArrByindex(i: any) {
+  //   // console.log('i======>' + i);
+  //   // console.log('this.rolesArr:' + this.rolesArr.length)
+  //   if (this.rolesArr.length == 0)
+  //     return this.orgDetails
+  //   else {
+  //     if (i > (this.rolesArr.length - 1)) {
+  //       //  console.log('Returning []');
+  //       return []
+  //     }
+  //     else {
+  //       //  console.log('Returning ' + this.rolesArr[i].orgDetails)
+  //       return this.rolesArr[i].orgDetails;
+  //     }
+  //   }
+  // }
+
+  rolesArr: any[] = [];
+
+
+  onOrgSelect(event: any) {
+    console.log(event);
+    // console.log("Org Name", event.target.value);
+    this.selectedOrg = event.value;
+    let orgIndex = event.id;
+    if (orgIndex == undefined)
+      orgIndex = 0;
+    else
+      orgIndex = parseInt(orgIndex)
+    console.log("Dropdown Index:", orgIndex);
+
+    for (let i = 0; i < this.orgs.length; i++) {
+      if (this.orgs[i].orgtype == this.selectedOrg) {
+        //this.rolesArr[orgIndex].orgDetails = this.orgs[i].details;
+        this.orgDetails = this.orgs[i].details;
+      }
+    }
+  }
+
+  addeventCategory(): FormGroup {
+    return this.formBuilder.group({
+      eventCategoryID: '',
+      name: '',
+      schoolGradeFrom: '',
+      schoolGradeTo: '',
+      judges: '',
+      venueId: ''
+    });
+  }
 
   //function to validate event dates
 // checkDates(group: FormGroup) {
@@ -128,14 +197,14 @@ export class EventCreationComponent implements OnInit {
 //   return null;
 // }
 
-  changeRegion(region: any) {
-    for (let i = 0; i < this.regionList.length; i++) {
-      if (this.regionList[i].regionId == region.value) {
-        console.log(this.regionList[i].parishes);
-        this.parishList = this.regionList[i].parishes;
-      }
-    }
-  }
+  // changeRegion(region: any) {
+  //   for (let i = 0; i < this.regionList.length; i++) {
+  //     if (this.regionList[i].regionId == region.value) {
+  //       console.log(this.regionList[i].parishes);
+  //       this.parishList = this.regionList[i].parishes;
+  //     }
+  //   }
+  // }
 
 
   setuserVenuAndProcter(venuesdataOfdata: any): FormArray {
@@ -202,8 +271,8 @@ export class EventCreationComponent implements OnInit {
 
     let venuesDatanew: any = {};
 
-    venuesDatanew.regionId = this.eventsDataFormGroup.value.eventRegion;
-    venuesDatanew.parishIds = this.eventsDataFormGroup.value.parishName;
+    venuesDatanew.orgType = this.eventsDataFormGroup.value.orgType;
+    venuesDatanew.orgId = this.eventsDataFormGroup.value.orgId;
     //venuesDatanew.push(parish);
 
     this.apiService.getVenues({ data: venuesDatanew }).subscribe((res: any) => {
@@ -217,6 +286,15 @@ export class EventCreationComponent implements OnInit {
         this.categoriesDataFormGroup.setControl('categories', this.setEventCategory(this.eventcategorydata[i].eventName));
       }
     }
+
+    for(let i = 0; i < this.eventList.length; i++) {
+      if (this.eventList[i].eventType == this.eventsDataFormGroup.value.eventType) {
+                 this.isVenueRequired  = this.eventList[i].isVenueRequired;  
+                 this.isProctorRequired = this.eventList[i].isProctorRequired; 
+                 this.isJudgeRequired = this.eventList[i].isJudgeRequired; 
+                 this.isSchoolGradeRequired = this.eventList[i].isSchoolGradeRequired;
+           }
+       }
   }
 
   onVenuesNextBtnClick() {
@@ -235,10 +313,7 @@ export class EventCreationComponent implements OnInit {
     console.log(this.newVenues);
   }
 
-  onaddbtncategory() {
-    this.categories = this.categoriesDataFormGroup.get('categories') as FormArray;
-    this.categories.push(this.addeventCategory());
-  }
+ 
 
   onaddbtnclick1() {
     this.questionnaire = this.questionnaireDataFormGroup.get('questionnaire') as FormArray;
@@ -256,6 +331,8 @@ export class EventCreationComponent implements OnInit {
   removeEventCategory(index: any) {
     (<FormArray>this.categoriesDataFormGroup.get('categories').removeAt(index));
   }
+
+  
 
   adduserquestionary(): FormGroup {
     return this.formBuilder.group({
@@ -279,18 +356,6 @@ export class EventCreationComponent implements OnInit {
     });
   }
 
-  addeventCategory(): FormGroup {
-    return this.formBuilder.group({
-      eventCategoryID: '',
-      name: '',
-      schoolGradeFrom: '',
-      schoolGradeTo: '',
-      judge1: 1,
-      judge2: 2,
-      judge3: 3,
-      venueId: ''
-    });
-  }
 
   setEventCategory(eventcategorydata: any): FormArray {
     const formArray = new FormArray([]);
@@ -300,9 +365,7 @@ export class EventCreationComponent implements OnInit {
         name: e.name,
         schoolGradeFrom: e.schoolGradeFrom,
         schoolGradeTo: e.schoolGradeTo,
-        judge1: '',
-        judge2: '',
-        judge3: '',
+        judges: '',
         venueId: ''
       }));
     });
