@@ -152,7 +152,8 @@
 
             </mat-step>
 
-            <mat-step *ngIf= "isVenueRequired && isProctorRequired" [stepControl]="venuesDataFormGroup">
+            
+            <mat-step *ngIf= "isVenueRequired" [stepControl]="venuesDataFormGroup">
                 <div class="container">
 
                     <form [formGroup]="venuesDataFormGroup">
@@ -173,7 +174,7 @@
                                     <div class="container" style="padding-left: 2%;" [formGroupName]="i">
 
                                         <div class="row">
-                                            <div class="col-md-6" *ngIf="isVenueRequired">
+                                            <div class="col-md-6">
                                                 <mat-form-field class="col-md-12">
                                                     <mat-label>Venue</mat-label>
 

@@ -30,7 +30,7 @@ export class EventCreationComponent implements OnInit {
   userId: any;
   selectedOrg: any;
   orgDetails!: any;
-  
+
   orgs!: any[];
   isLinear!: boolean;
   venuesdataOfdata!: any[];
@@ -51,14 +51,13 @@ export class EventCreationComponent implements OnInit {
   isProctorRequired: any;
   isJudgeRequired: any;
   isSchoolGradeRequired: any;
-  selectedRowJson:any ={};
+  selectedRowJson: any = {};
   constructor(private apiService: ApiService,
-    private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils, private eventDataService:EventDataService) { }
+    private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils, private eventDataService: EventDataService) { }
 
   ngOnInit(): void {
 
-    if( this.eventDataService.getSelectedRowData() != undefined )
-    {
+    if (this.eventDataService.getSelectedRowData() != undefined) {
       this.selectedRowJson = this.eventDataService.getSelectedRowData();
       console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson))
     }
@@ -80,9 +79,9 @@ export class EventCreationComponent implements OnInit {
     });//,{validator: this.checkDates}); //to compare event registration dates
 
 
-    
 
-     //to compare event dates
+
+    //to compare event dates
     //  this.eventsDataFormGroup.setValue({
     //   registrationStartDate: this.eventsDataFormGroup.registrationStartDate,
     //   registrationEndDate: this.eventsDataFormGroup.registrationEndDate,
@@ -99,7 +98,7 @@ export class EventCreationComponent implements OnInit {
       categories: this.formBuilder.array([this.addeventCategory()])
     });
 
-    
+
 
     this.questionnaireDataFormGroup = this.formBuilder.group({
       questionnaire: this.formBuilder.array([this.adduserquestionary()])
@@ -116,20 +115,20 @@ export class EventCreationComponent implements OnInit {
       this.eventcategorydata = res.data.metaData.eventType;
     });
 
-    
-  this.apiService.getUserRoleData().subscribe(res => {
-    //console.log("User Role Data : ", res.data.metadata);
-    //this.roledata = res.data.metadata.roles;
-    this.orgs = res.data.metadata.orgs;
-    //console.log("Roles Data:", this.orgs);
-  });
+
+    this.apiService.getUserRoleData().subscribe(res => {
+      //console.log("User Role Data : ", res.data.metadata);
+      //this.roledata = res.data.metadata.roles;
+      this.orgs = res.data.metadata.orgs;
+      //console.log("Roles Data:", this.orgs);
+    });
 
 
-  
+
   }
 
 
-  
+
   // getOrgDetailsArrByindex(i: any) {
   //   // console.log('i======>' + i);
   //   // console.log('this.rolesArr:' + this.rolesArr.length)
@@ -181,21 +180,21 @@ export class EventCreationComponent implements OnInit {
   }
 
   //function to validate event dates
-// checkDates(group: FormGroup) {
-//   if(group.controls.registrationEndDate.value < group.controls.registrationStartDate.value) {
-//     return { notValid:true }
-    
-//   } 
-//  if(group.controls.startDate.value < (group.controls.registrationEndDate.value )) {
-//    return { notValid1:true }
-    
-//   }
-//   if(group.controls.endDate.value < (group.controls.startDate.value )) {
-//     return { notValid2:true }
-     
-//    }
-//   return null;
-// }
+  // checkDates(group: FormGroup) {
+  //   if(group.controls.registrationEndDate.value < group.controls.registrationStartDate.value) {
+  //     return { notValid:true }
+
+  //   } 
+  //  if(group.controls.startDate.value < (group.controls.registrationEndDate.value )) {
+  //    return { notValid1:true }
+
+  //   }
+  //   if(group.controls.endDate.value < (group.controls.startDate.value )) {
+  //     return { notValid2:true }
+
+  //    }
+  //   return null;
+  // }
 
   // changeRegion(region: any) {
   //   for (let i = 0; i < this.regionList.length; i++) {
@@ -273,7 +272,6 @@ export class EventCreationComponent implements OnInit {
 
     venuesDatanew.orgType = this.eventsDataFormGroup.value.orgType;
     venuesDatanew.orgId = this.eventsDataFormGroup.value.orgId;
-    //venuesDatanew.push(parish);
 
     this.apiService.getVenues({ data: venuesDatanew }).subscribe((res: any) => {
       this.venuesList = res.data.venueList;
@@ -287,15 +285,18 @@ export class EventCreationComponent implements OnInit {
       }
     }
 
-    for(let i = 0; i < this.eventList.length; i++) {
+    for (let i = 0; i < this.eventList.length; i++) {
       if (this.eventList[i].eventType == this.eventsDataFormGroup.value.eventType) {
-                 this.isVenueRequired  = this.eventList[i].isVenueRequired;  
-                 this.isProctorRequired = this.eventList[i].isProctorRequired; 
-                 this.isJudgeRequired = this.eventList[i].isJudgeRequired; 
-                 this.isSchoolGradeRequired = this.eventList[i].isSchoolGradeRequired;
-           }
-       }
+        this.isVenueRequired = this.eventList[i].isVenueRequired;
+        this.isProctorRequired = this.eventList[i].isProctorRequired;
+        this.isJudgeRequired = this.eventList[i].isJudgeRequired;
+        this.isSchoolGradeRequired = this.eventList[i].isSchoolGradeRequired;
+      }
+    }
   }
+
+
+
 
   onVenuesNextBtnClick() {
     this.venues = this.venuesDataFormGroup.get('venues') as FormArray;
@@ -313,7 +314,7 @@ export class EventCreationComponent implements OnInit {
     console.log(this.newVenues);
   }
 
- 
+
 
   onaddbtnclick1() {
     this.questionnaire = this.questionnaireDataFormGroup.get('questionnaire') as FormArray;
@@ -332,7 +333,7 @@ export class EventCreationComponent implements OnInit {
     (<FormArray>this.categoriesDataFormGroup.get('categories').removeAt(index));
   }
 
-  
+
 
   adduserquestionary(): FormGroup {
     return this.formBuilder.group({
@@ -344,14 +345,6 @@ export class EventCreationComponent implements OnInit {
   adduserVenuAndProcter(): FormGroup {
     return this.formBuilder.group({
       venueId: '',
-      //name: '',
-      // description: '',
-      // addressLine1: '',
-      // addressLine2: '',
-      // city: '',
-      // state: '',
-      // postalCode: '',
-      // country: '',
       proctorId: ''
     });
   }
@@ -377,14 +370,12 @@ export class EventCreationComponent implements OnInit {
     eventCreationForm = { ...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value }
     console.log("this.eventCreationForm", eventCreationForm);
     this.eventsDataFormGroup.value.orgId = this.orgId;
-    //this.eventCreationForm.value.venues.proctorId = this.userId;
-    this.apiService.insertevents({ data: eventCreationForm }).subscribe(res => {
-      console.log("res", JSON.stringify(res));
-      console.log("Event created successfully!");
-      this.uiCommonUtils.showSnackBar("Event created successfully!", "Success", 4000);
+    this.apiService.insertevents({ data: eventCreationForm }).subscribe((res: any) => {
+      if (res.data.status == "success") {
+        this.uiCommonUtils.showSnackBar("Event created successfully!", "success", 3000);
+      }
+      else
+        this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
     });
-    console.log("FormValues:", JSON.stringify(eventCreationForm));
   }
-
-
 }
