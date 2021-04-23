@@ -400,7 +400,7 @@ async function insertEvents(eventsData) {
 
                 await client.query("COMMIT");
                 console.log("After commit");
-
+                client.end();
                 return ({
                     data: {
                         status: 'success'
@@ -410,9 +410,11 @@ async function insertEvents(eventsData) {
 
         }
         catch (err) {
+            client.connect()
             await client.query("ROLLBACK");
             console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`)
             console.log("Transaction ROLLBACK called");
+            client.end();
             return (errorHandling.handleDBError('transactionError'));
         }
     }
@@ -479,7 +481,7 @@ async function getRegionAndParish() {
         }
 
         metadata.regions = regions;
-
+        client.end();
         return ({
             data: {
                 status: 'success',
@@ -547,7 +549,7 @@ async function getEventType() {
         }
 
         metadata.eventType = eventType;
-
+        client.end();
         return ({
             data: {
                 status: 'success',
@@ -589,7 +591,7 @@ async function getProctorData(userData) {
             }
             metadata.proctorData = proctorData;
         }
-
+        client.end();
         return ({
             data: {
                 status: 'success',
@@ -651,7 +653,10 @@ async function getEventForRegistration() {
     await client.connect();
     try {
         let metadata = {};
-        let getEventForRegistration = `select * from v_event`;
+        let getEventForRegistration = `select distinct  event_id, event_name, event_type, event_desciption, event_start_date, event_end_date from v_event ve where 
+                                            ve.registration_start_date <= current_date
+                                        and  ve.registration_end_date >= current_date
+                                        and ve.is_deleted = false;`;
         let res = await client.query(getEventForRegistration);
         if (res && res.rowCount > 0) {
             console.log("In Event response : " + res);
@@ -670,8 +675,8 @@ async function getEventForRegistration() {
                 eventData.push(events);
             }
             metadata.eventData = eventData;
-            client.end()
         }
+        client.end();
         return ({
             data: {
                 status: 'success',

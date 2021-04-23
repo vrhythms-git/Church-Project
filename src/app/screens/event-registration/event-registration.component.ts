@@ -26,29 +26,29 @@ export class EventRegistrationComponent implements OnInit {
 
   ngOnInit(): void {
     this.columnDefs = [
-      { headerName: 'Event Name', field: 'name', sortable: true, filter: true, width: 170, checkboxSelection: true },
-      { headerName: 'Event Type', field: 'event_type', sortable: true, filter: true, width: 160 },
-      { headerName: 'Description', field: 'description', sortable: true, filter: true },
-      { headerName: 'Event Start Date', field: 'startDate', sortable: true, filter: true, width: 170,
+      { headerName: 'Event Name', field: 'name', sortable: true, filter: true,  checkboxSelection: true },
+      { headerName: 'Event Type', field: 'event_type', sortable: true, filter: true, },
+      { headerName: 'Description', field: 'description', sortable: true, filter: true,  },
+      { headerName: 'Event Start Date', field: 'startDate', sortable: true, filter: true, 
           cellRenderer: (data:any) => {
           return data.value ? (new Date(data.value)).toLocaleDateString() : '';
             }
       },
-      { headerName: 'Event End Date', field: 'endDate', sortable: true, filter: true,width: 170,
+      { headerName: 'Event End Date', field: 'endDate', sortable: true, filter: true,
           cellRenderer: (data:any) => {
             return data.value ? (new Date(data.value)).toLocaleDateString() : '';
             }
       },
-      { headerName: 'Registration Start Date', field: 'registrationStartDate', sortable: true, filter: true, width: 170,
-          cellRenderer: (data:any) => {
-          return data.value ? (new Date(data.value)).toLocaleDateString() : '';
-            }
-      },
-      { headerName: 'Registration Start Date', field: 'registrationEndDate', sortable: true, filter: true, width: 170,
-      cellRenderer: (data:any) => {
-      return data.value ? (new Date(data.value)).toLocaleDateString() : '';
-        },suppressSizeToFit: false
-  },
+  //     { headerName: 'Registration Start Date', field: 'registrationStartDate', sortable: true, filter: true, width: 170,
+  //         cellRenderer: (data:any) => {
+  //         return data.value ? (new Date(data.value)).toLocaleDateString() : '';
+  //           }
+  //     },
+  //     { headerName: 'Registration Start Date', field: 'registrationEndDate', sortable: true, filter: true, width: 170,
+  //     cellRenderer: (data:any) => {
+  //     return data.value ? (new Date(data.value)).toLocaleDateString() : '';
+  //       },suppressSizeToFit: false
+  // },
     
 
     ];

@@ -115,23 +115,23 @@ async function getMembers(fireBaseId) {
                         //   ) res;`
 
 
-                        let fetchAllMembersData = `select jsonb_agg(
-                        jsonb_build_object(
-                          'userId', res.user_id, 'title', res.title, 
-                          'firstName', res.first_name, 'lastName', 
-                          res.last_name,  'role', res.role_name 
-                        ) 
-                      ) member_list from (
-                   select distinct user_id, title, first_name, last_name, role_name
-                      from v_user tu2 where user_id in(
-                   select distinct family_member_id from t_person_relationship tpr where family_member_id in 
-                (select user_id from t_user tu where email_id =
-                      (select distinct email_id from t_user where firebase_id = '${fireBaseId}'))
-                     and is_deleted != true
-                     union 
-       		select distinct user_id  from v_user tu3 where firebase_id = '${fireBaseId}' and role_name = 'Family Head'
-                     )
-                     ) res`;
+                            let fetchAllMembersData = `select jsonb_agg(
+                            jsonb_build_object(
+                            'userId', res.user_id, 'title', res.title, 
+                            'firstName', res.first_name, 'lastName', 
+                            res.last_name,  'role', res.role_name 
+                            ) 
+                        ) member_list from (
+                    select distinct user_id, title, first_name, last_name, role_name
+                        from v_user tu2 where user_id in(
+                    select distinct family_member_id from t_person_relationship tpr where family_member_id in 
+                    (select user_id from t_user tu where email_id =
+                        (select distinct email_id from t_user where firebase_id = '${fireBaseId}'))
+                        and is_deleted != true
+                        union 
+                select distinct user_id  from v_user tu3 where firebase_id = '${fireBaseId}' and role_name = 'Family Head'
+                        )
+                        ) res`;
 
                         client.query(fetchAllMembersData, (err, result) => {
 

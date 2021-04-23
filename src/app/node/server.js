@@ -1,6 +1,7 @@
 const processRequest = require(`${__dirname}/reqOperations`);
 const processUserRequest = require(`${__dirname}/userReqOperations`)
 const processMiscRequest = require(`${__dirname}/miscReqOperations`)
+const processEventTemp = require(`${__dirname}/reqEventTemp`)
 const processEventRequest = require(`./eventReqOperations`)
 const dbConnections = require(`${__dirname}/dbConnection`);
 express = require('express')
@@ -503,6 +504,25 @@ app.get('/api/logout', function (req, res) {
       })
   } catch (error) {
     console.error('Error in logout as : ' + error)
+  }
+});
+
+
+
+
+app.get('/api/getEvent', function (req, res) {
+  console.log("getEvent called...");
+  try {
+    processEventTemp.getEventById(req.query.id)
+    .then((data) => {
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getEvent as : ' + error)
   }
 });
 
