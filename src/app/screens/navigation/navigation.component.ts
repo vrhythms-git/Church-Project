@@ -14,10 +14,21 @@ export class NavigationComponent implements OnInit {
   opened = true;
   userMetaData: any;
   numberOfMenusElements: any;
+  datetimeString: any;
+  lastLoggedInDateTime:any;
   ngOnInit(): void {
 
     this.userMetaData = JSON.parse(localStorage.getItem('chUserMetaData') || '{}');
     console.log('userMetaData is :' + JSON.stringify(this.userMetaData))
+
+    console.log("Timestamp data is : "+this.userMetaData.lastLoggedIn.toString(''));
+    this.lastLoggedInDateTime = this.userMetaData.lastLoggedIn;
+    //var date = new Date(this.userMetaData.lastLoggedIn).toLocaleDateString("en-us");
+    //var time = new Date(this.userMetaData.lastLoggedIn).toLocaleTimeString("en-us");
+    this.datetimeString = new Date(this.lastLoggedInDateTime).toLocaleString("en-us");
+    //console.log("date : " + date);
+    //console.log("time : " + time);
+    //console.log("string : " + this.datetimeString);
 
     if (this.userMetaData.menus) {
       this.numberOfMenusElements = this.userMetaData.menus.length;

@@ -80,10 +80,18 @@
                                                                 <mat-form-field class="col-md-4">
                                                                                 <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
                                                                                 <input matInput type="text" ng2TelInput (ng2TelOutput)="getMobileNumber($event)" formControlName="mobileNo" id="mobileNo" maxLength="10" minLength="10" (keypress)="keyPress($event)" required style="width: fit-content;"/>
+                                                                                <mat-error *ngIf="updateuserinfo.controls.mobileNo.touched && updateuserinfo.controls.mobileNo.invalid">
+                                                                                        <span *ngIf="updateuserinfo.controls.mobileNo.errors.required">This field is mandatory.</span>
+                                                                                        <span *ngIf="updateuserinfo.controls.mobileNo.errors.pattern">Enter 10 digit number.</span>
+                                                                                    </mat-error>
                                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-4">
                                                                 <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
                                                                 <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput (ng2TelOutput)="getHomePhoneNumber($event)" length="10" placeholder="Enter Home Phone Number" />
+                                                                <mat-error *ngIf="updateuserinfo.controls.homePhoneNo.touched && updateuserinfo.controls.homePhoneNo.invalid">
+                                                                        <span *ngIf="updateuserinfo.controls.homePhoneNo.errors.required">This field is mandatory.</span>
+                                                                        <span *ngIf="updateuserinfo.controls.homePhoneNo.errors.pattern">Enter 10 digit number.</span>
+                                                                    </mat-error>
                                                         </mat-form-field>
 
                                                         <mat-form-field class="col-md-4">

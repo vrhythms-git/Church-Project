@@ -52,7 +52,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       middleName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
       nickName: new FormControl('', Validators.required),
-      batismalName: new FormControl('', Validators.required),
+      baptismalName: new FormControl('', Validators.required),
       dob: new FormControl('', [Validators.required]),
       homePhoneNo: new FormControl('', [Validators.required]),
       mobileNo: new FormControl('', [Validators.required]),
@@ -121,7 +121,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
         middleName: this.alluserdata.middleName,
         lastName: this.alluserdata.lastName,
         nickName: this.alluserdata.nickName,
-        batismalName: this.alluserdata.batismalName,
+        baptismalName: this.alluserdata.baptismalName,
         dob: this.alluserdata.dob,
         homePhoneNo: this.alluserdata.homePhoneNo,
         mobileNo: this.alluserdata.mobile_no,
@@ -229,6 +229,11 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       this.myprofileform.value.updatedBy = this.userId;
       this.myprofileform.value.orgId = this.orgId;
 
+      if(this.myprofileform.value.isFamilyHead == '' && this.alluserdata.isFamilyHead ==true ){
+        this.myprofileform.value.isFamilyHead = true;
+      }else
+      this.myprofileform.value.isFamilyHead = false;
+
       this.apiService.updateUserProfile({ data: this.myprofileform.value }).subscribe((res: any) => {
         if (res.data.status == "success") {
           this.uiCommonUtils.showSnackBar("Profile updated successfully!", "success", 3000);
@@ -237,6 +242,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
         else
           this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
       });
+      
     } if (this.isApprovedUserLoggedIn == false) {
 
       this.signUpForm.value.userId = this.alluserdata.userId;

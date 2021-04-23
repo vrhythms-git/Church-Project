@@ -52,7 +52,7 @@
 
         <mat-form-field class="col-md">
           <mat-label>Baptismal Name</mat-label>
-          <input id="batismalName" matInput formControlName="batismalName" />
+          <input id="baptismalName" matInput formControlName="baptismalName" />
         </mat-form-field>
 
 
@@ -165,8 +165,8 @@
         </div>
         <div class="col-md-4" style="padding-top: 0.4%;margin-left: -4%;">
           <mat-radio-group formControlName="isFamilyHead" aria-label="Select an option">
-            <mat-radio-button value="true">Yes</mat-radio-button>&nbsp;
-            <mat-radio-button value="false">No</mat-radio-button>
+            <mat-radio-button [checked]=isFamilyHead value="true">Yes</mat-radio-button>&nbsp;
+            <mat-radio-button [checked]=!isFamilyHead value="false">No</mat-radio-button>
           </mat-radio-group>
         </div>
       </div>
@@ -205,6 +205,12 @@
                       <mat-option value="Father">Father</mat-option>
                       <mat-option value="Mother">Mother</mat-option>
                     </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <mat-form-field class="col-md-12">
+                    <mat-label>Baptismal Name</mat-label>
+                    <input required id="baptismalName" matInput formControlName="baptismalName" placeholder="Enter Baptismal Name" />
                   </mat-form-field>
                 </div>
 

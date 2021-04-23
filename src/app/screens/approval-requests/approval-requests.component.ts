@@ -96,25 +96,26 @@ export class ApprovalRequestsComponent implements OnInit {
           { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
           { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
           { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
-          { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
-          { headerName: 'City', field: 'city', sortable: true, filter: true, width: 150 },
-          { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
-          { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
+          { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 450 },
+         // { headerName: 'City', field: 'city', sortable: true, filter: true, width: 150 },
+          //{ headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
+          //{ headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
           { headerName: 'Actions', field: 'action', cellRendererFramework: ReqRendererComponent, width: 170 }
         ]
       }else if(usertype == 'rejected'){
         this.columnDefs = [
           { headerName: 'First Name', field: 'firstName', sortable: true, filter: true, width: 170, checkboxSelection: true },
           { headerName: 'Last Name', field: 'lastName', sortable: true, filter: true, width: 170 },
-          { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
-          { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 170 },
-          { headerName: 'City', field: 'city', sortable: true, filter: true, width: 150 },
-          { headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
-          { headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
+          { headerName: 'Member Type', field: 'memberTypeForRejected', sortable: true, filter: true, width: 150 },
+          { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 450 },
+         // { headerName: 'City', field: 'city', sortable: true, filter: true, width: 150 },
+          //{ headerName: 'State', field: 'state', sortable: true, filter: true, width: 150 },
+          //{ headerName: 'Postal Code', field: 'postalCode', sortable: true, filter: true, width: 150 },
+          { headerName: 'Reason', field:'reason', sortable:true, filter:true, width:180}
           ]
       }
       
-      console.log(res.data.metaData);
+      //console.log(res.data.metaData);
       this.rowData = res.data.metaData;
     });
   }
@@ -165,10 +166,10 @@ export class ApprovalRequestsComponent implements OnInit {
     this.approveReqForm.value.userId = this.selectedUserData.userId;
     this.approveReqForm.value.isApproved = this.isApproved;
     this.approveReqForm.value.loggedInuserId = this.loggedInUser;
-    console.log(this.approveReqForm.value);
+    //console.log(this.approveReqForm.value);
     this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe(res => {
       console.log(res);
-     // this.getUnapprovedUserData();
+      this.getUnapprovedUserData('approval_requests');
       $("#imagemodal").modal("hide");
     })
   }
@@ -180,7 +181,7 @@ export class ApprovalRequestsComponent implements OnInit {
     console.log(this.approveReqForm.value);
     this.apiService.approveOrRejReq({ data: this.approveReqForm.value }).subscribe(res => {
       console.log(res);
-    //  this.getUnapprovedUserData();
+      this.getUnapprovedUserData('approval_requests');
       $("#imagemodal").modal("hide");
     })
   }
@@ -198,5 +199,10 @@ export class ApprovalRequestsComponent implements OnInit {
   resetForm() {
     this.approveReqForm.reset();
   }
+
+  // refreshGrid(){
+
+  //   this.getUnapprovedUserData('approval_requests');
+  // }
 }
 

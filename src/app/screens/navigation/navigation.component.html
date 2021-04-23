@@ -9,21 +9,27 @@
     <div>
       <!-- <a mat-button [routerLink]="'/accounts'"> Accounts </a>-->
 
-
-      <button [matMenuTriggerFor]="menu" mat-button [routerLink]="'/my-profile'">
-        <mat-icon>account_circle</mat-icon> {{userMetaData.firstName}}&nbsp;{{userMetaData.lastName}}
-      </button>
-
+      <div class="row">
+        <button mat-button [routerLink]="'/contacts'">
+          <mat-icon>notifications_none</mat-icon>
+        </button>
+  
+        <button [matMenuTriggerFor]="menu" mat-button [routerLink]="'/my-profile'">
+          <mat-icon>account_circle</mat-icon> {{userMetaData.firstName}}&nbsp;{{userMetaData.lastName}}
+        </button>
+      </div>
+      <div class="col text-right" *ngIf="datetimeString">
+        <h3>Last Logged In Date : {{datetimeString | date:'short' }}</h3>
+      </div>
+     
+  </div>
       <mat-menu #menu="matMenu" xPosition="before">
         <div class="ProfileInfo">
           <button (click)="onmyProfileclick()" mat-menu-item>
             <mat-icon>person_outline</mat-icon>
             My Profile
           </button>
-          <button mat-menu-item>
-            <mat-icon>settings</mat-icon>
-            Settings
-          </button>
+          
           <button (click)="handleLogoutBtnClick()" mat-menu-item>
             <mat-icon>power_settings_new</mat-icon>
             Logout
@@ -34,12 +40,10 @@
       <!-- <a mat-button [routerLink]="'/login'"> Login </a>
         <a mat-button [routerLink]="'/signup'"> Sign up </a> -->
 
-      <button mat-button [routerLink]="'/contacts'">
-        <mat-icon>notifications_none</mat-icon>
-      </button>
+    
 
 
-    </div>
+    
   </mat-toolbar-row>
 
 

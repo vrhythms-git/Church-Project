@@ -1,7 +1,9 @@
 h1{
 font-family: poppins;
 }
-
+h3{
+    font-size:small
+}
 .ProfileInfo { width: 170px; }
 
 .mat-button

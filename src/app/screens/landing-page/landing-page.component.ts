@@ -53,6 +53,7 @@ export class LandingPageComponent implements OnInit {
   selectedCountry: any;
   mobileNumber: any;
   homePhoneNumber: any;
+  alluserdata: any;
 
   constructor(private apiService: ApiService, private uiCommonUtils: uiCommonUtils,
     private http: HttpClient, private formBuilder: FormBuilder) { }
@@ -75,12 +76,12 @@ export class LandingPageComponent implements OnInit {
       firstName: new FormControl('', Validators.required),
       middleName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
-      nickName: new FormControl('',),
-      batismalName: new FormControl(''),
+      nickName: new FormControl('', Validators.required),
+      batismalName: new FormControl('', Validators.required),
       dob: new FormControl('', [Validators.required]),
-      mobileNo: new FormControl('', [Validators.required]),
-      homePhoneNo: new FormControl(''),
-      emailAddress: new FormControl(''),
+      mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
+      homePhoneNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
+      emailAddress: new FormControl('',[Validators.required, Validators.email]),
       addressLine1: new FormControl('', Validators.required),
       addressLine2: new FormControl(''),
       addressLine3: new FormControl(''),
@@ -133,6 +134,13 @@ export class LandingPageComponent implements OnInit {
       this.orgs = res.data.metadata.orgs;
       console.log("Roles Data:", this.orgs);
     })
+
+
+    this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
+      console.log('These are users from database : ');
+     console.log(res.data.metaData);
+   this.alluserdata = res.data.metaData;
+   });
 
     this.apiService.getCountryStates().subscribe((res: any) => {
       this.countries = res.data.countryState;

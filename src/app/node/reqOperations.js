@@ -892,7 +892,7 @@ async function processUpdateUserRoles(userData) {
             userData.homePhoneNo,
             userData.updatedBy,
             new Date().toISOString(),
-            userData.batismalName,
+            userData.baptismalName,
             userData.maritalStatus,
             userData.dateofMarriage,
             userData.userId
@@ -979,12 +979,13 @@ async function processUpdateUserRoles(userData) {
                     try {
 
                         const insertuserTbl = `INSERT INTO public.t_user
-                        (org_id, firebase_id, title, first_name, middle_name, last_name, created_by, created_date, member_type, is_approved )
-                        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning user_id;`;
+                        (org_id, email_id, firebase_id, title, first_name, middle_name, last_name, created_by, created_date, member_type, is_approved )
+                        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning user_id;`;
 
                         //Populating t_user table
                         const insertuserTblValues = [
                             userData.orgId,
+                            userData.emailId,
                             '',
                             details.title,
                             details.firstName,
