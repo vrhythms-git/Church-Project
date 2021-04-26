@@ -63,7 +63,7 @@
 
                                     <!-- <input matInput type="date" required  id="start_date" formControlName="start_date" placeholder="Event Start Date">-->
                                     <mat-label>Event Start Date</mat-label>
-                                    <input matInput id="startDate" formControlName="startDate"
+                                    <input [min]="minDate" matInput id="startDate" formControlName="startDate"
                                         [matDatepicker]="startatpicker">
                                     <mat-datepicker-toggle matSuffix [for]="startatpicker">
                                         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
@@ -77,7 +77,7 @@
 
                                     <!-- <input matInput type="date" required  id="end_date" formControlName="end_date" placeholder="Event End Date">-->
                                     <mat-label>Event End Date</mat-label>
-                                    <input matInput id="endDate" formControlName="endDate"
+                                    <input [min]="minDate" matInput id="endDate" formControlName="endDate"
                                         [matDatepicker]="endatpicker">
                                     <mat-datepicker-toggle matSuffix [for]="endatpicker">
                                         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
@@ -96,7 +96,7 @@
 
                                     <!-- <input matInput type="date" required  id="registration_start_date" formControlName="registration_start_date" placeholder="Regisrtation Start Date">-->
                                     <mat-label>Registration Start Date</mat-label>
-                                    <input matInput id="registrationStartDate" formControlName="registrationStartDate"
+                                    <input [min]="minDate" matInput id="registrationStartDate" formControlName="registrationStartDate"
                                         [matDatepicker]="registrationStartatpicker">
                                     <mat-datepicker-toggle matSuffix [for]="registrationStartatpicker">
                                         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
@@ -110,7 +110,7 @@
 
                                     <!-- <input matInput type="date" required  id="registration_end_date" formControlName="registration_end_date" placeholder="Regisrtation End Date"> -->
                                     <mat-label>Registration End Date</mat-label>
-                                    <input matInput id="registrationEndDate" formControlName="registrationEndDate"
+                                    <input [min]="minDate" matInput id="registrationEndDate" formControlName="registrationEndDate"
                                         [matDatepicker]="registrationEndatpicker">
                                     <mat-datepicker-toggle matSuffix [for]="registrationEndatpicker">
                                         <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
@@ -129,6 +129,10 @@
 
                                 <input required id="eventUrl" matInput formControlName="eventUrl"
                                     placeholder="Enter Event URL" />
+                                    <mat-error *ngIf="eventsDataFormGroup.controls.eventUrl.touched && eventsDataFormGroup.controls.eventUrl.invalid">
+                                        <span *ngIf="eventsDataFormGroup.controls.eventUrl.errors.required">This field is mandatory.</span>
+                                        <span *ngIf="eventsDataFormGroup.controls.eventUrl.errors.pattern">Please enter valid URL.</span>
+                                    </mat-error>
                             </mat-form-field>
                         </div>
 
@@ -313,7 +317,7 @@
                         </div>
 
                         <div>
-                            <button mat-raised-button matStepperNext>Next</button>
+                            <button mat-raised-button matStepperNext (click)="onCategoriesNextBtn()">Next</button>
                         </div>
 
                     </form>
