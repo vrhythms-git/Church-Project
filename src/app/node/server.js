@@ -526,6 +526,23 @@ app.get('/api/getEvent', function (req, res) {
   }
 });
 
+app.post('/api/registerEvent', function (req, res) {
+  console.log("registerEvent called...");
+  try {
+    processEventTemp.eventRegistration(req.body.data)
+    .then((data) => {
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in registerEvent as : ' + error)
+  }
+});
+
+
 // let client = dbConnections.getConnection();
 // try {
 //   client.connect();
