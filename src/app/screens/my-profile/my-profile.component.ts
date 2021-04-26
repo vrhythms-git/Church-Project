@@ -54,9 +54,9 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       nickName: new FormControl('', Validators.required),
       baptismalName: new FormControl('', Validators.required),
       dob: new FormControl('', [Validators.required]),
-      homePhoneNo: new FormControl('', [Validators.required]),
-      mobileNo: new FormControl('', [Validators.required]),
-      emailId: new FormControl('', [Validators.required]),
+      homePhoneNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
+      mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
+      emailId: new FormControl('',[Validators.required, Validators.email]),
       addressLine1: new FormControl('', Validators.required),
       addressLine2: new FormControl('', Validators.required),
       addressLine3: new FormControl('', Validators.required),
@@ -95,11 +95,11 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
 
 
 
-      // this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
-      //   console.log('These are users from database : ');
-      //   console.log(res.data.metaData);
-      //   //this.alluserdata = res.data.metaData;
-      // });
+       this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
+         console.log('These are users from database : ');
+         console.log(res.data.metaData);
+         this.alluserdata = res.data.metaData;
+       });
 
       this.apiService.getParishListData().subscribe(res => {
         for (let i = 0; i < res.data.metaData.Parish.length; i++) {
@@ -115,7 +115,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       })
 
       this.myprofileform.patchValue({
-        country: this.alluserdata.country,
+       country: this.alluserdata.country,
         title: this.alluserdata.title,
         firstName: this.alluserdata.firstName,
         middleName: this.alluserdata.middleName,
@@ -142,7 +142,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
     } if (this.isApprovedUserLoggedIn == false) {
 
       this.signUpForm = this.formBuilder.group({
-        title: new FormControl('', Validators.required),
+        title : new FormControl('',Validators.required),
         firstName: new FormControl('', Validators.required),
         lastName: new FormControl('', Validators.required),
         email: new FormControl('', [Validators.required, Validators.email]),
@@ -150,8 +150,8 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
         password: new FormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[@])(?=.*?[0-9]).{8,}$')]),
         cnfmpwd: new FormControl('', Validators.required),
         mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
-        memberType: new FormControl('', Validators.required),
-        orgId: new FormControl('', Validators.required),
+        memberType : new FormControl('',Validators.required),
+        orgId: new FormControl('',Validators.required),
         abtyrslf: new FormControl('')
       });
 
@@ -188,6 +188,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
         middleName: e.middleName,
         lastName: e.lastName,
         relationship: e.relationship,
+        baptismalName: e.baptismalName,
         dob: e.dob,
         mobileNo: e.mobileNo,
         emailId: e.emailId
@@ -203,14 +204,15 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
 
   addfamilyMembers(): FormGroup {
     return this.formBuilder.group({
-      title: '',
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      relationship: '',
-      dob: '',
-      mobileNo: '',
-      emailId: ''
+      title: new FormControl('', Validators.required),
+      firstName: new FormControl('', Validators.required),
+      middleName: new FormControl('', Validators.required),
+      lastName: new FormControl('', Validators.required),
+      relationship: new FormControl('', Validators.required),
+      baptismalName: new FormControl('', Validators.required),
+      dob: new FormControl('', Validators.required),
+      mobileNo: new FormControl('', [Validators.pattern('[0-9].{9}')]),
+      emailId: new FormControl('',[Validators.required, Validators.email]),
     });
   }
 
@@ -287,9 +289,9 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
     }
   }
 
-
+  isStateDataSet = false;
   keyPress(event: any) {
-    //this.isStateDataSet = false;
+  this.isStateDataSet = false;
     const pattern = /[0-9\+\-\ ]/;
 
     let inputChar = String.fromCharCode(event.charCode);

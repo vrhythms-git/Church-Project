@@ -48,9 +48,9 @@ export class ApprovalRequestsComponent implements OnInit {
       nickName: new FormControl('',),
       batismalName: new FormControl(''),
       dob: new FormControl('', [Validators.required]),
-      mobileNo: new FormControl('', [Validators.required]),
-      homePhoneNo: new FormControl(''),
-      emailAddress: new FormControl(''),
+      mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
+      homePhoneNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
+      emailAddress: new FormControl('',[Validators.required, Validators.email]),
       addressLine1: new FormControl('', Validators.required),
       addressLine2: new FormControl(''),
       addressLine3: new FormControl(''),
@@ -61,7 +61,7 @@ export class ApprovalRequestsComponent implements OnInit {
       parish: new FormControl('', Validators.required),
       maritalStatus: new FormControl('', Validators.required),
       dateofMarriage: new FormControl(''),
-      about_urself: new FormControl(''),
+      aboutYourself: new FormControl(''),
       isFamilyHead: new FormControl(''),
     })
 
@@ -151,7 +151,7 @@ export class ApprovalRequestsComponent implements OnInit {
       parish: this.selectedUserData.parish_name,
       maritalStatus: this.selectedUserData.maritalStatus,
       dateofMarriage: this.selectedUserData.dateofMarriage,
-      about_urself: this.selectedUserData.about_urself,
+      aboutYourself: this.selectedUserData.aboutYourself,
       isFamilyHead: this.selectedUserData.isFamilyHead
     })
   }

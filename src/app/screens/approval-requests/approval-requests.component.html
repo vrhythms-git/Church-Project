@@ -87,18 +87,30 @@
                                 <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
                                 <input id="mobileNo" matInput formControlName="mobileNo" ng2TelInput length="10"
                                     placeholder="Enter Mobile Number" />
+                                    <mat-error *ngIf="reqDisableForm.controls.mobileNo.touched && reqDisableForm.controls.mobileNo.invalid">
+                                        <span *ngIf="reqDisableForm.controls.mobileNo.errors.required">This field is mandatory.</span>
+                                        <span *ngIf="reqDisableForm.controls.mobileNo.errors.pattern">Enter 10 digit number.</span>
+                                    </mat-error>
                             </mat-form-field>
                             <mat-form-field class="col-md-4">
                                 <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
                                 <input id="homePhoneNo" matInput formControlName="homePhoneNo" ng2TelInput length="10"
                                     placeholder="Enter Home Phone Number" />
+                                    <mat-error *ngIf="reqDisableForm.controls.homePhoneNo.touched && reqDisableForm.controls.homePhoneNo.invalid">
+                                        <span *ngIf="reqDisableForm.controls.homePhoneNo.errors.required">This field is mandatory.</span>
+                                        <span *ngIf="reqDisableForm.controls.homePhoneNo.errors.pattern">Enter 10 digit number.</span>
+                                    </mat-error>
                             </mat-form-field>
 
                             <mat-form-field class="col-md-4">
                                 <mat-label>Email Address</mat-label>
                                 <input id="emailAddress" matInput formControlName="emailAddress"
                                     placeholder="Enter Email Address" readonly />
-                            </mat-form-field>
+                                    <mat-error *ngIf="reqDisableForm.controls.emailAddress.touched && reqDisableForm.controls.emailAddress.invalid">
+                                        <span *ngIf="reqDisableForm.controls.emailAddress.errors.required">This field is mandatory.</span>
+                                        <span *ngIf="reqDisableForm.controls.emailAddress.errors.pattern">invalid email id.</span>
+                                    </mat-error>
+                                </mat-form-field>
                         </div>
                         <div class="row">
                             <mat-form-field class="col-md-12">
@@ -173,8 +185,8 @@
                         <div class="row">
                             <mat-form-field class="col-md-12">
                                 <mat-label>About Yourself</mat-label>
-                                <textarea id="about_urself" matInput formControlName="about_urself"
-                                    placeholder="About Yourself"></textarea>
+                                <textarea id="aboutYourself" matInput formControlName="aboutYourself"
+                                    placeholder="About Your self"></textarea>
                             </mat-form-field>
                         </div>
 

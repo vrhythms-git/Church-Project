@@ -67,7 +67,7 @@
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md">
                                                                 <mat-label>Baptismal Name</mat-label>
-                                                                <input id="batismalName" matInput formControlName="batismalName" />
+                                                                <input id="baptismalName" matInput formControlName="baptismalName" />
                                                         </mat-form-field>
                                                         <mat-form-field class="col-md">
                                                                 <mat-label>Date of Birth</mat-label>
@@ -87,7 +87,7 @@
                                                                         </mat-form-field>
                                                         <mat-form-field class="col-md-4">
                                                                 <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
-                                                                <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput (ng2TelOutput)="getHomePhoneNumber($event)" length="10" placeholder="Enter Home Phone Number" />
+                                                                <input id="homePhoneNo" matInput formControlName="homePhoneNo"  ng2TelInput (ng2TelOutput)="getHomePhoneNumber($event)" maxLength="10" minLength="10" (keypress)="keyPress($event)" placeholder="Enter Home Phone Number" />
                                                                 <mat-error *ngIf="updateuserinfo.controls.homePhoneNo.touched && updateuserinfo.controls.homePhoneNo.invalid">
                                                                         <span *ngIf="updateuserinfo.controls.homePhoneNo.errors.required">This field is mandatory.</span>
                                                                         <span *ngIf="updateuserinfo.controls.homePhoneNo.errors.pattern">Enter 10 digit number.</span>
@@ -97,6 +97,10 @@
                                                         <mat-form-field class="col-md-4">
                                                                 <mat-label>Email Address</mat-label>
                                                                 <input id="emailAddress" matInput formControlName="emailAddress" placeholder="Enter Email Address" readonly/>
+                                                                <mat-error *ngIf="updateuserinfo.controls.emailAddress.touched && updateuserinfo.controls.emailAddress.invalid">
+                                                                        <span *ngIf="updateuserinfo.controls.emailAddress.errors.required">This field is mandatory.</span>
+                                                                        <span *ngIf="updateuserinfo.controls.emailAddress.errors.pattern">invalid email id.</span>
+                                                                    </mat-error>
                                                         </mat-form-field>
                                                 </div>
                                                 <div class="row">
@@ -166,7 +170,7 @@
                                                 <div class="row">
                                                         <mat-form-field class="col-md-12">
                                                                 <mat-label>About Yourself</mat-label>
-                                                                <textarea id="about_urself" matInput formControlName="about_urself" placeholder="About Yourself"></textarea>
+                                                                <textarea id="aboutYourself" matInput formControlName="aboutYourself" placeholder="About Your self"></textarea>
                                                         </mat-form-field>
                                                 </div>
 

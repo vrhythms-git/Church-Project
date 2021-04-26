@@ -256,7 +256,7 @@ async function processGetUserMetaDataRequest(uid) {
             metaData.orgId = res.rows[0].org_id;
             metaData.membershipType = res.rows[0].membership_type
             metaData.lastLoggedIn = lastLoggedInRes.rows[0].last_logged_in 
-
+            metaData.mobile_no = res.rows[0].mobile_no;
 
             if (res.rows[0].is_approved == true) {
 
@@ -401,6 +401,7 @@ async function getuserRecords(userType, loggedInUser) {
                         vu.marital_status,
                         vu.date_of_marriage,
                         vu.about_yourself,
+                        vu.is_family_head,
                         vu.role_id,
                         vu.user_org_id org_id,
                         vu.user_org_type org_type,
@@ -497,10 +498,11 @@ async function getuserRecords(userType, loggedInUser) {
                     user.postalCode = row.postal_code;
                     user.country = row.country;
                     user.homePhoneNo = row.home_phone_no;
-                    user.baptismalNname = row.baptismal_name;
+                    user.baptismalName = row.baptismal_name;
                     user.maritalStatus = row.marital_status;
                     user.dateofMarriage = row.date_of_marriage;
                     user.aboutYourself = row.about_yourself;
+                    user.isFamilyHead = row.is_family_head;
                     user.roleId = row.role_id;
                     user.orgId = row.org_id;
                     user.orgType = row.org_type;

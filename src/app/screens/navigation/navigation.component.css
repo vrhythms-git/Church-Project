@@ -1,8 +1,13 @@
 h1{
 font-family: poppins;
 }
+h6{
+    font-size:medium;
+    font-family: poppins;
+}
 h3{
-    font-size:small
+    font-size:x-small;
+    font-family: poppins;
 }
 .ProfileInfo { width: 170px; }
 

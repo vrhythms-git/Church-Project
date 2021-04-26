@@ -67,19 +67,31 @@
       <div class="row">
         <mat-form-field class="col-md-4">
           <mat-label style="padding-left: 15%;">Mobile Number</mat-label>
-          <input id="mobileNo" matInput formControlName="mobileNo" ng2TelInput length="10"
+          <input id="mobileNo" matInput formControlName="mobileNo" ng2TelInput  length="10" (keypress)="keyPress($event)"
             placeholder="Enter Mobile Number" />
+            <mat-error *ngIf="myprofileform.controls.mobileNo.touched && myprofileform.controls.mobileNo.invalid">
+              <span *ngIf="myprofileform.controls.mobileNo.errors.required">This field is mandatory.</span>
+              <span *ngIf="myprofileform.controls.mobileNo.errors.pattern">Enter 10 digit number.</span>
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field class="col-md-4">
           <mat-label style="padding-left: 15%;">Home Phone Number</mat-label>
-          <input id="homePhoneNo" matInput formControlName="homePhoneNo" ng2TelInput length="10"
+          <input id="homePhoneNo" matInput formControlName="homePhoneNo" ng2TelInput  length="10" (keypress)="keyPress($event)"
             placeholder="Enter Home Phone Number" />
+            <mat-error *ngIf="myprofileform.controls.homePhoneNo.touched && myprofileform.controls.homePhoneNo.invalid">
+              <span *ngIf="myprofileform.controls.homePhoneNo.errors.required">This field is mandatory.</span>
+              <span *ngIf="myprofileform.controls.homePhoneNo.errors.pattern">Enter 10 digit number.</span>
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field class="col-md-4">
           <mat-label>Email Address</mat-label>
           <input id="emailId" matInput formControlName="emailId" placeholder="Enter Email Address" />
+          <mat-error *ngIf="myprofileform.controls.emailId.touched && myprofileform.controls.emailId.invalid">
+            <span *ngIf="myprofileform.controls.emailId.errors.required">This field is mandatory.</span>
+            <span *ngIf="myprofileform.controls.emailId.errors.pattern">Enter valid email id.</span>
+        </mat-error>
         </mat-form-field>
       </div>
       <div class="row">
@@ -280,11 +292,19 @@
                   <!-- <input id="mobileNo" matInput formControlName="mobileNo" placeholder="Enter Mobile No" ng2TelInput length="10"/>                  -->
                   <input matInput type="text" ng2TelInput formControlName="mobileNo" id="mobileNo" maxLength="10"
                     minLength="10" required style="width: fit-content;" />
+                    <mat-error *ngIf="myprofileform.controls.mobileNo.touched && myprofileform.controls.mobileNo.invalid">
+                      <span *ngIf="myprofileform.controls.mobileNo.errors.required">This field is mandatory.</span>
+                      <span *ngIf="myprofileform.controls.mobileNo.errors.pattern">Enter 10 digit number.</span>
+                  </mat-error>
                 </mat-form-field>
 
                 <mat-form-field class="col-md-4" style="padding-right: 2%;">
                   <mat-label>Email Address</mat-label>
                   <input required id="emailId" matInput formControlName="emailId" placeholder="Enter Email Address" />
+                  <mat-error *ngIf="myprofileform.controls.emailId.touched && myprofileform.controls.emailId.invalid">
+                    <span *ngIf="myprofileform.controls.emailId.errors.required">This field is mandatory.</span>
+                    <span *ngIf="myprofileform.controls.emailId.errors.pattern">Enter valid mailid.</span>
+                </mat-error>
                 </mat-form-field>
               </div>
             </div>
