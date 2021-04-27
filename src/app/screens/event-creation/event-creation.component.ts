@@ -122,23 +122,9 @@ export class EventCreationComponent implements OnInit {
     //   endDate: this.eventsDataFormGroup.endDate
     // });
 
-    this.apiService.getEventsData().subscribe((res) => {
-      console.log('These are all the events from database : ');
-      console.log(res.data.metaData);
-      this.rowData = res.data.metaData.eventData;
-      this.eventId = res.data.metaData.eventData[0].event_Id;
-      console.log("Event Id is : " +this.eventId);
-
-      //this.events = this.rowData
+    this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}`).subscribe((res)=> {
+      console.log("event Id data : " + res.data.eventData);
     });
-
-    this.apiService.getEventById(this.eventId).subscribe((res) => {
-      console.log(res.data.metaData);
-    });
-
-    // this.apiService.callGetService(getEventById?id=this.selectedRowJson.eventId).subscribe((res)=> {
-    //   console.log("event Id data : " + res.data.metaData);
-    // });
 
   }
 

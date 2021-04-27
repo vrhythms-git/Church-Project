@@ -212,16 +212,6 @@ export class ApiService {
     return this.http.get(`${this._baseUrl}/getEventForRegistration`);
   }
 
-  getEventById(eventId: any): Observable<any> {
-    console.log(`calling the getEventById()`);
-    // let headerObj = new HttpHeaders({
-    //   'Authorization': localStorage.getItem('cormUserTokenId')!,
-    //   'Content-Type': 'application/json'
-    // });
-    console.log('user data is : ' + this.http.get(`${this._baseUrl}/getEventById`), eventId);
-    return this.http.get(`${this._baseUrl}/getEventById?type=$loggedInUser=` + eventId);
-
-  }
 
 }
 
