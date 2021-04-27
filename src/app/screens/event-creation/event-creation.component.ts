@@ -401,24 +401,37 @@ export class EventCreationComponent implements OnInit {
       if (this.categoriesDataFormGroup.value.categories.length == 0) {
         this.uiCommonUtils.showSnackBar("Event should atleast have one category!", "error", 3000);
       }
+      else {
+        let eventCreationForm: any = {};
+        eventCreationForm = { ...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value }
+        console.log("this.eventCreationForm", eventCreationForm);
+        this.apiService.insertevents({ data: eventCreationForm }).subscribe((res: any) => {
+          if (res.data.status == "success") {
+            this.uiCommonUtils.showSnackBar("Event Created Successfully!", "success", 3000);
+          }
+          else
+            this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
+        });
+      }
     }
     else if (this.eventsDataFormGroup.value.eventType == 'CWC') {
       if (this.venuesDataFormGroup.value.venues.length == 0) {
         this.uiCommonUtils.showSnackBar("Event should atleast have one venue!", "error", 3000);
       }
+      else {
+        let eventCreationForm: any = {};
+        eventCreationForm = { ...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value }
+        console.log("this.eventCreationForm", eventCreationForm);
+        this.apiService.insertevents({ data: eventCreationForm }).subscribe((res: any) => {
+          if (res.data.status == "success") {
+            this.uiCommonUtils.showSnackBar("Event Created Successfully!", "success", 3000);
+          }
+          else
+            this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
+        });
+      }
     }
-    else {
-      let eventCreationForm: any = {};
-      eventCreationForm = { ...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value }
-      console.log("this.eventCreationForm", eventCreationForm);
-      this.apiService.insertevents({ data: eventCreationForm }).subscribe((res: any) => {
-        if (res.data.status == "success") {
-          this.uiCommonUtils.showSnackBar("Event Created Successfully!", "success", 3000);
-        }
-        else
-          this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
-      });
-    }
+    
 
 
   }
@@ -428,23 +441,36 @@ export class EventCreationComponent implements OnInit {
       if (this.categoriesDataFormGroup.value.categories.length == 0) {
         this.uiCommonUtils.showSnackBar("Event should atleast have one category!", "error", 3000);
       }
+      else {
+        let eventCreationForm: any = {};
+        eventCreationForm = { ...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value }
+        console.log("this.eventCreationForm", eventCreationForm);
+        this.apiService.updateEvent({ data: eventCreationForm }).subscribe((res: any) => {
+          if (res.data.status == "success") {
+            this.uiCommonUtils.showSnackBar("Event Updated Successfully!", "success", 3000);
+          }
+          else
+            this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
+        });
+      }
     }
     else if (this.eventsDataFormGroup.value.eventType == 'CWC') {
       if (this.venuesDataFormGroup.value.venues.length == 0) {
         this.uiCommonUtils.showSnackBar("Event should atleast have one venue!", "error", 3000);
       }
+      else {
+        let eventCreationForm: any = {};
+        eventCreationForm = { ...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value }
+        console.log("this.eventCreationForm", eventCreationForm);
+        this.apiService.updateEvent({ data: eventCreationForm }).subscribe((res: any) => {
+          if (res.data.status == "success") {
+            this.uiCommonUtils.showSnackBar("Event Updated Successfully!", "success", 3000);
+          }
+          else
+            this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
+        });
+      }
     }
-    else {
-      let eventCreationForm: any = {};
-      eventCreationForm = { ...this.eventsDataFormGroup.value, ...this.venuesDataFormGroup.value, ...this.categoriesDataFormGroup.value, ...this.questionnaireDataFormGroup.value }
-      console.log("this.eventCreationForm", eventCreationForm);
-      this.apiService.updateEvent({ data: eventCreationForm }).subscribe((res: any) => {
-        if (res.data.status == "success") {
-          this.uiCommonUtils.showSnackBar("Event Updated Successfully!", "success", 3000);
-        }
-        else
-          this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
-      });
-    }
+   
   }
 }
