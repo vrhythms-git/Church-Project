@@ -55,6 +55,7 @@ async function getEventById(eventId) {
                 event.startDate = result.rows[0].event_start_date;
                 event.endDate = result.rows[0].event_end_date;
                 event.orgType = result.rows[0].org_type;
+                event.eventUrl = result.rows[0].event_url;
 
                 let category = {};
                 let venue = {};
