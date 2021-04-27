@@ -20,8 +20,8 @@ export class EventCreationComponent implements OnInit {
   venuesDataFormGroup: any;
   categoriesDataFormGroup: any;
   questionnaireDataFormGroup: any;
-  eventId:any;
-  rowData:any;
+  eventId: any;
+  rowData: any;
 
   selectedRegion: any;
   venues: any;
@@ -31,7 +31,8 @@ export class EventCreationComponent implements OnInit {
   orgId: any;
   userId: any;
   selectedOrg: any;
-  orgDetails!: any;
+  orgDetails: any;
+  eventsDataUpdate: any;
 
   orgs!: any[];
   isLinear!: boolean;
@@ -54,7 +55,7 @@ export class EventCreationComponent implements OnInit {
   isJudgeRequired: any;
   isSchoolGradeRequired: any;
   public myreg = /(^|\s)((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi
-  minDate = new Date(); 
+  minDate = new Date();
   selectedRowJson: any = {};
   constructor(private apiService: ApiService,
     private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils, private eventDataService: EventDataService) { }
@@ -80,18 +81,15 @@ export class EventCreationComponent implements OnInit {
       registrationEndDate: new FormControl('', Validators.required),
       eventUrl: new FormControl('', [Validators.required, Validators.pattern(this.myreg)]),
       description: new FormControl('', Validators.required),
-    }),//{validator: this.checkDates}); //to compare event registration dates
+    });//{validator: this.checkDates}); //to compare event registration dates
 
-
-      this.venuesDataFormGroup = this.formBuilder.group({
+    this.venuesDataFormGroup = this.formBuilder.group({
         venues: this.formBuilder.array([this.adduserVenuAndProcter()])
-      });
+    });
 
     this.categoriesDataFormGroup = this.formBuilder.group({
       categories: this.formBuilder.array([this.addeventCategory()])
     });
-
-
 
     this.questionnaireDataFormGroup = this.formBuilder.group({
       questionnaire: this.formBuilder.array([this.adduserquestionary()])
@@ -101,7 +99,6 @@ export class EventCreationComponent implements OnInit {
       this.regionList = res.data.metaData.regions;
       console.log("regionList", this.regionList);
     });
-
 
     this.apiService.getEventType().subscribe((res: any) => {
       this.eventList = res.data.metaData.eventType;
@@ -122,9 +119,45 @@ export class EventCreationComponent implements OnInit {
     //   endDate: this.eventsDataFormGroup.endDate
     // });
 
-    this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}`).subscribe((res)=> {
+    this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}`).subscribe((res) => {
       console.log("event Id data : " + res.data.eventData);
+      this.eventsDataUpdate = res.data.eventData;
+
+      if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
+        console.log("Patch Values event_Id = " + this.selectedRowJson.event_Id);
+        this.eventsDataFormGroup.patchValue({
+          name: this.eventsDataUpdate.name,
+          eventType: this.eventsDataUpdate.eventType,
+          orgType: this.eventsDataUpdate.orgType,
+          orgId: this.eventsDataUpdate.orgId,   // array
+          startDate: this.eventsDataUpdate.startDate,
+          endDate: this.eventsDataUpdate.endDate,
+          registrationStartDate: this.eventsDataUpdate.registrationStartDate,
+          registrationEndDate: this.eventsDataUpdate.registrationEndDate,
+          //eventUrl: this.eventsDataUpdate.orgId,
+          description: this.eventsDataUpdate.description,
+        });
+  
+        this.venuesDataFormGroup.patchValue({
+          venues: this.eventsDataUpdate.venues // array
+        });
+  
+        this.categoriesDataFormGroup.patchValue({
+          categories: this.eventsDataUpdate.categories // array
+        });
+  
+        this.questionnaireDataFormGroup.patchValue({
+          questionnaire: this.eventsDataUpdate.questionnaire // array
+        });
+  
+      }
+
+
+
     });
+
+    
+  
 
   }
 
