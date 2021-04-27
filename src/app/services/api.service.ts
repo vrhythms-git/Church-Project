@@ -148,7 +148,7 @@ export class ApiService {
   }
 
   insertevents(eventsData: any) {
-    console.log("update User Profile Called..")
+    console.log("insertevents api Called..")
     let headerObj = new HttpHeaders({
       'Authorization': localStorage.getItem('chUserToken')!,
       'Content-Type': 'application/json'
@@ -210,6 +210,18 @@ export class ApiService {
     });
     console.log('getEventForRegistration Data data is : ' + this.http.get(`${this._baseUrl}/getEventForRegistration`));
     return this.http.get(`${this._baseUrl}/getEventForRegistration`);
+  }
+
+  
+  updateEvent(eventsData: any) {
+    console.log("updateEvent api Called..")
+    let headerObj = new HttpHeaders({
+      'Authorization': localStorage.getItem('chUserToken')!,
+      'Content-Type': 'application/json'
+    });
+    console.log('headers set to ' + JSON.stringify(headerObj))
+    console.log(JSON.stringify(eventsData));
+    return this.http.post(`${this._baseUrl}/updateEvent`, JSON.stringify(eventsData), { headers: headerObj });
   }
 
 

@@ -284,7 +284,7 @@
                                                     <mat-form-field class="col-md-12">
                                                         <mat-select required multiple id="eventCategoryVenue"
                                                             formControlName="venueId" placeholder="Select Venues">
-                                                            <mat-option *ngFor="let venue of venuesList"
+                                                            <mat-option *ngFor="let venue of newVenues"
                                                                 [value]="venue.venueId">{{venue.venueName}}</mat-option>
                                                         </mat-select>
                                                     </mat-form-field>
@@ -380,10 +380,17 @@
                         <button mat-button matStepperNext>Next</button>
                       </div> -->
 
-                        <div class="row" style="padding-top: 1%;">
+                        <div *ngIf="!eventFormLabel" class="row" style="padding-top: 1%;">
                             <div class="col text-center">
                                 <button mat-raised-button type="submit" class="mbutton" (click)="createEvent()">
                                     Create Event</button>
+                            </div>
+                        </div>
+
+                        <div *ngIf="eventFormLabel" class="row" style="padding-top: 1%;">
+                            <div class="col text-center">
+                                <button mat-raised-button type="submit" class="mbutton" (click)="updateEvent()">
+                                    Update Event</button>
                             </div>
                         </div>
 
