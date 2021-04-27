@@ -36,6 +36,7 @@ export class EventCreationComponent implements OnInit {
 
   orgs!: any[];
   isLinear!: boolean;
+  eventFormLabel!: boolean;
   venuesdataOfdata!: any[];
   venuesList!: any[];
   eventList!: any[];
@@ -69,6 +70,7 @@ export class EventCreationComponent implements OnInit {
     this.alluserdata = this.uiCommonUtils.getUserMetaDataJson();
     this.orgId = this.alluserdata.orgId;
     this.userId = this.alluserdata.userId;
+   
 
     this.eventsDataFormGroup = this.formBuilder.group({
       name: new FormControl('', Validators.required),
@@ -122,6 +124,7 @@ export class EventCreationComponent implements OnInit {
     this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}`).subscribe((res) => {
       console.log("event Id data : " + res.data.eventData);
       this.eventsDataUpdate = res.data.eventData;
+    
 
       if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
         console.log("Patch Values event_Id = " + this.selectedRowJson.event_Id);
@@ -138,25 +141,38 @@ export class EventCreationComponent implements OnInit {
           description: this.eventsDataUpdate.description,
         });
   
+        if(this.eventsDataUpdate.venues != null){
         this.venuesDataFormGroup.patchValue({
           venues: this.eventsDataUpdate.venues // array
         });
+      }
   
+      if(this.eventsDataUpdate.categories != null){
         this.categoriesDataFormGroup.patchValue({
           categories: this.eventsDataUpdate.categories // array
         });
-  
+      }
+
+
+      if(this.eventsDataUpdate.questionnaire != null){
         this.questionnaireDataFormGroup.patchValue({
           questionnaire: this.eventsDataUpdate.questionnaire // array
         });
+      }
   
       }
 
+      if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
+        this.eventFormLabel = true;
+      }
+      else{
+        this.eventFormLabel = false;
+      }
+      this.selectedRowJson.event_Id = null;
 
 
     });
 
-    
   
 
   }

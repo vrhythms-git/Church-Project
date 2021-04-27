@@ -1,6 +1,7 @@
 <div class="container mt-4">
     <mat-card class="shadow">
-        <h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;">Create Event</h1>
+        <h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;" *ngIf="!eventFormLabel">Create Event</h1>
+        <h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;" *ngIf="eventFormLabel">Update Event</h1>
 
         <mat-vertical-stepper [linear]="true" #stepper>
 
