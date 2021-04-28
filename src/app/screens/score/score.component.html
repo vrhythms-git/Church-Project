@@ -32,16 +32,33 @@
                     </button>
                     <!-- (click)="" -->
                 </div>
-                <div class="modal-body p-4 border m-3 rounded">
+                <div class="modal-body border rounded">
                     <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3"
                         [rowData]="participantRowData | filter:term " [columnDefs]="participantColumnDefs" [pagination]="true"
-                        rowSelection='multiple'
                         [checkboxSelection]="true" [gridOptions]="participantGridOptions">
                          (selectionChanged)="onSelectionChanged($event)" 
                             (rowClicked)='onRowClicked($event)'
 
-                            <!-- (gridReady)="onGridReady($event)"  -->
+                            <!-- (gridReady)="onGridReady($event)"  
+                             rowSelection='multiple'
+                            -->
                     </ag-grid-angular>
+                    <div style="padding: 9px; text-align-last: center;">
+                        <button mat-button class="ml-auto border" style="background: #d68165;" data-dismiss="modal" >  
+                           Cancel
+                            <!-- <mat-icon>clear</mat-icon> -->
+                        </button>
+
+                        <button mat-button class="ml-auto border" (click)="handleScoreSaveBtnClick($event)" style="background: #d68165;">  
+                            Save
+                             <!-- <mat-icon>clear</mat-icon> -->
+                         </button>
+
+                         <button mat-button class="ml-auto border" style="background: #d68165;">  
+                            Complete
+                             <!-- <mat-icon>clear</mat-icon> -->
+                         </button>
+                    </div>
                 </div>
             </div>
         </div>

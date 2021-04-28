@@ -696,10 +696,16 @@ async function getEventForRegistration() {
     await client.connect();
     try {
         let metadata = {};
-        let getEventForRegistration = `select distinct  event_id, event_name, event_type, event_desciption, event_start_date, event_end_date from v_event ve where 
-                                            ve.registration_start_date <= current_date
+        let getEventForRegistration = `select distinct  event_id, event_name, event_type, event_desciption, event_start_date, event_end_date, registration_start_date, registration_end_date
+                                        from v_event ve
+                                        where
+                                        ve.event_id not in (select event_id 
+                                                                from t_event_participant_registration tepr 
+                                                                where tepr.user_id = 1223
+                                                            )
+                                        and  ve.registration_start_date <= current_date
                                         and  ve.registration_end_date >= current_date
-                                        and ve.is_deleted = false;`;
+                                        and  ve.is_deleted = false;`;
         let res = await client.query(getEventForRegistration);
         if (res && res.rowCount > 0) {
             console.log("In Event response : " + res);

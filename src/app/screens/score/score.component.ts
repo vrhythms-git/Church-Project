@@ -23,10 +23,10 @@ export class ScoreComponent implements OnInit {
   term: any;
   eventGridOption: any;
 
-  participantRowData:any;
-  participantColumnDefs:any;
-  participantGridOptions:any;
-  
+  participantRowData: any;
+  participantColumnDefs: any;
+  participantGridOptions: any;
+
   ngOnInit(): void {
 
     this.eventGridOption = {
@@ -54,19 +54,30 @@ export class ScoreComponent implements OnInit {
     }
 
     this.eventColumnDefs = [
-      { headerName: 'Event Name', field: 'name', sortable: true, filter: true,  checkboxSelection: true },
-      { headerName: 'Event Type', field: 'event_type', sortable: true, filter: true,  },
+      { headerName: 'Event Name', field: 'name', resizable: true, sortable: true, filter: true, checkboxSelection: true },
+      { headerName: 'Event Type', field: 'event_type', resizable: true, sortable: true, filter: true, },
       // { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
       // { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 450 },
-      { headerName: 'Upload Score', field: 'action', cellRendererFramework: ScoreUploadComponent, width: 170 }
+      { headerName: 'Upload Score', field: 'action', resizable: true, cellRendererFramework: ScoreUploadComponent, width: 170 }
     ];
 
     this.participantColumnDefs = [
-      { headerName: 'Enrollment Id', field: 'enrollmentId', sortable: true, filter: true,  checkboxSelection: true },
+      { headerName: 'Enrollment Id', field: 'enrollmentId', resizable: true, sortable: true, filter: true, checkboxSelection: true },
       // { headerName: 'School Grade', field: 'schoolGrade', sortable: true, filter: true },
-      { headerName: 'Category', field: 'category', sortable: true, filter: true,  },
+      { headerName: 'Category', field: 'category', sortable: true, resizable: true, filter: true, },
       // { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 450 },
-      { headerName: 'Score', field: 'action', cellRendererFramework: ScoreUploadInputComponent }
+      {
+        headerName: 'Score', field:'score', flex: 1, width:50, editable: true, resizable: true,
+
+        valueGetter: function (params:any) {
+            return params.data.score;
+        },
+        valueSetter: function (params:any) {
+          params.data.score = params.newValue;
+          return true; 
+        },
+
+      }
     ];
 
     let userId = this.uiCommonUtils.getUserMetaDataJson().userId
@@ -88,19 +99,48 @@ export class ScoreComponent implements OnInit {
 
   }
 
-  
+
   onRowClicked(event: any) {
     $("#imagemodal").modal("show");
-          
-          this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}`).subscribe((respData) => {
 
-            if (respData.data.status == 'failed') {
-              this.participantRowData = [];
-              this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
-              return;
-            }else
-              this.participantRowData = respData.data.paticipants  
-          });
+    this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}`).subscribe((respData) => {
+
+      if (respData.data.status == 'failed') {
+        this.participantRowData = [];
+        this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
+        return;
+      } else
+        this.participantRowData = respData.data.paticipants
+    });
+  }
+
+  handleScoreSaveBtnClick(event: any) {
+    //this.participantGridOptions.api.forEachNode(this.printNode);
+
+    const firstRowNode = this.participantGridOptions.api.getDisplayedRowAtIndex(0);
+    const params = { columns: ['Score'], rowNodes: [firstRowNode] };
+    const instances = this.participantGridOptions.api.getCellRendererInstances(params);
+
+  }
+
+  printNode(node: any, index: number) {
+    // if (node.group) {
+    //   console.log(index + ' -> group: ' + node);
+    // } else {
+    //   console.log(
+    //     index + ' -> data: ' + node
+    //   );
+    // }
+
+    const firstRowNode = this.participantGridOptions.api.getDisplayedRowAtIndex(0);
+    const params = { columns: ['Score'], rowNodes: [firstRowNode] };
+    const instances = this.participantGridOptions.api.getCellRendererInstances(params);
+
+    if (instances.length > 0) {
+      // got it, user must be scrolled so that it exists
+      const instance = instances[0];
+    }
+
   }
 }
 

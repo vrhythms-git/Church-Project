@@ -3,6 +3,7 @@ const processUserRequest = require(`${__dirname}/userReqOperations`)
 const processMiscRequest = require(`${__dirname}/miscReqOperations`)
 const processEventTemp = require(`${__dirname}/reqEventTemp`)
 const processEventRequest = require(`./eventReqOperations`)
+const processScoreRequest = require(`./reqScoreOperations`)
 const dbConnections = require(`${__dirname}/dbConnection`);
 express = require('express')
 const cors = require('cors')
@@ -10,6 +11,7 @@ var app = express();
 var compression = require('compression')
 const path = require('path');
 const { ConsoleReporter } = require('jasmine');
+const { post } = require('jquery');
 
 let port = 8081;
 
@@ -544,8 +546,9 @@ app.post('/api/registerEvent', function (req, res) {
 
 app.get('/api/getParticipants', function (req, res) {
   console.log("getParticipants called...");
+  let loggedInUser =  decodeUser(req)
   try {
-    processEventTemp.getParticipant(req.query.event)
+    processEventTemp.getParticipant(req.query.event, loggedInUser)
       .then((data) => {
         res.send(data);
         res.end();
@@ -558,18 +561,30 @@ app.get('/api/getParticipants', function (req, res) {
   }
 });
 
+app.post('/api/postScore', function (req, res) {
+  console.log("postScore called...");
+  let loggedInUser =  decodeUser(req)
+  try {
+    processScoreRequest.persistParticipantScore(req.body.data, loggedInUser)
+      .then((data) => {
+        //console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        //console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in updateBasicProfile as : ' + error)
+  }
+});
 
 
-// let client = dbConnections.getConnection();
-// try {
-//   client.connect();
-//   client.query('SELECT * FROM test;', (err, res) => {
-//     if (err) throw console.log(err);
-//     for (let row of res.rows) {
-//       console.log(JSON.stringify(row));
-//     }
-//     client.end()
-//   });
-// } catch (error) {
-//   console.error('error executing query as : ' + error);
-// }
+
+//to decode loggedin user Id from the request context.
+function decodeUser(reqContext) {
+  let userId = reqContext.header('User').toString();
+  let bufferObj = Buffer.from(userId, "base64");
+  return bufferObj.toString("utf8");
+}

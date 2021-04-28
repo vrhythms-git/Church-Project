@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { uiCommonUtils } from '../common/uiCommonUtils'
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class ApiService {
     })
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private uiCommonUtils:uiCommonUtils) { }
   // private _baseUrl = 'https://cormentis.herokuapp.com';
   private _baseUrl = 'http://localhost:8081/api';
 
@@ -32,9 +33,9 @@ export class ApiService {
     console.log(`callGetService called..`)
     let headerObj = new HttpHeaders({
       'Authorization': localStorage.getItem('chUserToken')!,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'User': btoa(this.uiCommonUtils.getUserMetaDataJson().userId)
     });
-   // console.log('headers set to ' + JSON.stringify(headerObj))
     return this.http.get(`${this._baseUrl}/${endPoint}`, { headers: headerObj });
   }
 
@@ -42,8 +43,9 @@ export class ApiService {
     console.log(`postService called`)
     let headerObj = new HttpHeaders({
       'Authorization': localStorage.getItem('chUserToken')!,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     });
+    
     return this.http.post(`${this._baseUrl}/${endPoint}`,{data:payload},{ headers: headerObj });
   }
 

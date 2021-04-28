@@ -332,26 +332,43 @@ async function eventRegistration(eventData) {
     }
 }
 
-async function getParticipant(eventId) {
-    console.log('fetching participants for event ' + eventId);
+async function getParticipant(eventId, userId) {
+    console.log('fetching participants for event ' + eventId +', user : '+userId);
 
     let client = dbConnections.getConnection();
     try {
         await client.connect();
         const getPaticipantQuery = `select jsonb_agg(
-                                        jsonb_build_object(
-                                        'regId', ereg.event_participant_registration_id,
-                                        'enrollmentId',  ereg.enrollment_id,
-                                        'schoolGrade', ereg.school_grade,
-                                        'category', (select "name" from t_event_category
-                                                      where event_category_id = ecmp.event_category_id),
-                                        'categoryId', ecmp.event_category_id              
-                                        ) 
-                                    ) participants
-                         from t_event_participant_registration ereg 
-                             inner join t_event_category_map ecmp 
-                             on ereg.event_id = ecmp.event_id and ereg.event_id = ${eventId}
-                            group by ecmp.event_category_id;`;
+                                                jsonb_build_object(
+                                                'regId', res.event_participant_registration_id,
+                                                'enrollmentId',  res.enrollment_id,
+                                                'category', res.category,
+                                                'categoryId', res.event_category_id,
+                                                'catStaffMapId',res.event_cat_staff_map_id,
+                                                'scoreRefId' , res.participant_event_score_id,
+                                                'partEveRegCatId', res.participant_event_reg_cat_id              
+                                                ) 
+                                            ) participants
+                                    from (                           
+                                    select distinct 
+                                    tepr.event_participant_registration_id,
+                                    tecm.event_category_id,
+                                    tpes.score,
+                                    tecsm.event_cat_staff_map_id,
+                                    tpes.participant_event_score_id, 
+                                    tperc.participant_event_reg_cat_id, 
+                                    (select "name" from t_event_category where event_category_id = tecm.event_category_id) category,
+                                    tepr.enrollment_id
+                                    from t_event_category_map tecm
+                                    join t_event_cat_staff_map tecsm on tecsm.event_category_map_id = tecm.event_cat_map_id
+                                    join t_event_participant_registration tepr on tepr.event_id = tecm.event_id
+                                    join t_participant_event_reg_cat tperc on tperc.event_participant_registration_id = tepr.event_participant_registration_id
+                                    join v_user vu on vu.user_id = tepr.user_id
+                                    left join t_participant_event_score tpes on tpes.event_cat_staff_map_id = tecsm.event_cat_staff_map_id
+                                            and  tperc.participant_event_reg_cat_id = tpes.participant_event_reg_cat_id 
+                                    and tperc.event_category_id = tecm.event_category_id
+                                    where tecm.event_id = ${eventId}
+                                    and tecsm.user_id = ${userId}) res`;
 
         let result = await client.query(getPaticipantQuery);
         return {
@@ -369,6 +386,8 @@ async function getParticipant(eventId) {
     }
 
 }
+
+
 
 module.exports = {
     getEventById,

@@ -13,7 +13,7 @@ import { AfterViewInit, ViewChild, ViewContainerRef } from "@angular/core";
   data: any;
   params: any;
   rowData : any;
-  value:number=0;
+  value:number=100;
   userRecords : any;
 
   ngOnInit(): void {
@@ -21,6 +21,7 @@ import { AfterViewInit, ViewChild, ViewContainerRef } from "@angular/core";
   }
 
   agInit(params:  any) {
+    // console.log('agInit called..' + JSON.stringify(params))
     this.params = params;
     this.data = params.value;
   }
@@ -45,23 +46,23 @@ import { AfterViewInit, ViewChild, ViewContainerRef } from "@angular/core";
 
 // /* Component Editor Lifecycle methods */
 // // the final value to send to the grid, on completion of editing
-// getValue() {
-//     // this simple editor doubles any value entered into the input
-//     return this.value * 2;
-// }
+getValue() {
+    // this simple editor doubles any value entered into the input
+    return 999999;
+}
 
 // // Gets called once before editing starts, to give editor a chance to
 // // cancel the editing before it even starts.
-// isCancelBeforeStart() {
-//     return false;
-// }
+isCancelBeforeStart() {
+    return false;
+}
 
 // // Gets called once when editing is finished (eg if enter is pressed).
 // // If you return true, then the result of the edit will be ignored.
-// isCancelAfterEnd() {
-//     // our editor will reject any value greater than 1000
-//     return this.value > 1000;
-// }
+isCancelAfterEnd() {
+    // our editor will reject any value greater than 1000
+    return this.value > 1000;
+}
 
 }
 
