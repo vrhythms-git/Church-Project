@@ -15,7 +15,7 @@ import { ApprovalRequestsComponent } from './screens/approval-requests/approval-
 import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.component';
 import { CwcregistrationComponent } from './screens/cwcregistration/cwcregistration.component';
 import { EventRegistrationComponent } from './screens/event-registration/event-registration.component';
-
+import { ScoreComponent } from './screens/score/score.component';
 
 const routes: Routes = [
   { path: 'signup', component: SignUpComponent },
@@ -32,7 +32,8 @@ const routes: Routes = [
     {path : 'myprofile', component:MyProfileComponent, canDeactivate:[DirtycheckGuard]},
     { path : 'createevent', component: EventCreationComponent },
     { path : 'cwcregistration', component :CwcregistrationComponent},
-    { path : 'eventRegistration', component:EventRegistrationComponent}
+    { path : 'eventRegistration', component:EventRegistrationComponent},
+    { path : 'score', component:ScoreComponent}
     // { path: 'testEvent',component:UserProfileComponent},
   ]
 },

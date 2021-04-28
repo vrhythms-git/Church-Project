@@ -1,0 +1,50 @@
+<div class="container mt-3" style="overflow: hidden;">
+
+    <!-- <div class="form-group form-inline row m-0 p-0">
+            <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
+            <button *ngIf = "hasDeletePermission" mat-button class="col-2 ml-auto border" (click)="onDelete()">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+            </button>
+    </div> -->
+
+    <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" [rowData]="eventRowData | filter:term "
+        [columnDefs]="eventColumnDefs " [pagination]="true" 
+        [checkboxSelection]="true"
+        [gridOptions]="eventGridOption" (rowClicked)='onRowClicked($event)'>
+        <!-- (selectionChanged)="onSelectionChanged($event)"
+              (gridReady)="onGridReady($event)"
+              rowSelection='multiple'
+              -->
+    </ag-grid-angular>
+
+
+
+<div class="col-md-12">
+    <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true" data-backdrop="false" style="padding-left:5%!important;padding-top:3%!important;margin-left: 5%;">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Upload Score Here</h4>
+                    <button mat-button class="ml-auto" data-dismiss="modal" >  
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                    <!-- (click)="" -->
+                </div>
+                <div class="modal-body p-4 border m-3 rounded">
+                    <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3"
+                        [rowData]="participantRowData | filter:term " [columnDefs]="participantColumnDefs" [pagination]="true"
+                        rowSelection='multiple'
+                        [checkboxSelection]="true" [gridOptions]="participantGridOptions">
+                         (selectionChanged)="onSelectionChanged($event)" 
+                            (rowClicked)='onRowClicked($event)'
+
+                            <!-- (gridReady)="onGridReady($event)"  -->
+                    </ag-grid-angular>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

@@ -142,15 +142,15 @@ app.get('/api/getEventCategory', function (req, res) {
 
 
 app.get('/api/getEventData', function (req, res) {
-  console.log("getEventData called with : " + JSON.stringify(req.query.fbuid));
+  console.log("getEventData called with : " + req.query.user);
   try {
-    processRequest.getEventData()
+    processRequest.getEventData(req.query.user)
       .then((data) => {
-        console.log(`Returning with response : ${JSON.stringify(data)}`)
+        //     console.log(`Returning with response : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with response : ${error}`)
+        //   console.log(`Returning with response : ${error}`)
         res.send(error);
         res.end();
       })
@@ -514,7 +514,7 @@ app.get('/api/getEvent', function (req, res) {
   console.log("getEvent called...");
   try {
     processEventTemp.getEventById(req.query.id)
-    .then((data) => {
+      .then((data) => {
         res.send(data);
         res.end();
       }).catch((error) => {
@@ -530,7 +530,7 @@ app.post('/api/registerEvent', function (req, res) {
   console.log("registerEvent called...");
   try {
     processEventTemp.eventRegistration(req.body.data)
-    .then((data) => {
+      .then((data) => {
         res.send(data);
         res.end();
       }).catch((error) => {
@@ -541,6 +541,23 @@ app.post('/api/registerEvent', function (req, res) {
     console.error('Error in registerEvent as : ' + error)
   }
 });
+
+app.get('/api/getParticipants', function (req, res) {
+  console.log("getParticipants called...");
+  try {
+    processEventTemp.getParticipant(req.query.event)
+      .then((data) => {
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getParticipants as : ' + error)
+  }
+});
+
 
 
 // let client = dbConnections.getConnection();

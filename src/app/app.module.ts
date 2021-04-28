@@ -63,6 +63,9 @@ import { CwcregistrationComponent } from './screens/cwcregistration/cwcregistrat
 import { EventRegistrationComponent } from './screens/event-registration/event-registration.component'
 //import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { ScoreComponent } from './screens/score/score.component';
+import { ScoreUploadComponent } from './screens/renderers/score-upload/score-upload.component';
+import { ScoreUploadInputComponent } from './screens/renderers/score-upload-input/score-upload-input.component';
 
 
 
@@ -82,7 +85,7 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
     MyProfileComponent,
     ApprovalRequestsComponent,
     ReqRendererComponent,  
-    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent
+    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent, ScoreComponent, ScoreUploadComponent, ScoreUploadInputComponent
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],

@@ -55,7 +55,6 @@ async function getEventById(eventId) {
                 event.startDate = result.rows[0].event_start_date;
                 event.endDate = result.rows[0].event_end_date;
                 event.orgType = result.rows[0].org_type;
-                event.eventUrl = result.rows[0].event_url;
 
                 let category = {};
                 let venue = {};
@@ -275,8 +274,8 @@ async function eventRegistration(eventData) {
 
         let result = await client.query(registerQuery, registerQueryValues)
         let participantRegId = result.rows[0].event_participant_registration_id;
-        console.log('inserted into t_event_participant_registration!, for event_participant_registration_id : ' + participantRegId + 
-                    ' and with enrollment Id: '+ enrollmentId);
+        console.log('inserted into t_event_participant_registration!, for event_participant_registration_id : ' + participantRegId +
+            ' and with enrollment Id: ' + enrollmentId);
 
         // Populating t_participant_event_reg_cat table.
         const registerEvtCatQuery = `INSERT INTO t_participant_event_reg_cat
@@ -329,14 +328,50 @@ async function eventRegistration(eventData) {
         return (errorHandling.handleDBError('connectionError'));
     } finally {
         client.end();
-        console.log('Connection closed.')
+        // console.log('Connection closed.')
     }
+}
 
+async function getParticipant(eventId) {
+    console.log('fetching participants for event ' + eventId);
 
+    let client = dbConnections.getConnection();
+    try {
+        await client.connect();
+        const getPaticipantQuery = `select jsonb_agg(
+                                        jsonb_build_object(
+                                        'regId', ereg.event_participant_registration_id,
+                                        'enrollmentId',  ereg.enrollment_id,
+                                        'schoolGrade', ereg.school_grade,
+                                        'category', (select "name" from t_event_category
+                                                      where event_category_id = ecmp.event_category_id),
+                                        'categoryId', ecmp.event_category_id              
+                                        ) 
+                                    ) participants
+                         from t_event_participant_registration ereg 
+                             inner join t_event_category_map ecmp 
+                             on ereg.event_id = ecmp.event_id and ereg.event_id = ${eventId}
+                            group by ecmp.event_category_id;`;
+
+        let result = await client.query(getPaticipantQuery);
+        return {
+            data: {
+                status: 'success',
+                paticipants: result.rows[0] == undefined ? [] : result.rows[0].participants
+            }
+        }
+
+    } catch (error) {
+        console.error(`eventReqOperations.js::getParticipant() : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.end();
+    }
 
 }
 
 module.exports = {
     getEventById,
-    eventRegistration
+    eventRegistration,
+    getParticipant
 }

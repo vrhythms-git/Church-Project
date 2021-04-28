@@ -762,17 +762,24 @@ async function getParishData() {
 }
 
 /* .............get events Data from database.................. */
-async function getEventData() {
+async function getEventData(judgeId) {
     let client = dbConnections.getConnection();
-    await client.connect();
     try {
+        await client.connect();
         let metadata = {};
         let getEventData = `select * from t_event`;
+        if(judgeId != null  || judgeId != undefined){
+            console.log(`Fetching event data for ${judgeId} judge.`)
+            getEventData = `select * from t_event where event_id in ( 
+                select distinct event_id from t_event_cat_staff_map where user_id = ${judgeId})
+                and is_deleted = false;`
+        }
+       
         let res = await client.query(getEventData);
         if (res && res.rowCount > 0) {
-            console.log("In Event response : " + res);
+          //  console.log("In Event response : " + res);
             let eventData = [];
-            for (let row of res.rows) {
+            for (let row of res.rows) { 
                 let events = {};
                 events.event_Id = row.event_id;
                 events.name = row.name;
@@ -786,7 +793,7 @@ async function getEventData() {
                 eventData.push(events);
             }
             metadata.eventData = eventData;
-            client.end()
+         //   client.end()
         }
         return ({
             data: {
@@ -797,9 +804,11 @@ async function getEventData() {
         })
 
     } catch (error) {
-        client.end();
+      //  client.end();
         console.log(`reqOperations.js::getEventData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    }finally{
+        client.end()
     }
 }
 
