@@ -238,11 +238,11 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       // this.myprofileform.value.isFamilyHead = false;
 
       let currFHValue = this.myprofileform.value.isFamilyHead;
-      if (currFHValue == true || currFHValue == 'true')
+      if (currFHValue === true || currFHValue == 'true')
         this.myprofileform.value.isFamilyHead = true;
-      else if (currFHValue == false || currFHValue == 'false')
+      else if (currFHValue === false || currFHValue == 'false')
         this.myprofileform.value.isFamilyHead = false;
-      else if (currFHValue == '')
+      else if (currFHValue === '')
         this.myprofileform.value.isFamilyHead = this.alluserdata.isFamilyHead
 
       this.apiService.updateUserProfile({ data: this.myprofileform.value }).subscribe((res: any) => {
