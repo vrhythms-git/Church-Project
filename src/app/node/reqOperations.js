@@ -315,13 +315,13 @@ async function processGetUserMetaDataRequest(uid) {
 
                 console.log("metaData.userId", metaData.userId);
 
-                let query1 = `select distinct vu.user_id, vu.email_id, vu.title,
+                let query1 = `select distinct vu.user_id,vu.baptismal_name, vu.email_id, vu.title,
                     vu.first_name, vu.middle_name, vu.last_name,
 			    	vu.dob, vu.mobile_no, tpr.relationship,
                     tpr.relationship_id relationship_id
                     from v_user vu, t_person_relationship tpr 
                     where tpr.family_head_id = '${metaData.userId}' 
-                    and tpr.is_deleted = 'no'
+                    and tpr.is_deleted = false
                     and vu.user_id = tpr.family_member_id;`
 
                 let res1 = await client.query(query1);
@@ -338,6 +338,7 @@ async function processGetUserMetaDataRequest(uid) {
                     member.mobileNo = row.mobile_no;
                     member.relationship = row.relationship;
                     member.relationshipId = row.relationship_id;
+                    member.baptismalName = row.baptismal_name;
                     memberDetails.push(member);
                 }
 
@@ -973,8 +974,8 @@ async function processUpdateUserRoles(userData) {
                 // console.log("emailResults", emailResults);
 
                 const insertPerson = `INSERT INTO public.t_person
-                (user_id, dob,  mobile_no, created_by, created_date, membership_type)
-                VALUES($1 , $2, $3, $4, $5, $6);`;
+                (user_id, dob,  mobile_no, created_by, created_date, membership_type, baptismal_name )
+                VALUES($1 , $2, $3, $4, $5, $6, $7);`;
 
                 let insertPersonRelationship = `INSERT INTO t_person_relationship(
                     family_head_id, family_member_id, relationship, updated_by, updated_date)
@@ -1029,7 +1030,8 @@ async function processUpdateUserRoles(userData) {
                                 details.mobileNo,
                                 userData.updatedBy,
                                 new Date().toISOString(),
-                                'member'
+                                'member',
+                                details.baptismalName
                             ]
                         await client.query(insertPerson, insertPersonValues);
                         console.log('t_person table populated!')
@@ -1098,7 +1100,7 @@ async function processUpdateUserRoles(userData) {
 
 
                         const insertuserTbl = `INSERT INTO public.t_user
-                (email_id, org_id, firebase_id, title, first_name, middle_name, last_name, created_by, created_date, member_type, is_approved )
+                (email_id, org_id, firebase_id, title, first_name, middle_name, last_name, created_by, created_date, member_type, is_approved)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning user_id;`;
 
                         const insertuserTblValues = [
@@ -1112,7 +1114,7 @@ async function processUpdateUserRoles(userData) {
                             userData.updatedBy,
                             new Date().toISOString(),
                             'member',
-                            true
+                            true,
                         ]
 
                         let result = await client.query(insertuserTbl, insertuserTblValues)
@@ -1140,7 +1142,8 @@ async function processUpdateUserRoles(userData) {
                                 details.mobileNo,
                                 userData.updatedBy,
                                 new Date().toISOString(),
-                                'member'
+                                'member',
+                                details.baptismalName
                             ]
 
                         console.log('insertPersonValues :' + insertPersonValues);
