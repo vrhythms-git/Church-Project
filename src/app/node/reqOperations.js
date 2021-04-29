@@ -444,9 +444,10 @@ async function getuserRecords(userType, loggedInUser) {
                                                 WHERE  org_id IN
                                                         (
                                                                 SELECT a.org_id
-                                                                FROM   t_user_role_context a,                                                                            t_user b
-                                                                WHERE  b.user_id = ${loggedInUser}        
-                                                                AND    a.user_id = b.user_id)                                                        UNION
+                                                                FROM   t_user_role_context a, t_user b
+                                                                WHERE  b.user_id = ${loggedInUser}
+                                                                AND    a.user_id = b.user_id)                                                        
+                                                UNION
                                                 SELECT     child_org.org_id child_id
                                                 FROM       t_organization child_org
                                                 INNER JOIN child_orgs c
@@ -463,14 +464,14 @@ async function getuserRecords(userType, loggedInUser) {
 
         if (res && res.rowCount > 0) {
 
-            console.log("In response" + res);
+            // console.log("In response" + res);
 
 
             for (let row of res.rows) {
-                console.log("Datbase User id" + row.user_id);
-                console.log("User id" + userid);
+                // console.log("Datbase User id" + row.user_id);
+                // console.log("User id" + userid);
                 if (userid != row.user_id && userid != 0) {
-                    console.log("In Pushing user to users" + row.user_id);
+                    // console.log("In Pushing user to users" + row.user_id);
                     user.roles = roles;
                     users.push(user);
                     user = {}
@@ -478,7 +479,7 @@ async function getuserRecords(userType, loggedInUser) {
                     //   userid = row.user_id;
                 }
                 if (userid != row.user_id) {
-                    console.log("User id In IF Condition" + row.user_id);
+                    // console.log("User id In IF Condition" + row.user_id);
 
                     user.userId = row.user_id;
                     user.reason = row.reason
@@ -520,12 +521,12 @@ async function getuserRecords(userType, loggedInUser) {
                 role.roleId = row.role_id;
                 role.orgType = row.org_type;
                 role.orgId = row.org_id;
-                console.log("In user" + user);
-                console.log("In role" + JSON.stringify(role));
-                console.log("In roles" + JSON.stringify(roles));
+                // console.log("In user" + user);
+                // console.log("In role" + JSON.stringify(role));
+                // console.log("In roles" + JSON.stringify(roles));
 
                 if (_.findWhere(roles, role) == null) {
-                    console.log("role" + JSON.stringify(role));
+                    // console.log("role" + JSON.stringify(role));
                     roles.push(role);
                 }
 
@@ -572,8 +573,7 @@ async function getRoleMetadata() {
             client.connect();
             client.query(getRoles, (err, res) => {
                 if (err) {
-                    console.log("Inside Error" + res);
-                    console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
+                    console.error(`reqOperations.js::getRoleMetadata() --> error while fetching results : ${err}`)
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
@@ -599,8 +599,7 @@ async function getRoleMetadata() {
             // client.connect();
             client.query(getorgs, (err, res) => {
                 if (err) {
-                    console.log("Inside Error" + res);
-                    console.error(`reqOperations.js::processSignInRequest() --> error while fetching results : ${err}`)
+                    console.error(`reqOperations.js::getRoleMetadata() --> error while fetching results : ${err}`)
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
@@ -640,7 +639,7 @@ async function getRoleMetadata() {
             });
 
         } catch (error) {
-            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
+            console.error(`reqOperations.js::getRoleMetadata() --> error executing query as : ${error}`);
             reject(errorHandling.handleDBError('connectionError'));
         }
     });
@@ -711,7 +710,7 @@ async function getEventCategory() {
 
     } catch (error) {
         client.end();
-        console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
+        console.error(`reqOperations.js::getEventCategory() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
 
 
@@ -822,6 +821,7 @@ async function processUpdateUserRoles(userData) {
         await client.query("BEGIN");
         // console.log("1");
 
+        
         if (userData.isFamilyHead == true || userData.isFamilyHead == "true") {
 
             let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
@@ -831,11 +831,20 @@ async function processUpdateUserRoles(userData) {
         }
         if (userData.isFamilyHead == false || userData.isFamilyHead == "false") {
 
+            console.log('user is not family member any more, Removing his \'add_member\' permission.');
+
+            let deleteRole = `delete from t_user_role_mapping 
+                                where user_id = ${userData.userId} 
+                                    and role_id = (select role_id from t_role where name = 'Family Head');`
+      
+            await client.query(deleteRole)
+
             let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
                 select ${userData.userId}, role_id from t_role where name = 'Member';`
 
             await client.query(insertRoleMappingmember)
         }
+
 
         /********************** t_user************************* */
 
@@ -858,7 +867,7 @@ async function processUpdateUserRoles(userData) {
             userData.middleName,
             userData.lastName,
             userData.aboutYourself,
-            userData.isFamilyHead == 'true' ? true : false,
+            userData.isFamilyHead,
             userData.updatedBy,
             new Date().toISOString(),
             userData.userId
@@ -1279,6 +1288,23 @@ async function processUpdateUserRoles(userData) {
                 await client.query(insertRoleContext, insertRoleContext_value);
 
             }
+
+            
+        if (userData.isFamilyHead == true || userData.isFamilyHead == "true") {
+
+            let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
+                (select ${userData.userId}, role_id from t_role where name = 'Family Head');`
+            await client.query(insertRoleMapping)
+            console.log('User is family head gave him add member permission');
+        }
+        if (userData.isFamilyHead == false || userData.isFamilyHead == "false") {
+
+            let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+                select ${userData.userId}, role_id from t_role where name = 'Member';`
+
+            await client.query(insertRoleMappingmember)
+        }
+
         }
 
 

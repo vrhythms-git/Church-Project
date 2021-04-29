@@ -44,11 +44,11 @@ app.post('/api/signUp', function (req, res) {
   try {
     processRequest.processSignInRequest(req.body)
       .then((data) => {
-        console.log(`Returning with resonse : ${data}`)
+       // console.log(`Returning with resonse : ${data}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+       // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -64,11 +64,11 @@ app.get('/api/getuserRecords', function (req, res) {
   try {
     processRequest.getuserRecords(req.query.type, req.query.loggedInUser)
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+      //  console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -84,11 +84,11 @@ app.get('/api/getRoleMetadata', function (req, res) {
   try {
     processRequest.getRoleMetadata()
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+       // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -111,11 +111,11 @@ app.get('/api/getUserMetaData', function (req, res) {
   try {
     processRequest.processGetUserMetaDataRequest(req.query.uid)
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+      //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+       // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -129,11 +129,11 @@ app.get('/api/getEventCategory', function (req, res) {
   try {
     processRequest.getEventCategory()
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+      //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+       // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -166,11 +166,11 @@ app.get('/api/getParishData', function (req, res) {
   try {
     processRequest.getParishData()
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+      //  console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -186,11 +186,11 @@ app.post('/api/insertEvents', function (req, res) {
   try {
     processEventRequest.insertEvents(req.body.data)
       .then((data) => {
-        console.log(`Returning with resonse : ${data}`)
+       // console.log(`Returning with resonse : ${data}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+       // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -206,11 +206,11 @@ app.post('/api/updateUserRoles', function (req, res) {
   try {
     processRequest.processUpdateUserRoles(req.body.data)
       .then((data) => {
-        console.log(`Returning with resonse : ${data}`)
+       /// console.log(`Returning with resonse : ${data}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+        //console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -224,11 +224,11 @@ app.get('/api/getParishData', function (req, res) {
   try {
     processRequest.getParishData()
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+      //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+       // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -244,11 +244,11 @@ app.post('/api/deleteUsers', function (req, res) {
   try {
     processRequest.deleteUsers(req.body.data)
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+        //console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -263,11 +263,11 @@ app.post('/api/setUserApprovalState', function (req, res) {
   try {
     processUserRequest.setUserApprovalState(req.body.data)
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        //console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+        //console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -282,11 +282,11 @@ app.get('/api/getCountryStates', function (req, res) {
   try {
     processMiscRequest.getCountryStates()
       .then((data) => {
-        console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        //console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-        console.log(`Returning with resonse : ${error}`)
+        //console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })

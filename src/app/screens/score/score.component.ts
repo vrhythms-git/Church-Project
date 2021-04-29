@@ -67,14 +67,22 @@ export class ScoreComponent implements OnInit {
       { headerName: 'Category', field: 'category', sortable: true, resizable: true, filter: true, },
       // { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 450 },
       {
-        headerName: 'Score', field:'score', flex: 1, width:50, editable: true, resizable: true,
+        headerName: 'Score', field: 'score', flex: 1, width: 50, editable: true, resizable: true,
 
-        valueGetter: function (params:any) {
-            return params.data.score;
+        valueGetter: function (params: any) {
+          return params.data.score;
         },
-        valueSetter: function (params:any) {
-          params.data.score = params.newValue;
-          return true; 
+        valueSetter: function (params: any) {
+
+          try {
+            let score = parseInt(params.newValue);
+            if (score > 0 && score != NaN)
+              params.data.score = score;
+            return true;
+          } catch (error) {
+            // alert('Please enter valid score.')
+            return false;
+          };
         },
 
       }
@@ -99,10 +107,12 @@ export class ScoreComponent implements OnInit {
 
   }
 
-
+selectedEventId:any;
+selectedEventName:any;
   onRowClicked(event: any) {
     $("#imagemodal").modal("show");
-
+    this.selectedEventId = event.data.event_Id; 
+    this.selectedEventName = event.data.name;
     this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}`).subscribe((respData) => {
 
       if (respData.data.status == 'failed') {
@@ -115,31 +125,45 @@ export class ScoreComponent implements OnInit {
   }
 
   handleScoreSaveBtnClick(event: any) {
-    //this.participantGridOptions.api.forEachNode(this.printNode);
 
-    const firstRowNode = this.participantGridOptions.api.getDisplayedRowAtIndex(0);
-    const params = { columns: ['Score'], rowNodes: [firstRowNode] };
-    const instances = this.participantGridOptions.api.getCellRendererInstances(params);
+    let scoreData: any = this.getuserScoreArray();
+    if (scoreData.length == 0) {
+      this.uiCommonUtils.showSnackBar('Nothing to save!', 'error', 3000)
+      return;
+    } else {
+      let payload: any = {};
+      payload.action = 'save';
+      payload.scoreData = scoreData;
 
+      this.apiService.callPostService('postScore', payload).subscribe((response) => {
+
+          if(response.data.status == 'failed'){
+            this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000)
+            return;
+          }else{
+            this.uiCommonUtils.showSnackBar('Score recorded successfully!', 'success', 3000)
+          }
+      })
+
+    }
   }
 
-  printNode(node: any, index: number) {
-    // if (node.group) {
-    //   console.log(index + ' -> group: ' + node);
-    // } else {
-    //   console.log(
-    //     index + ' -> data: ' + node
-    //   );
-    // }
+  getuserScoreArray(): any[] {
 
-    const firstRowNode = this.participantGridOptions.api.getDisplayedRowAtIndex(0);
-    const params = { columns: ['Score'], rowNodes: [firstRowNode] };
-    const instances = this.participantGridOptions.api.getCellRendererInstances(params);
+    let scoreData: any = [];
 
-    if (instances.length > 0) {
-      // got it, user must be scrolled so that it exists
-      const instance = instances[0];
-    }
+    this.participantRowData.forEach((item: any) => {
+      if (item.score) {
+        scoreData.push({
+          scoreRefId: item.scoreRefId,
+          partEveRegCatId: item.partEveRegCatId,
+          score: item.score,
+          catStaffMapId: item.catStaffMapId
+        })
+      }
+    });
+
+    return scoreData;
 
   }
 }

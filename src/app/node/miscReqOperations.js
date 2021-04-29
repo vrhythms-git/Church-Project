@@ -31,7 +31,7 @@ function getCountryStates() {
 
                 if (res) {
                     let conStatejson = res.rows[0].op_json
-                    console.log(conStatejson)
+                    //console.log(conStatejson)
 
                     client.end();
 

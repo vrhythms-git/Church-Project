@@ -343,6 +343,7 @@ async function getParticipant(eventId, userId) {
                                                 'regId', res.event_participant_registration_id,
                                                 'enrollmentId',  res.enrollment_id,
                                                 'category', res.category,
+                                                'score', res.score,
                                                 'categoryId', res.event_category_id,
                                                 'catStaffMapId',res.event_cat_staff_map_id,
                                                 'scoreRefId' , res.participant_event_score_id,

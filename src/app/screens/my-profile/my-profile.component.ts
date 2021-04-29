@@ -56,7 +56,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       dob: new FormControl('', [Validators.required]),
       homePhoneNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
       mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
-      emailId: new FormControl('',[Validators.required, Validators.email]),
+      emailId: new FormControl('', [Validators.required, Validators.email]),
       addressLine1: new FormControl('', Validators.required),
       addressLine2: new FormControl('', Validators.required),
       addressLine3: new FormControl('', Validators.required),
@@ -95,11 +95,11 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
 
 
 
-       this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
-         console.log('These are users from database : ');
-         console.log(res.data.metaData);
-         this.alluserdata = res.data.metaData;
-       });
+      //  this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
+      //   // console.log('These are users from database : ');
+      //   // console.log(res.data.metaData);
+      //    this.alluserdata = res.data.metaData;
+      //  });
 
       this.apiService.getParishListData().subscribe(res => {
         for (let i = 0; i < res.data.metaData.Parish.length; i++) {
@@ -115,7 +115,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       })
 
       this.myprofileform.patchValue({
-       country: this.alluserdata.country,
+        country: this.alluserdata.country,
         title: this.alluserdata.title,
         firstName: this.alluserdata.firstName,
         middleName: this.alluserdata.middleName,
@@ -142,7 +142,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
     } if (this.isApprovedUserLoggedIn == false) {
 
       this.signUpForm = this.formBuilder.group({
-        title : new FormControl('',Validators.required),
+        title: new FormControl('', Validators.required),
         firstName: new FormControl('', Validators.required),
         lastName: new FormControl('', Validators.required),
         email: new FormControl('', [Validators.required, Validators.email]),
@@ -150,8 +150,8 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
         password: new FormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[@])(?=.*?[0-9]).{8,}$')]),
         cnfmpwd: new FormControl('', Validators.required),
         mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
-        memberType : new FormControl('',Validators.required),
-        orgId: new FormControl('',Validators.required),
+        memberType: new FormControl('', Validators.required),
+        orgId: new FormControl('', Validators.required),
         abtyrslf: new FormControl('')
       });
 
@@ -212,7 +212,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       baptismalName: new FormControl('', Validators.required),
       dob: new FormControl('', Validators.required),
       mobileNo: new FormControl('', [Validators.pattern('[0-9].{9}')]),
-      emailId: new FormControl('',[Validators.required, Validators.email]),
+      emailId: new FormControl('', [Validators.required, Validators.email]),
     });
   }
 
@@ -231,10 +231,19 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       this.myprofileform.value.updatedBy = this.userId;
       this.myprofileform.value.orgId = this.orgId;
 
-      if(this.myprofileform.value.isFamilyHead == '' && this.alluserdata.isFamilyHead ==true ){
+      // if((this.myprofileform.value.isFamilyHead == '' || this.alluserdata.isFamilyHead ==true )
+      //      &&  this.myprofileform.value.isFamilyHead == true){
+      //   this.myprofileform.value.isFamilyHead = true;
+      // }else
+      // this.myprofileform.value.isFamilyHead = false;
+
+      let currFHValue = this.myprofileform.value.isFamilyHead;
+      if (currFHValue == true || currFHValue == 'true')
         this.myprofileform.value.isFamilyHead = true;
-      }else
-      this.myprofileform.value.isFamilyHead = false;
+      else if (currFHValue == false || currFHValue == 'false')
+        this.myprofileform.value.isFamilyHead = false;
+      else if (currFHValue == '')
+        this.myprofileform.value.isFamilyHead = this.alluserdata.isFamilyHead
 
       this.apiService.updateUserProfile({ data: this.myprofileform.value }).subscribe((res: any) => {
         if (res.data.status == "success") {
@@ -244,7 +253,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
         else
           this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
       });
-      
+
     } if (this.isApprovedUserLoggedIn == false) {
 
       this.signUpForm.value.userId = this.alluserdata.userId;
@@ -265,7 +274,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
     }
   }
 
-  getAndSetMetdata(userId:number) {
+  getAndSetMetdata(userId: number) {
     this.apiService.callGetService(`getUserMetaData?uid=${userId}`).subscribe((data) => {
       localStorage.setItem('chUserMetaData', JSON.stringify(data.data.metaData));
     });
@@ -291,7 +300,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
 
   isStateDataSet = false;
   keyPress(event: any) {
-  this.isStateDataSet = false;
+    this.isStateDataSet = false;
     const pattern = /[0-9\+\-\ ]/;
 
     let inputChar = String.fromCharCode(event.charCode);

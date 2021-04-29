@@ -44,6 +44,7 @@ export class ApiService {
     let headerObj = new HttpHeaders({
       'Authorization': localStorage.getItem('chUserToken')!,
       'Content-Type': 'application/json',
+      'User': btoa(this.uiCommonUtils.getUserMetaDataJson().userId)
     });
     
     return this.http.post(`${this._baseUrl}/${endPoint}`,{data:payload},{ headers: headerObj });
