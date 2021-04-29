@@ -107,11 +107,11 @@ export class ScoreComponent implements OnInit {
 
   }
 
-selectedEventId:any;
-selectedEventName:any;
+  selectedEventId: any;
+  selectedEventName: any;
   onRowClicked(event: any) {
     $("#imagemodal").modal("show");
-    this.selectedEventId = event.data.event_Id; 
+    this.selectedEventId = event.data.event_Id;
     this.selectedEventName = event.data.name;
     this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}`).subscribe((respData) => {
 
@@ -124,6 +124,20 @@ selectedEventName:any;
     });
   }
 
+
+  // clickMethod(name: string) {
+  //   if(confirm("Are you sure to delete "+name)) {
+  //     console.log("Implement delete functionality here");
+  //   }
+  // }
+
+  handleScoreCompleteBtnClick($event: any) {
+
+    let confmMsgSt = ` Press \`OK\` to submit participant's score for approval.[YOU WON'T BE ABLE TO MODIFY ASSIGNED SCORE AFTER SUBMISSION.!]`;
+    if (confirm(confmMsgSt))
+      this.handleScoreSaveBtnClick('complete');
+  }
+
   handleScoreSaveBtnClick(event: any) {
 
     let scoreData: any = this.getuserScoreArray();
@@ -132,17 +146,21 @@ selectedEventName:any;
       return;
     } else {
       let payload: any = {};
-      payload.action = 'save';
+      if (event == 'complete'){
+        payload.action = 'complete';
+      }
+      else
+        payload.action = 'save';
       payload.scoreData = scoreData;
 
-      this.apiService.callPostService('postScore', payload).subscribe((response) => {
+      this.apiService.callPostService('postScore', payload ).subscribe((response) => {
 
-          if(response.data.status == 'failed'){
-            this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000)
-            return;
-          }else{
-            this.uiCommonUtils.showSnackBar('Score recorded successfully!', 'success', 3000)
-          }
+        if (response.data.status == 'failed') {
+          this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000)
+          return;
+        } else {
+          this.uiCommonUtils.showSnackBar('Score recorded successfully!', 'success', 3000)
+        }
       })
 
     }
@@ -162,9 +180,7 @@ selectedEventName:any;
         })
       }
     });
-
     return scoreData;
-
   }
 }
 
