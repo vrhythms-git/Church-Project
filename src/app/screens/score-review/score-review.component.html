@@ -1,0 +1,93 @@
+<div class="container mt-3" style="overflow: hidden;">
+
+
+    <div class="row mt-2 d-flex" style="justify-content: center;margin: 5px;">
+        <mat-radio-group aria-label="Select User Types to filter">
+            <mat-radio-button value="pending_requests" checked>Pending Approvals</mat-radio-button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <!-- <mat-radio-button  value="approved">Approved</mat-radio-button>&nbsp;&nbsp;&nbsp;&nbsp; -->
+            <mat-radio-button value="approved">Approved</mat-radio-button>
+        </mat-radio-group>
+    </div>
+
+    <!-- (change)='onFilteringRadioButtonChange($event)' -->
+    <div>
+
+        <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3"
+            [rowData]="eventRowData | filter:term " [columnDefs]="eventColumnDefs " [pagination]="true"
+            [checkboxSelection]="true" [gridOptions]="eventGridOption" (rowClicked)='onRowClicked($event)'>
+        </ag-grid-angular>
+    </div>
+
+
+    <div class="col-md-12">
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+            aria-hidden="true" data-backdrop="false"
+            style="padding-left:5%!important;padding-top:2%!important;margin-left: 4%;">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Approve Score for <b>{{selectedEventData.name}} </b> event </h4>
+                        <button mat-button class="ml-auto" data-dismiss="modal">
+                            <mat-icon>clear</mat-icon>
+                        </button>
+                        <!-- (click)="" -->
+                    </div>
+                    <div class="modal-body border rounded">
+
+                        <div class="row" style="padding: 0px;justify-content: space-evenly;">
+
+                            <mat-form-field>
+                                <mat-label>Category</mat-label>
+                                <mat-select (selectionChange)="onDropdowwnSelChange($event)" [(value)]="selectedCat">
+                                    <mat-option selected=true [value]="'All'"> All </mat-option>
+                                    <mat-option *ngFor="let cat of catNameArr" [value]="cat.categoryId">
+                                        {{cat.category}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+
+                            <mat-form-field>
+                                <mat-label>Judge</mat-label>
+                                <mat-select (selectionChange)="onDropdowwnSelChange($event)" [(value)]="selectedJudge">
+                                    <mat-option selected [value]="'All'"> All </mat-option>
+                                    <mat-option *ngFor="let judge of judgeNameArr" [value]="judge.judgeId">
+                                        {{judge.judgeName}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                        </div>
+
+
+
+                        <ag-grid-angular style="width: auto; height: 425px;" class="ag-theme-alpine mt-3"
+                            [rowData]="scoreApprovalRowData | filter:term " [columnDefs]="scoreApprovalColDef"
+                            [pagination]="true" [checkboxSelection]="true" [gridOptions]="scoreApprovalGridOption">
+                            <!-- (selectionChanged)="onSelectionChanged($event)" 
+                            (rowClicked)='onRowClicked($event)' -->
+
+                        </ag-grid-angular>
+                        <div style="padding: 9px; text-align-last: center;">
+                            <button mat-button class="ml-auto border" style="background: #d68165;" data-dismiss="modal">
+                                Cancel
+                                <!-- <mat-icon>clear</mat-icon> -->
+                            </button>
+                            <!-- 
+                        <button [disabled]="selectedEvtIsScrSubmted" mat-button class="ml-auto border" (click)="handleScoreSaveBtnClick($event)" style="background: #d68165;">  
+                            Save
+                       
+                         </button> -->
+                         <!-- [disabled]="selectedEvtIsScrSubmted" -->
+                            <button mat-button class="ml-auto border"
+                                (click)="handleScoreApproveBtnClick()" style="background: #d68165;">
+                                Approve
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

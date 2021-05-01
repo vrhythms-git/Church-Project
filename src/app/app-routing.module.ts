@@ -16,6 +16,7 @@ import { LoginAccListComponent } from './screens/login-acc-list/login-acc-list.c
 import { CwcregistrationComponent } from './screens/cwcregistration/cwcregistration.component';
 import { EventRegistrationComponent } from './screens/event-registration/event-registration.component';
 import { ScoreComponent } from './screens/score/score.component';
+import { ScoreReviewComponent } from './screens/score-review/score-review.component';
 
 const routes: Routes = [
   { path: 'signup', component: SignUpComponent },
@@ -33,7 +34,8 @@ const routes: Routes = [
     { path : 'createevent', component: EventCreationComponent },
     { path : 'cwcregistration', component :CwcregistrationComponent},
     { path : 'eventRegistration', component:EventRegistrationComponent},
-    { path : 'score', component:ScoreComponent}
+    { path : 'score', component:ScoreComponent},
+    { path : 'scoreReview', component:ScoreReviewComponent}
     // { path: 'testEvent',component:UserProfileComponent},
   ]
 },

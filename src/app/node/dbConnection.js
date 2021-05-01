@@ -12,7 +12,7 @@ function getConnection() {
     return client;
 }
 
-var pool =  new Pool({
+var pool = new Pool({
     user: "fjsbrbxppqqvvj",
     host: "ec2-54-73-68-39.eu-west-1.compute.amazonaws.com",
     database: "d43i6d6j774qi2",
@@ -22,8 +22,8 @@ var pool =  new Pool({
 
 async function getCoonectionPool() {
 
-    if(pool)
-     return pool;
+    if (pool)
+        return pool;
     // else  new Pool({
     //     user: "fjsbrbxppqqvvj",
     //     host: "ec2-54-73-68-39.eu-west-1.compute.amazonaws.com",
@@ -36,7 +36,12 @@ async function getCoonectionPool() {
 }
 
 function endConnection(client) {
-    client.end();
+    client.end(err => {
+        console.log('client has disconnected')
+        if (err) {
+            console.log('error during disconnection', err.stack)
+        }
+    })
 }
 
 module.exports = {

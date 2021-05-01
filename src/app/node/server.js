@@ -146,7 +146,7 @@ app.get('/api/getEventCategory', function (req, res) {
 app.get('/api/getEventData', function (req, res) {
   console.log("getEventData called with : " + req.query.user);
   try {
-    processRequest.getEventData(req.query.user)
+    processRequest.getEventData(req.query.user, req.query.eventType)
       .then((data) => {
         //     console.log(`Returning with response : ${JSON.stringify(data)}`)
         res.send(data);
@@ -548,7 +548,7 @@ app.get('/api/getParticipants', function (req, res) {
   console.log("getParticipants called...");
   let loggedInUser =  decodeUser(req)
   try {
-    processEventTemp.getParticipant(req.query.event, loggedInUser)
+    processEventTemp.getParticipant(req.query.event, loggedInUser, req.query.to)
       .then((data) => {
         res.send(data);
         res.end();

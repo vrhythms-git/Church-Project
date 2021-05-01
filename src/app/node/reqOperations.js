@@ -216,7 +216,7 @@ async function processGetUserMetaDataRequest(uid) {
                  vu.membership_type   
                 from v_user vu where user_id = '${uid}';`
 
-         let lastLoggedIn =  `select 
+        let lastLoggedIn = `select 
                                     action_timestamp as last_logged_in
                                 from 
                                     t_audit_log 
@@ -224,7 +224,7 @@ async function processGetUserMetaDataRequest(uid) {
                                     user_id ='${uid}'
                                     and "action" = 'LOG_IN' 
                                 order by 
-                                    audit_log_id desc FETCH FIRST 1 ROW ONLY;`       
+                                    audit_log_id desc FETCH FIRST 1 ROW ONLY;`
 
 
         let res = await client.query(query);
@@ -255,7 +255,7 @@ async function processGetUserMetaDataRequest(uid) {
             metaData.orgName = res.rows[0].org_name;
             metaData.orgId = res.rows[0].org_id;
             metaData.membershipType = res.rows[0].membership_type
-            metaData.lastLoggedIn = lastLoggedInRes.rows[0].last_logged_in 
+            metaData.lastLoggedIn = lastLoggedInRes.rows[0].last_logged_in
             metaData.mobile_no = res.rows[0].mobile_no;
 
             if (res.rows[0].is_approved == true) {
@@ -268,7 +268,7 @@ async function processGetUserMetaDataRequest(uid) {
                                         where 
                                             family_member_id = '${uid}';`
 
-                let isFamilyMemberRes = await client.query(isFamilyMember);                                            
+                let isFamilyMemberRes = await client.query(isFamilyMember);
 
                 metaData.middleName = res.rows[0].middle_name;
                 metaData.nickName = res.rows[0].nick_name;
@@ -289,7 +289,7 @@ async function processGetUserMetaDataRequest(uid) {
                 metaData.orgId = res.rows[0].org_id;
                 metaData.isFamilyHead = res.rows[0].is_family_head;
                 metaData.isFamilyMember = isFamilyMemberRes.rows[0].is_family_member;
-                
+
 
                 for (let row of res.rows) {
 
@@ -762,24 +762,65 @@ async function getParishData() {
 }
 
 /* .............get events Data from database.................. */
-async function getEventData(judgeId) {
+async function getEventData(userId, eventType) {
     let client = dbConnections.getConnection();
     try {
         await client.connect();
         let metadata = {};
         let getEventData = `select * from t_event`;
-        if(judgeId != null  || judgeId != undefined){
-            console.log(`Fetching event data for ${judgeId} judge.`)
-            getEventData = `select * from t_event where event_id in ( 
-                select distinct event_id from t_event_cat_staff_map where user_id = ${judgeId})
-                and is_deleted = false;`
+        console.log(`Fetching event data for ${userId} user.`)
+        if (eventType == 'for_judgement') {
+            
+            getEventData = `select distinct te.event_id, te."name",te.event_type,te.description,te.start_date, te.end_date,
+                            tecsm.is_score_submitted ,registration_start_date, te.registration_end_date, te.org_id
+                            from t_event te 
+                            join t_event_cat_staff_map tecsm on te.event_id = tecsm.event_id 
+                            where tecsm.user_id = ${userId} 
+                            and te.is_deleted = false
+                            order by event_id desc;`
         }
-       
+        if (eventType == 'review_pending') {
+
+            getEventData = ` select distinct te.event_id,
+                                    te."name",
+                                    te.event_type,
+                                    te.description,
+                                    te.start_date, 
+                                    te.end_date,
+                                tecsm.is_score_submitted,
+                                registration_start_date,
+                                te.registration_end_date,
+                                te.org_id
+                        from t_event_organization teo              
+                        join  (WITH recursive child_orgs 
+                                        AS (
+                                        SELECT org_id
+                                        FROM   t_organization parent_org 
+                                        WHERE  org_id IN
+                                                (
+                                                        SELECT a.org_id
+                                                        FROM   t_user_role_context a,                                                                            t_user b
+                                                        WHERE  b.user_id = ${userId}        
+                                                        AND    a.user_id = b.user_id)                                                        UNION
+                                        SELECT     child_org.org_id child_id
+                                        FROM       t_organization child_org
+                                        INNER JOIN child_orgs c
+                                        ON         c.org_id = child_org.parent_org_id ) SELECT *
+                                            FROM   child_orgs) hqry
+                            on 	teo.org_id  = hqry.org_id 
+                        join t_event te on teo.event_id = te.event_id 
+                        join t_event_cat_staff_map tecsm on tecsm.event_id = te.event_id 
+                        join t_event_category_map tecm on tecm.event_cat_map_id = tecsm.event_category_map_id 
+                        where tecsm.is_score_submitted = true
+                        order by te."name" asc`;
+        }
+
+
         let res = await client.query(getEventData);
         if (res && res.rowCount > 0) {
-          //  console.log("In Event response : " + res);
+            //  console.log("In Event response : " + res);
             let eventData = [];
-            for (let row of res.rows) { 
+            for (let row of res.rows) {
                 let events = {};
                 events.event_Id = row.event_id;
                 events.name = row.name;
@@ -790,10 +831,11 @@ async function getEventData(judgeId) {
                 events.registrationStartDate = row.registration_start_date;
                 events.registrationEndDate = row.registration_end_date;
                 events.orgId = row.org_id;
+                events.isScoreSubmitted = row.is_score_submitted
                 eventData.push(events);
             }
             metadata.eventData = eventData;
-         //   client.end()
+            //   client.end()
         }
         return ({
             data: {
@@ -804,10 +846,10 @@ async function getEventData(judgeId) {
         })
 
     } catch (error) {
-      //  client.end();
+        //  client.end();
         console.log(`reqOperations.js::getEventData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    }finally{
+    } finally {
         client.end()
     }
 }
@@ -822,7 +864,7 @@ async function processUpdateUserRoles(userData) {
         await client.query("BEGIN");
         // console.log("1");
 
-        
+
         if (userData.isFamilyHead == true || userData.isFamilyHead == "true") {
 
             let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
@@ -837,7 +879,7 @@ async function processUpdateUserRoles(userData) {
             let deleteRole = `delete from t_user_role_mapping 
                                 where user_id = ${userData.userId} 
                                     and role_id = (select role_id from t_role where name = 'Family Head');`
-      
+
             await client.query(deleteRole)
 
             let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
@@ -1292,21 +1334,21 @@ async function processUpdateUserRoles(userData) {
 
             }
 
-            
-        if (userData.isFamilyHead == true || userData.isFamilyHead == "true") {
 
-            let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
+            if (userData.isFamilyHead == true || userData.isFamilyHead == "true") {
+
+                let insertRoleMapping = `insert into t_user_role_mapping (user_id, role_id)
                 (select ${userData.userId}, role_id from t_role where name = 'Family Head');`
-            await client.query(insertRoleMapping)
-            console.log('User is family head gave him add member permission');
-        }
-        if (userData.isFamilyHead == false || userData.isFamilyHead == "false") {
+                await client.query(insertRoleMapping)
+                console.log('User is family head gave him add member permission');
+            }
+            if (userData.isFamilyHead == false || userData.isFamilyHead == "false") {
 
-            let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
+                let insertRoleMappingmember = `insert into t_user_role_mapping (user_id, role_id)
                 select ${userData.userId}, role_id from t_role where name = 'Member';`
 
-            await client.query(insertRoleMappingmember)
-        }
+                await client.query(insertRoleMappingmember)
+            }
 
         }
 

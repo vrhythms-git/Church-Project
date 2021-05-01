@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { uiCommonUtils } from '../../common/uiCommonUtils'
 import { ApiService } from '../../services/api.service'
 import { ScoreUploadComponent } from '../renderers/score-upload/score-upload.component'
-import { ScoreUploadInputComponent } from '../renderers/score-upload-input/score-upload-input.component'
+
 declare let $: any;
 
 
@@ -54,43 +54,16 @@ export class ScoreComponent implements OnInit {
     }
 
     this.eventColumnDefs = [
-      { headerName: 'Event Name', field: 'name', resizable: true, sortable: true, filter: true, checkboxSelection: true },
-      { headerName: 'Event Type', field: 'event_type', resizable: true, sortable: true, filter: true, },
-      // { headerName: 'Member Type', field: 'memberType', sortable: true, filter: true, width: 150 },
-      // { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 450 },
-      { headerName: 'Upload Score', field: 'action', resizable: true, cellRendererFramework: ScoreUploadComponent, width: 170 }
+      { headerName: 'Event Name', field: 'name',  suppressSizeToFit: true, flex:1,resizable: true, sortable: true, filter: true, },
+      { headerName: 'Event Type', field: 'event_type',  suppressSizeToFit: true, flex:1, resizable: true, sortable: true, filter: true, },
+      { headerName: 'Upload Score', field: 'action', suppressSizeToFit: true, flex:1, resizable: true, cellRendererFramework: ScoreUploadComponent, width: 170 }
     ];
 
-    this.participantColumnDefs = [
-      { headerName: 'Enrollment Id', field: 'enrollmentId', resizable: true, sortable: true, filter: true, checkboxSelection: true },
-      // { headerName: 'School Grade', field: 'schoolGrade', sortable: true, filter: true },
-      { headerName: 'Category', field: 'category', sortable: true, resizable: true, filter: true, },
-      // { headerName: 'Parish', field: 'parish_name', sortable: true, filter: true, width: 450 },
-      {
-        headerName: 'Score', field: 'score', flex: 1, width: 50, editable: true, resizable: true,
-
-        valueGetter: function (params: any) {
-          return params.data.score;
-        },
-        valueSetter: function (params: any) {
-
-          try {
-            let score = parseInt(params.newValue);
-            if (score > 0 && score != NaN)
-              params.data.score = score;
-            return true;
-          } catch (error) {
-            // alert('Please enter valid score.')
-            return false;
-          };
-        },
-
-      }
-    ];
+    this.participantColumnDefs = this.getParticipantDefArr(false)
 
     let userId = this.uiCommonUtils.getUserMetaDataJson().userId
 
-    this.apiService.callGetService(`getEventData?user=${userId}`).subscribe((respData) => {
+    this.apiService.callGetService(`getEventData?user=${userId}&&eventType=for_judgement`).subscribe((respData) => {
 
       if (respData.data.status == 'failed') {
         this.eventRowData = [];
@@ -109,18 +82,29 @@ export class ScoreComponent implements OnInit {
 
   selectedEventId: any;
   selectedEventName: any;
+  selectedEvtIsScrSubmted: boolean = false;
   onRowClicked(event: any) {
+   
+    this.participantRowData = [];
     $("#imagemodal").modal("show");
     this.selectedEventId = event.data.event_Id;
     this.selectedEventName = event.data.name;
-    this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}`).subscribe((respData) => {
+    this.selectedEvtIsScrSubmted = event.data.isScoreSubmitted;
+    if (this.selectedEvtIsScrSubmted == true) 
+      this.participantColumnDefs = this.getParticipantDefArr(false);
+    else
+      this.participantColumnDefs = this.getParticipantDefArr(true);
+    this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}&to=upload`).subscribe((respData) => {
 
       if (respData.data.status == 'failed') {
         this.participantRowData = [];
+        this.selectedEvtIsScrSubmted = true;
         this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
         return;
       } else
         this.participantRowData = respData.data.paticipants
+        this.selectedEvtIsScrSubmted = this.participantRowData != null ?  false : true;
+       
     });
   }
 
@@ -131,11 +115,46 @@ export class ScoreComponent implements OnInit {
   //   }
   // }
 
+  getParticipantDefArr(isEditable: boolean) {
+
+    return ([
+      { headerName: 'Enrollment Id', field: 'enrollmentId', flex:1, suppressSizeToFit: true, resizable: true, sortable: true, filter: true },
+      { headerName: 'Category', field: 'category', suppressSizeToFit: true, flex:1, sortable: true, resizable: true, filter: true, },
+      { headerName: 'Score', field: 'score', suppressSizeToFit: true, flex:1, editable: isEditable, resizable: true,
+
+        valueGetter: function (params: any) {
+          return params.data.score;
+        },
+        valueSetter: function (params: any) {
+
+          try {
+            let score = parseInt(params.newValue);
+            if (score > 0 && score != NaN)
+              params.data.score = score;
+            return true;
+          } catch (error) {
+            // alert('Please enter valid score.')
+            return false;
+          };
+        },
+
+      }
+    ]);
+  }
+
   handleScoreCompleteBtnClick($event: any) {
 
-    let confmMsgSt = ` Press \`OK\` to submit participant's score for approval.[YOU WON'T BE ABLE TO MODIFY ASSIGNED SCORE AFTER SUBMISSION.!]`;
-    if (confirm(confmMsgSt))
-      this.handleScoreSaveBtnClick('complete');
+    let scoreData: any = this.getuserScoreArray();
+    if (scoreData.length == 0) {
+      this.uiCommonUtils.showSnackBar('Nothing to save!', 'error', 3000)
+      return;
+    } {
+      let confmMsgSt = `Scores cannot be updated after submission, Please click \'Ok\' to proceed.`;
+      if (confirm(confmMsgSt)) {
+        this.handleScoreSaveBtnClick('submit');
+        this.ngOnInit();
+      }
+    }
   }
 
   handleScoreSaveBtnClick(event: any) {
@@ -146,14 +165,15 @@ export class ScoreComponent implements OnInit {
       return;
     } else {
       let payload: any = {};
-      if (event == 'complete'){
-        payload.action = 'complete';
+      if (event == 'submit') {
+        payload.action = 'submit';
+        payload.eventId = this.selectedEventId;
       }
       else
         payload.action = 'save';
       payload.scoreData = scoreData;
 
-      this.apiService.callPostService('postScore', payload ).subscribe((response) => {
+      this.apiService.callPostService('postScore', payload).subscribe((response) => {
 
         if (response.data.status == 'failed') {
           this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000)
@@ -164,6 +184,8 @@ export class ScoreComponent implements OnInit {
       })
 
     }
+    $("#imagemodal").modal("hide");
+    this.ngOnInit();
   }
 
   getuserScoreArray(): any[] {

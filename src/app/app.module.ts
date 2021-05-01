@@ -66,6 +66,7 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ScoreComponent } from './screens/score/score.component';
 import { ScoreUploadComponent } from './screens/renderers/score-upload/score-upload.component';
 import { ScoreUploadInputComponent } from './screens/renderers/score-upload-input/score-upload-input.component';
+import { ScoreReviewComponent } from './screens/score-review/score-review.component';
 
 
 
@@ -85,7 +86,7 @@ import { ScoreUploadInputComponent } from './screens/renderers/score-upload-inpu
     MyProfileComponent,
     ApprovalRequestsComponent,
     ReqRendererComponent,  
-    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent, ScoreComponent, ScoreUploadComponent, ScoreUploadInputComponent
+    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent, ScoreComponent, ScoreUploadComponent, ScoreUploadInputComponent, ScoreReviewComponent
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],
