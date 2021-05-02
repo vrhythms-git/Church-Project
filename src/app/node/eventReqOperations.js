@@ -56,6 +56,15 @@ async function deleteEvents(eventsData) {
                     let deleteTblEventQuestionnaire = `UPDATE t_event_questionnaire SET is_deleted = true where event_id = ${event.eventId};`
                     await client.query(deleteTblEventQuestionnaire);
                 }
+
+                console.log("Before commit");
+                await client.query("COMMIT");
+        
+                return ({
+                    data: {
+                        status: 'success'
+                    }
+                })
             }
         }
         catch (err) {
