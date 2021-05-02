@@ -1,8 +1,16 @@
 <div class="container mt-4">
     <mat-card class="shadow">
-        <h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;" *ngIf="!eventFormLabel">Create Event</h1>
-        <h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;" *ngIf="eventFormLabel">Update Event</h1>
-
+        <div class="row" style="padding-top: 0.6%;">
+            <div class="col-md-6">
+                <h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;" *ngIf="!eventFormLabel">Create Event</h1>
+                <h1 style="margin-top:1%; margin-bottom: 2%; padding-left: 2%;" *ngIf="eventFormLabel">Update Event</h1>
+                </div>
+            <div class="col-md-6" style="text-align: right;">
+            <button mat-button class="ml-auto" data-dismiss="modal" >  
+                <mat-icon (click)="onCloseBtnClick()">clear</mat-icon>
+            </button>
+            </div>   
+    </div>
         <mat-vertical-stepper [linear]="true" #stepper>
 
             <mat-step [stepControl]="eventsDataFormGroup">
@@ -254,14 +262,14 @@
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <mat-form-field class="col-md-12">
-                                                        <input matInput id="name" matInput formControlName="name"
+                                                        <input readonly matInput id="name" matInput formControlName="name"
                                                             placeholder="Name">
                                                     </mat-form-field>
                                                 </div>
 
                                                 <div *ngIf= "isSchoolGradeRequired" class="col-md-4">
                                                     <mat-form-field class="col-md-12">
-                                                        <input matInput id="schoolGradeFrom" matInput
+                                                        <input readonly matInput id="schoolGradeFrom" matInput
                                                             formControlName="schoolGradeFrom"
                                                             placeholder="School Grade From">
                                                     </mat-form-field>
@@ -269,7 +277,7 @@
 
                                                 <div *ngIf= "isSchoolGradeRequired" class="col-md-4">
                                                     <mat-form-field class="col-md-12">
-                                                        <input matInput id="schoolGradeTo" matInput
+                                                        <input readonly matInput id="schoolGradeTo" matInput
                                                             formControlName="schoolGradeTo"
                                                             placeholder="School Grade To">
                                                     </mat-form-field>

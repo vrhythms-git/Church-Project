@@ -10,15 +10,74 @@ const dbConnections = require(`${__dirname}/dbConnection`);
 
 
 
+async function deleteEvents(eventsData) {
+    let client = dbConnections.getConnection();
+    console.log("User Data" + JSON.stringify(eventsData));
+    await client.connect();
+    try {
+        await client.query("BEGIN");
+        try {
+            if (eventsData) {
+                for (let event of eventsData.eventId) {
+
+                    //t_event
+                    const deleteTblEvent = `UPDATE t_event SET is_deleted = true WHERE event_id = ${event.eventId};`
+                    await client.query(deleteTblEvent);
+
+                    //t_event_organization
+                    let deleteTblEventOrg = `DELETE FROM t_event_organization where event_id = ${eventsData.eventId};`
+                    await client.query(deleteTblEventOrg);
+
+                    //t_event_venue
+                    let deleteTblEventVenue = `UPDATE t_event_venue SET is_deleted = true where event_id = ${event.eventId};`
+                    await client.query(deleteTblEventVenue);
+
+                    let eventCatMapIds;
+                    let deletedEventCatMapIds = [];
+                    //t_event_category_map
+                    let deleteTblEventCatMap = `DELETE FROM t_event_category_map where event_id = ${event.eventId} returning event_cat_map_id;`
+                    let result = await client.query(deleteTblEventCatMap);
+                    for (let id of result.rows.event_cat_map_id) {
+                        eventCatMapIds = id;
+                        deletedEventCatMapIds.push(eventCatMapIds);
+                    }
+
+                    //t_event_category_venue_map
+                    for (let eventCatMapId of deletedEventCatMapIds) {
+                        let deleteVenueMap = `DELETE FROM t_event_category_venue_map where event_cat_map_id = ${eventCatMapId};`
+                        await client.query(deleteVenueMap);
+                    }
+
+                    //t_event_cat_staff_map
+                    let deleteTblEventCatStaffMap = `UPDATE t_event_cat_staff_map SET is_deleted = true where event_id = ${event.eventId};`
+                    await client.query(deleteTblEventCatStaffMap);
+
+                    //t_event_questionnaire
+                    let deleteTblEventQuestionnaire = `UPDATE t_event_questionnaire SET is_deleted = true where event_id = ${event.eventId};`
+                    await client.query(deleteTblEventQuestionnaire);
+                }
+            }
+        }
+        catch (err) {
+            await client.query("ROLLBACK");
+            console.error(`reqOperations.js::deleteEvents() --> error : ${JSON.stringify(err)}`)
+            console.log("Transaction ROLLBACK called");
+            return (errorHandling.handleDBError('transactionError'));
+        }
+    }
+    catch (error) {
+        console.error(`reqOperations.js::deleteEvents() --> error : ${JSON.stringify(err)}`);
+        return (errorHandling.handleDBError('transactionError'));
+    }
+
+}
 
 async function updateEvent(eventsData) {
-
 
     let client = dbConnections.getConnection();
     await client.connect();
     await client.query("BEGIN");
     try {
-        console.log("1");
         /********************** t_event*******************************************************************************************/
         const updateEvent = `UPDATE t_event
             SET "name"=$1, event_type=$2, description=$3, start_date=$4, end_date=$5,
@@ -41,12 +100,11 @@ async function updateEvent(eventsData) {
 
 
         ///////////////////////////////////////////// t_event_organization ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        console.log("2");
 
         let deleteOrgIdQuery = `DELETE FROM t_event_organization where event_id = ${eventsData.eventId};`
         await client.query(deleteOrgIdQuery);
 
-        if (eventsData.orgId != null) {
+        if (eventsData.orgId) {
             for (let org of eventsData.orgId) {
                 console.log("org", org);
                 const insertOrgTypeData = `INSERT INTO t_event_organization(event_id, org_type, org_id) VALUES($1, $2, $3);`
@@ -62,26 +120,27 @@ async function updateEvent(eventsData) {
 
 
         ////////////////////////////////////////////  t_event_venue  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        console.log("3");
 
         let updatedAndInsertedVenues = [];
-        if (eventsData.venues != null) {
+        if (eventsData.venues) {
             for (let venue of eventsData.venues) {
-                if (venue.eventVenueId != null) {
+                if (venue.eventVenueId) {
 
                     const updateVenueQuery = `UPDATE t_event_venue SET venue_id = $1, proctor_id = $2
-                                         where event_venue_id = ${venue.eventVenueId} and is_deleted = false;`
+                                         where event_venue_id = ${venue.eventVenueId} and is_deleted = false and event_id = ${eventsData.eventId};`
                     updateVenueValues =
                         [
                             venue.venueId,
                             venue.proctorId
                         ]
-                    if (venue.venueId != "") {
-                        let result = await client.query(updateVenueQuery, updateVenueValues);
+                    if (venue.venueId) {
+                        await client.query(updateVenueQuery, updateVenueValues);
                         updatedAndInsertedVenues.push(venue.eventVenueId);
+                        console.log("updatedAndInsertedVenues", updatedAndInsertedVenues);
                     }
                 }
-                else if (venue.eventVenueId == null) {
+                else if (!venue.eventVenueId) {
+
                     const insertVenueQuery = `INSERT INTO t_event_venue(event_id, venue_id, proctor_id)
                                             VALUES ($1, $2, $3) returning event_venue_id;`
                     insertVenueValues =
@@ -94,12 +153,13 @@ async function updateEvent(eventsData) {
                         let result = await client.query(insertVenueQuery, insertVenueValues);
                         this.eventVenueID = result.rows[0].event_venue_id;
                         updatedAndInsertedVenues.push(this.eventVenueID);
+                        console.log("updatedAndInsertedVenues", updatedAndInsertedVenues);
                     }
                 }
             }
             if (updatedAndInsertedVenues.length > 0) {
                 let existingVenueString = updatedAndInsertedVenues.join(',');
-                const deleteVenuesQuery = `UPDATE t_event_venue SET is_deleted = true where event_venue_id not in (${existingVenueString});`
+                const deleteVenuesQuery = `UPDATE t_event_venue SET is_deleted = true where event_venue_id not in (${existingVenueString}) and event_id = ${eventsData.eventId};`
                 await client.query(deleteVenuesQuery);
             }
         }
@@ -111,15 +171,15 @@ async function updateEvent(eventsData) {
         let updatedNInsertedEventCatMapIds = [];
         if (eventsData.categories != null) {
             let eventCatMapId;
-            console.log("5");
+
             for (let category of eventsData.categories) {
-                if (category.eventCatMapId != null) {
+                if (category.eventCatMapId) {
                     console.log("6");
                     eventCatMapId = category.eventCatMapId;
                     updatedNInsertedEventCatMapIds.push(category.eventCatMapId);
                     console.log(updatedNInsertedEventCatMapIds);
                 }
-                else if (category.eventCatMapId == null) {
+                else if (!category.eventCatMapId) {
                     console.log("7");
                     const insertCategory = `INSERT INTO t_event_category_map(event_id, event_category_id)
                                             VALUES ($1, $2) returning event_cat_map_id;`
@@ -134,7 +194,7 @@ async function updateEvent(eventsData) {
                     console.log(updatedNInsertedEventCatMapIds);
                 }
 
-                console.log("8");
+
                 let deleteVenueMap = `DELETE FROM t_event_category_venue_map where event_cat_map_id = ${eventCatMapId};`
                 await client.query(deleteVenueMap);
 
@@ -149,14 +209,13 @@ async function updateEvent(eventsData) {
                 }
 
 
-                console.log("9");
-                if (category.judges != null) {
+                if (category.judges.length) {
+
                     let existingJudgesString = category.judges.join(',');
 
                     let deleteEventCatVenueMapQuery = `DELETE FROM t_event_cat_staff_map where event_id = ${eventsData.eventId} 
                                                        and event_category_map_id = ${eventCatMapId} and user_id not in (${existingJudgesString});`
                     await client.query(deleteEventCatVenueMapQuery);
-
                     for (let judge of category.judges) {
 
                         const insertCatUserMap = `insert into t_event_cat_staff_map (event_id, event_category_map_id, user_id, role_type)
@@ -171,10 +230,10 @@ async function updateEvent(eventsData) {
                 }
             }
             if (updatedNInsertedEventCatMapIds.length > 0) {
-                console.log("10");
+
                 let existingEventCatMapIds = updatedNInsertedEventCatMapIds.join(',');
                 console.log("existingEventCatMapIds", existingEventCatMapIds);
-                const deleteEventCatMapIdsQuery = `DELETE FROM t_event_category_map where event_cat_map_id not in (${existingEventCatMapIds});`
+                const deleteEventCatMapIdsQuery = `DELETE FROM t_event_category_map where event_cat_map_id not in (${existingEventCatMapIds}) and event_id = ${eventsData.eventId};`
                 await client.query(deleteEventCatMapIdsQuery);
             }
         }
@@ -182,33 +241,37 @@ async function updateEvent(eventsData) {
 
 
         /********************** t_event_questionnaire ************************************************************************************/
-        console.log("11");
 
 
         let updatedAndInsertedQuestions = [];
-        if (eventsData.questionnaire != null) {
+        if (eventsData.questionnaire) {
             for (let question of eventsData.questionnaire) {
-                if (question.questionId != null) {
-                    console.log("12");
-                    const insertQuestionare = `UPDATE t_event_questionnaire SET question = $1, answer_type = $2
-                                               where question_id = ${question.questionId};`
+                console.log("question.questionId", question.questionId);
+                if (question.questionId) {
+
+                    const insertQuestionare = `UPDATE t_event_questionnaire SET question = $1, answer_type = $2, is_deleted = $3
+                                               where question_id = ${question.questionId} and event_id = ${eventsData.eventId};`
                     insertQuestionareValue =
                         [
                             question.question,
-                            question.answerType
+                            question.responseType,
+                            false
                         ]
                     await client.query(insertQuestionare, insertQuestionareValue);
                     updatedAndInsertedQuestions.push(question.questionId);
+                    console.log("updatedAndInsertedQuestions", updatedAndInsertedQuestions);
 
                 }
-                else if (question.questionId == null) {
+                else if (!question.questionId) {
+
                     const insertQuestionare = `INSERT INTO t_event_questionnaire(event_id, question, answer_type)
                                                VALUES ($1, $2, $3) returning question_id;`
                     insertQuestionareValue =
                         [
                             eventsData.eventId,
                             question.question,
-                            question.answerType
+                            question.responseType
+
                         ]
                     let result = await client.query(insertQuestionare, insertQuestionareValue);
                     this.questionId = result.rows[0].question_id;
@@ -216,13 +279,11 @@ async function updateEvent(eventsData) {
                 }
             }
             if (updatedAndInsertedQuestions.length > 0) {
-                let existingQuestionsString = updatedAndInsertedVenues.join(',');
-                const deleteQuestionsQuery = `UPDATE t_event_questionnaire SET is_deleted = true where question_id not in (${existingQuestionsString});`
+                let existingQuestionsString = updatedAndInsertedQuestions.join(',');
+                const deleteQuestionsQuery = `UPDATE t_event_questionnaire SET is_deleted = true where question_id not in (${existingQuestionsString}) and event_id = ${eventsData.eventId};`
                 await client.query(deleteQuestionsQuery);
             }
         }
-
-
 
 
         //client.end();
@@ -239,7 +300,7 @@ async function updateEvent(eventsData) {
     }
     catch (err) {
         await client.query("ROLLBACK");
-        console.error(`eventReqOperations.js::UpdateEvent() --> error : ${JSON.stringify(err)}`)
+        console.error(`eventReqOperations.js::UpdateEvent() --> error : ${err}`)
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
     }
@@ -297,7 +358,6 @@ async function getVenues(venueData) {
 
 async function insertEvents(eventsData) {
 
-
     let client = dbConnections.getConnection();
     console.log("User Data" + JSON.stringify(eventsData));
     await client.connect();
@@ -308,7 +368,7 @@ async function insertEvents(eventsData) {
                 let eventId = 0;
                 console.log("1");
                 /********************** t_event*******************************************************************************************/
-                const insertevent = `INSERT INTO public.t_event(name, event_type, description, start_date, end_date, registration_start_date, registration_end_date, event_url) 
+                const insertevent = `INSERT INTO t_event (name, event_type, description, start_date, end_date, registration_start_date, registration_end_date, event_url) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning event_id;`
                 const insertevent_values = [
                     eventsData.name,
@@ -656,6 +716,7 @@ async function getProctorData(userData) {
 
 
 
+
 async function getEventQuestionnaireData() {
     let client = dbConnections.getConnection();
     await client.connect();
@@ -752,5 +813,6 @@ module.exports = {
     getProctorData,
     getEventType,
     getEventQuestionnaireData,
-    getEventForRegistration
+    getEventForRegistration,
+    deleteEvents
 }

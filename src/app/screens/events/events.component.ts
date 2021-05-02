@@ -29,6 +29,7 @@ export class EventsComponent implements OnInit {
   eventId : any;
   eventEditForm:any;
   selectedEventData:any;
+  selectedRowJson: any = {};
   //events! : Events[];
 
   //events! : Events[];
@@ -127,6 +128,10 @@ export class EventsComponent implements OnInit {
   }
   onDeleteEventClick(){
     console.log("Clicked on Event delete button");
+    if (this.eventDataService.getSelectedRowData() != undefined) {
+      this.selectedRowJson = this.eventDataService.getSelectedRowData();
+      console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson));
+    }
   }
 
   onRowClicked(event:any){    

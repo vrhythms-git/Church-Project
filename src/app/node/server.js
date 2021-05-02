@@ -606,6 +606,25 @@ app.get('/api/getEventCatsAndStaffById', function (req, res) {
   }
 });
 
+app.post('/api/deleteEvents', function (req, res) {
+  console.log("deleteEvents called with : " + JSON.stringify(req.body));
+  try {
+    processEventRequest.deleteEvents(req.body.data)
+      .then((data) => {
+        console.log(`Returning with resonse : ${data}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in deleteEvents as : ' + error)
+  }
+});
+
+
 
 //to decode loggedin user Id from the request context.
 function decodeUser(reqContext) {
