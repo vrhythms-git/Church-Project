@@ -548,7 +548,12 @@ app.get('/api/getParticipants', function (req, res) {
   console.log("getParticipants called...");
   let loggedInUser =  decodeUser(req)
   try {
-    processEventTemp.getParticipant(req.query.event, loggedInUser, req.query.to)
+    processEventTemp.getParticipant(req.query.event,
+                                   loggedInUser,
+                                   req.query.to,
+                                   req.query.judge,
+                                   req.query.category
+                                   )
       .then((data) => {
         res.send(data);
         res.end();
@@ -580,6 +585,26 @@ app.post('/api/postScore', function (req, res) {
   }
 });
 
+
+
+app.get('/api/getEventCatsAndStaffById', function (req, res) {
+  console.log("getEventCatsAndStaffById called... with  event ID:" + req.query.id);
+ // let loggedInUser =  decodeUser(req)
+  try {
+    processEventTemp.getEventCatsAndStaffById(req.query.id)
+      .then((data) => {
+        //console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        //console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in getEventCatsAndStaffById as : ' + error)
+  }
+});
 
 
 //to decode loggedin user Id from the request context.

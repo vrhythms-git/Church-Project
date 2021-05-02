@@ -332,7 +332,7 @@ async function eventRegistration(eventData) {
     }
 }
 
-async function getParticipant(eventId, userId, action) {
+async function getParticipant(eventId, userId, action, judgeId, catId) {
     console.log('fetching participants for event ' + eventId + ', user : ' + userId);
 
     let client = dbConnections.getConnection();
@@ -368,14 +368,19 @@ async function getParticipant(eventId, userId, action) {
                                                     'categoryId', res.event_category_id,
                                                     'isScoreApproved', res.is_score_approved,
                                                     'judgeId', res.staff_id,
-                                                    'judgeName', res.judge_name
+                                                    'judgeName', res.judge_name,
+                                                    'catStaffMapId', res.event_cat_staff_map_id
                                                     ) 
                                                 ) participants                                  
-                                    from (select staff_id, enrollment_id, score, event_category_id, event_category_name,
-                                        concat(staff_first_name, ' ', staff_last_name ) judge_name, is_score_approved 
-                                    from v_event_participant vep where event_id = ${eventId} 
-                                    and is_score_submitted = true order by enrollment_id order by 5) res;`;
-        }else{
+                                    from (  select staff_id, enrollment_id, score, event_category_id, event_category_name,
+                                        concat(staff_first_name, ' ', staff_last_name ) judge_name,
+                                         is_score_approved, event_cat_staff_map_id 
+                                    from v_event_participant vep 
+                                    where event_id = ${eventId} 
+                                    and staff_id = ${judgeId}
+                                    and event_category_id = ${catId}
+                                    and is_score_submitted = true order by enrollment_id, 5 asc) res;`;
+        } else {
             console.log('Invalid action sent to getParticipant api, action recived to process  : ' + action);
             return (errorHandling.handleDBError('connectionError'));
         }
@@ -396,10 +401,47 @@ async function getParticipant(eventId, userId, action) {
 
 }
 
+async function getEventCatsAndStaffById(eventId) {
 
+    let client = dbConnections.getConnection();
+    try {
+        await client.connect();
+
+        let queryStmt = `select         
+                                jsonb_agg(
+                                        distinct jsonb_build_object('categoryId', res.event_category_id,
+                                                                    'categoryName', res.event_category_name ) 		
+                                            ) catarr,
+                                jsonb_agg(
+                                        distinct jsonb_build_object('judgeId', res.staff_id,
+                                                                    'judgeName', res.judge_name ) 		
+                                            ) judgearr 		                                    
+                        from  
+                            ( select distinct staff_id, concat(staff_first_name, ' ', staff_last_name ) judge_name,
+                                event_category_id, event_category_name from v_event_participant 
+                                where event_id = ${eventId}) res;`;
+
+        let result = await client.query(queryStmt);
+
+        return {
+            data: {
+                status: 'success',
+                eventData : result.rows[0]
+            }
+        }
+
+    } catch (error) {
+        console.error(`eventReqOperations.js::getEventCatsAndStaffById() : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.end();
+    }
+
+}
 
 module.exports = {
     getEventById,
     eventRegistration,
-    getParticipant
+    getParticipant,
+    getEventCatsAndStaffById
 }

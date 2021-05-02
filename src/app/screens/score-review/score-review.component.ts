@@ -56,13 +56,13 @@ export class ScoreReviewComponent implements OnInit {
 
     // this.eventGridOption.autoSizeColumns(['Event Name', 'Event Type'])
     this.eventColumnDefs = [
-      { headerName: 'Event Name', field: 'name', resizable: true, flex:1, suppressSizeToFit: true, sortable: true, filter: true },
-      { headerName: 'Event Type', field: 'event_type',flex:1, resizable: true, suppressSizeToFit: true, sortable: true, filter: true },
+      { headerName: 'Event Name', field: 'name', resizable: true, flex: 1, suppressSizeToFit: true, sortable: true, filter: true },
+      { headerName: 'Event Type', field: 'event_type', flex: 1, resizable: true, suppressSizeToFit: true, sortable: true, filter: true },
     ];
 
     this.scoreApprovalColDef = [
-      { headerName: 'Enrollment ID', field: 'enrollmentId',flex:1, resizable: true, suppressSizeToFit: true, sortable: true, filter: true },
-      { headerName: 'Category', field: 'category',flex:1, resizable: true, suppressSizeToFit: true, sortable: true, filter: true },
+      { headerName: 'Enrollment ID', field: 'enrollmentId', flex: 1, resizable: true, suppressSizeToFit: true, sortable: true, filter: true },
+      { headerName: 'Category', field: 'category', flex: 1, resizable: true, suppressSizeToFit: true, sortable: true, filter: true },
       { headerName: 'Score', field: 'score', flex: 1, width: 50, suppressSizeToFit: true, resizable: true, }
     ];
 
@@ -89,60 +89,104 @@ export class ScoreReviewComponent implements OnInit {
 
   }
 
-  selectedCat: string = 'All';
-  selectedJudge: string = 'All';
+  selectedCat: string = '';
+  selectedJudge: string = '';
   catNameArr: any = [];
   judgeNameArr: any = [];
   selectedEventData: any = {}
   masterData: any;
+  disableApproveBtn: boolean = false;
+
   onRowClicked(event: any) {
 
     this.scoreApprovalRowData = [];
     this.catNameArr = [];
     this.judgeNameArr = [];
     this.selectedEventData = event.data;
+    this.disableApproveBtn = true;
     $("#imagemodal").modal("show");
 
-    this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}&to=approve`).subscribe((respData) => {
+    this.apiService.callGetService(`getEventCatsAndStaffById?id=${event.data.event_Id}`).subscribe((respData) => {
+
+
       if (respData.data.status == 'failed') {
         this.scoreApprovalRowData = [];
         this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
         return;
       } else {
-        this.scoreApprovalRowData = respData.data.paticipants
-        this.masterData = respData.data.paticipants;
 
-        respData.data.paticipants.forEach((item: any) => {
-          let index1 = this.catNameArr.findIndex((arrItem: any) => arrItem.categoryId == item.categoryId)
-          let index2 = this.judgeNameArr.findIndex((arrItem: any) => arrItem.judgeId == item.judgeId)
-          if (index1 < 0)
-            this.catNameArr.push(item);
-          if (index2 < 0)
-            this.judgeNameArr.push(item)
-        });
+        if (respData.data.eventData.catarr !== null && respData.data.eventData.catarr !== null) {
+          this.catNameArr = respData.data.eventData.catarr;
+          this.judgeNameArr = respData.data.eventData.judgearr;
+          this.selectedCat = this.catNameArr[0].categoryId;
+          this.selectedJudge = this.judgeNameArr[0].judgeId;
+
+          let urlString = `to=approve&event=${event.data.event_Id}&judge=${this.selectedJudge}&category=${this.selectedCat}`
+
+          this.apiService.callGetService('getParticipants?' + urlString).subscribe((respData) => {
+            if (respData.data.status == 'failed') {
+              this.scoreApprovalRowData = [];
+              this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
+              return;
+            } else {
+              this.scoreApprovalRowData = respData.data.paticipants
+              if (this.scoreApprovalRowData !==null && this.scoreApprovalRowData[0].isScoreApproved === true)
+                this.disableApproveBtn = true;
+              else 
+                this.disableApproveBtn = false;
+            }
+          });
+
+        }
       }
     });
   }
 
   onDropdowwnSelChange(event: any) {
 
-    if (this.selectedCat === 'All' && this.selectedJudge === 'All')
-      this.scoreApprovalRowData = this.masterData;
-    else if (this.selectedCat !== 'All' && this.selectedJudge === 'All')
-      this.scoreApprovalRowData = this.masterData.filter((item: any) => item.categoryId == this.selectedCat)
-    else if (this.selectedCat === 'All' && this.selectedJudge !== 'All')
-      this.scoreApprovalRowData = this.masterData.filter((item: any) => item.judgeId == this.selectedJudge)
-    else if (this.selectedCat !== 'All' && this.selectedJudge !== 'All') {
-      this.scoreApprovalRowData = this.masterData.filter((item: any) => (item.judgeId == this.selectedJudge) && item.categoryId == this.selectedCat)
-    }
+    let urlString = `to=approve&event=${this.selectedEventData.event_Id}&judge=${this.selectedJudge}&category=${this.selectedCat}`
 
+    this.apiService.callGetService('getParticipants?' + urlString).subscribe((respData) => {
+      if (respData.data.status == 'failed') {
+        this.scoreApprovalRowData = [];
+        this.uiCommonUtils.showSnackBar('Something  went wrong!', 'error', 3000);
+        return;
+      } else {
+        this.scoreApprovalRowData = respData.data.paticipants
+        if ( this.scoreApprovalRowData !==null && this.scoreApprovalRowData[0].isScoreApproved === true)
+          this.disableApproveBtn = true;
+        else
+          this.disableApproveBtn = false;
+      }
+    });
   }
 
   handleScoreApproveBtnClick() {
 
-    if (this.scoreApprovalRowData.length == 0) {
+    if (this.scoreApprovalRowData === null || this.scoreApprovalRowData.length === 0  ) {
       this.uiCommonUtils.showSnackBar('Nothing to Approve!', 'error', 3000)
       return;
-    } 
+    } else {
+
+      let payload = {
+        action: 'approve',
+        eventId: this.selectedEventData.event_Id,
+        judgeId: this.selectedJudge,
+        catId: this.selectedCat
+      };
+
+      this.apiService.callPostService('postScore', payload).subscribe((response) => {
+
+        if (response.data.status == 'failed') {
+          this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000)
+          return;
+        } else {
+          this.uiCommonUtils.showSnackBar('Score successfully approved!', 'success', 3000)
+          this.onDropdowwnSelChange('');
+        }
+      })
+
+
+    }
   }
 }

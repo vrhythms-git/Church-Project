@@ -40,9 +40,9 @@
                             <mat-form-field>
                                 <mat-label>Category</mat-label>
                                 <mat-select (selectionChange)="onDropdowwnSelChange($event)" [(value)]="selectedCat">
-                                    <mat-option selected=true [value]="'All'"> All </mat-option>
+                                    <!-- <mat-option selected=true [value]="'All'"> All </mat-option> -->
                                     <mat-option *ngFor="let cat of catNameArr" [value]="cat.categoryId">
-                                        {{cat.category}}
+                                        {{cat.categoryName}}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
@@ -51,7 +51,7 @@
                             <mat-form-field>
                                 <mat-label>Judge</mat-label>
                                 <mat-select (selectionChange)="onDropdowwnSelChange($event)" [(value)]="selectedJudge">
-                                    <mat-option selected [value]="'All'"> All </mat-option>
+                                    <!-- <mat-option selected [value]="'All'"> All </mat-option> -->
                                     <mat-option *ngFor="let judge of judgeNameArr" [value]="judge.judgeId">
                                         {{judge.judgeName}}
                                     </mat-option>
@@ -72,15 +72,8 @@
                         <div style="padding: 9px; text-align-last: center;">
                             <button mat-button class="ml-auto border" style="background: #d68165;" data-dismiss="modal">
                                 Cancel
-                                <!-- <mat-icon>clear</mat-icon> -->
                             </button>
-                            <!-- 
-                        <button [disabled]="selectedEvtIsScrSubmted" mat-button class="ml-auto border" (click)="handleScoreSaveBtnClick($event)" style="background: #d68165;">  
-                            Save
-                       
-                         </button> -->
-                         <!-- [disabled]="selectedEvtIsScrSubmted" -->
-                            <button mat-button class="ml-auto border"
+                            <button mat-button [disabled]="disableApproveBtn" class="ml-auto border"
                                 (click)="handleScoreApproveBtnClick()" style="background: #d68165;">
                                 Approve
                             </button>

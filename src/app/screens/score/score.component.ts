@@ -90,21 +90,19 @@ export class ScoreComponent implements OnInit {
     this.selectedEventId = event.data.event_Id;
     this.selectedEventName = event.data.name;
     this.selectedEvtIsScrSubmted = event.data.isScoreSubmitted;
-    if (this.selectedEvtIsScrSubmted == true) 
+    if (this.selectedEvtIsScrSubmted === true) 
       this.participantColumnDefs = this.getParticipantDefArr(false);
     else
       this.participantColumnDefs = this.getParticipantDefArr(true);
     this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}&to=upload`).subscribe((respData) => {
 
-      if (respData.data.status == 'failed') {
+      if (respData.data.status === 'failed') {
         this.participantRowData = [];
         this.selectedEvtIsScrSubmted = true;
         this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
         return;
       } else
-        this.participantRowData = respData.data.paticipants
-        this.selectedEvtIsScrSubmted = this.participantRowData != null ?  false : true;
-       
+        this.participantRowData = respData.data.paticipants       
     });
   }
 

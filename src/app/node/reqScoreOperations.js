@@ -3,6 +3,7 @@ const _ = require('underscore');
 const errorHandling = require('./ErrorHandling/commonDBError');
 const { result } = require('underscore');
 const { json } = require('express');
+const { query } = require('@angular/animations');
 const dbConnections = require(`${__dirname}/dbConnection`);
 
 
@@ -14,11 +15,14 @@ async function persistParticipantScore(userScoreData, userId) {
     try {
         client = dbConnections.getConnection();
         await client.connect();
-        console.log('Judge to ' + userId + ' ' + userScoreData.action + ' ' + userScoreData.scoreData.length + ' participants score.');
+        if(userScoreData.action === 'save' || userScoreData.action === 'submit')
+            console.log('Judge\'s  {' + userId + ')action is : ' + userScoreData.action + ' no. of participant\'s score to update : ' + userScoreData.scoreData.length)
+        else if(userScoreData.action === 'approve')
+            console.log('Event co-ordinator ('+ userId +') to approve score.')
 
         await client.query('begin;');
         //Populating user t_participant_event_score;
-        console.log('Action is : ' + userScoreData.action + ' no. of participant\'s score to update : ' + userScoreData.scoreData.length)
+     
        
        // Score upload save button logic.
         if (userScoreData.action === 'save') {
@@ -75,6 +79,16 @@ async function persistParticipantScore(userScoreData, userId) {
         // when event co-ordinator approves the score, Approve button logic. 
         if (userScoreData.action === 'approve'){
 
+            let query = ` update t_event_cat_staff_map set is_score_approved = true 
+                                where event_id = ${userScoreData.eventId} 
+                                and user_id = ${userScoreData.judgeId}	
+                                and event_category_map_id in (
+                                                        select event_cat_map_id  from t_event_category_map 
+                                                                                where event_category_id = ${userScoreData.catId} 
+                                                                                and event_id = ${userScoreData.eventId});` 
+            await client.query(query);
+            console.log(`User ${userId} approved score for category: ${userScoreData.catId}, Judge: ${userScoreData.judgeId}, Event: ${userScoreData.eventId}`);
+            client.query(`commit;`);
         }
 
         return {
