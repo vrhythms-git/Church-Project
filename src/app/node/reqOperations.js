@@ -697,45 +697,39 @@ async function getEventCategory() {
 
 async function getParishData() {
 
-   
-    return new Promise((resolve, reject) => {
-        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
+    let client = await dbConnections.getConnection();
+  //  return new Promise((resolve, reject) => {
+    
         try {
-            let client = dbConnections.getConnection();
-            client.query(getParishData, (err, res) => {
-                if (err) {
-                    console.log("Inside Error" + res);
-                    console.error(`reqOperations.js::getParishData() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
-                    return;
-                }
+            let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`        
+         let result = await client.query(getParishData)
 
-                if (res) {
+               
                     console.log("In response" + res);
                     let metadata = {};
                     let Parish = [];
-                    for (let row of res.rows) {
+                    for (let row of result.rows) {
                         let data = {};
                         data.id = row.id;
                         data.name = row.name;
                         Parish.push(data);
                     }
                     metadata.Parish = Parish;
-                    resolve({
+                    return({
                         data: {
                             status: 'success',
                             metaData: metadata
                         }
                     })
-                }
-            });
+            
+            //});
         } catch (error) {
-            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
+            console.error(`reqOperations.js::getParishData() --> error executing query as : ${error}`);
+            return(errorHandling.handleDBError('connectionError'));
         } finally {
             client.release(false);
         }
-    });
+    //});
 }
 
 /* .............get events Data from database.................. */
@@ -1347,43 +1341,37 @@ async function processUpdateUserRoles(userData) {
 
 async function getParishData() {
 
-    return new Promise((resolve, reject) => {
-        let client = dbConnections.getConnection();
-        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
+    let client = await dbConnections.getConnection();
+   // return new Promise((resolve, reject) => {
+    
         try {
-            client.query(getParishData, (err, res) => {
-                if (err) {
-                    console.log("Inside Error" + res);
-                    console.error(`reqOperations.js::getParishData() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
-                    return;
-                }
-                if (res) {
-                    console.log("In response" + res);
+
+            let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
+          let result = await client.query(getParishData)
+              
                     let metadata = {};
                     let Parish = [];
-                    for (let row of res.rows) {
+                    for (let row of result.rows) {
                         let data = {};
                         data.id = row.id;
                         data.name = row.name;
                         Parish.push(data);
                     }
                     metadata.Parish = Parish;
-                    resolve({
+                    return({
                         data: {
                             status: 'success',
                             metaData: metadata
                         }
                     })
-                }
-            });
+                
         } catch (error) {
             console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
+            return(errorHandling.handleDBError('connectionError'));
         } finally {
             client.release(false);
         }
-    });
+   // });
 }
 
 
