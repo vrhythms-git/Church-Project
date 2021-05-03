@@ -18,10 +18,9 @@ try {
 
 async function processSignInRequest(userInfo) {
 
-    let client = dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     console.log("User Data" + JSON.stringify(userInfo));
     try {
-        await client.connect();
         await client.query("BEGIN");
 
         // if (userInfo.data.memberType != "member") {
@@ -136,7 +135,6 @@ async function processSignInRequest(userInfo) {
         console.log("Before commit");
         await client.query("COMMIT");
         console.log("After commit");
-        client.end()
 
         return ({
             data: {
@@ -150,6 +148,8 @@ async function processSignInRequest(userInfo) {
         console.error(`reqOperations.js::processSignInRequest() --> error : ${error}`)
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
+    } finally {
+        client.release(false);
     }
 }
 
@@ -158,9 +158,7 @@ async function processSignInRequest(userInfo) {
 async function processGetUserMetaDataRequest(uid) {
 
 
-    let client = dbConnections.getConnection();
-    await client.connect();
-
+    let client = await dbConnections.getConnection();
     //Validate user, if not valid then respond him back with appropriate request
     // try {
     //     //console.log('Validating user approval and his deleted status.')
@@ -230,13 +228,7 @@ async function processGetUserMetaDataRequest(uid) {
         let res = await client.query(query);
         let lastLoggedInRes = await client.query(lastLoggedIn);
 
-
-        console.log("4", res.rowCount);
-
-
         if (res && res.rowCount > 0) {
-
-            console.log("5");
 
             let metaData = {};
             let permissions = [];
@@ -345,8 +337,6 @@ async function processGetUserMetaDataRequest(uid) {
                 metaData.memberDetails = memberDetails;
             }
 
-            client.end();
-
             return ({
                 data: {
                     status: 'success',
@@ -356,18 +346,19 @@ async function processGetUserMetaDataRequest(uid) {
         }
 
     } catch (error) {
-        client.end();
         console.error(`reqOperations.js::processGetUserMetaDataRequest() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
     }
+
 
 }
 
 
 async function getuserRecords(userType, loggedInUser) {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
 
         let condition = ' ';
@@ -534,8 +525,6 @@ async function getuserRecords(userType, loggedInUser) {
             }
             user.roles = roles;
             users.push(user);
-            console.log("Before Resolve" + res);
-            client.end();
             return ({
                 data: {
                     status: 'success',
@@ -551,19 +540,21 @@ async function getuserRecords(userType, loggedInUser) {
             })
         }
     } catch (error) {
-        client.end();
         console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
     }
 }
 
 
 async function getRoleMetadata() {
 
+    let client = await dbConnections.getConnection();
+
     return new Promise((resolve, reject) => {
         let getRoles = `select role_id id, name from t_role where is_deleted = 'no' order by name;`
         let getorgs = `select org_type, org_id id, name, level from t_organization where is_deleted = 'no' order by level, org_type, name;`
-        let client = dbConnections.getConnection();
         let metadata = {};
         let roles = [];
         let org = {};
@@ -571,14 +562,12 @@ async function getRoleMetadata() {
         details = [];
 
         try {
-            client.connect();
             client.query(getRoles, (err, res) => {
                 if (err) {
                     console.error(`reqOperations.js::getRoleMetadata() --> error while fetching results : ${err}`)
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
-                //client.end();
                 if (res) {
                     for (let row of res.rows) {
                         let role = {}
@@ -588,23 +577,15 @@ async function getRoleMetadata() {
                     }
                     metadata.roles = roles;
                 }
-                // resolve({
-                //     data: {
-                //         status: 'success',
-                //         metadata: metadata
-                //     }
-                // })
 
             });
 
-            // client.connect();
             client.query(getorgs, (err, res) => {
                 if (err) {
                     console.error(`reqOperations.js::getRoleMetadata() --> error while fetching results : ${err}`)
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
-                client.end();
                 if (res) {
 
                     orgtype = null;
@@ -642,14 +623,15 @@ async function getRoleMetadata() {
         } catch (error) {
             console.error(`reqOperations.js::getRoleMetadata() --> error executing query as : ${error}`);
             reject(errorHandling.handleDBError('connectionError'));
+        } finally {
+            client.release(false);
         }
     });
 }
 
 async function getEventCategory() {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
         let metadata = {};
         let getEventCategory = `select event_category_id id, name, description ,school_grade_from,school_grade_to from t_event_category;`
@@ -667,8 +649,6 @@ async function getEventCategory() {
                 eventCategory.push(events);
             }
             metadata.eventCategory = eventCategory;
-            //client.end()
-
         }
 
 
@@ -698,8 +678,6 @@ async function getEventCategory() {
                 venuesData.push(venues);
             }
             metadata.venuesData = venuesData;
-            client.end()
-
         }
 
         return ({
@@ -710,22 +688,20 @@ async function getEventCategory() {
         })
 
     } catch (error) {
-        client.end();
         console.error(`reqOperations.js::getEventCategory() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-
-
+    } finally {
+        client.release(false);
     }
 }
 
 async function getParishData() {
 
+   
     return new Promise((resolve, reject) => {
         let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
-        let client = dbConnections.getConnection();
-
         try {
-            client.connect();
+            let client = dbConnections.getConnection();
             client.query(getParishData, (err, res) => {
                 if (err) {
                     console.log("Inside Error" + res);
@@ -745,7 +721,6 @@ async function getParishData() {
                         Parish.push(data);
                     }
                     metadata.Parish = Parish;
-                    client.end()
                     resolve({
                         data: {
                             status: 'success',
@@ -757,20 +732,21 @@ async function getParishData() {
         } catch (error) {
             console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
             reject(errorHandling.handleDBError('connectionError'));
+        } finally {
+            client.release(false);
         }
     });
 }
 
 /* .............get events Data from database.................. */
 async function getEventData(userId, eventType) {
-    let client = dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     try {
-        await client.connect();
         let metadata = {};
         let getEventData = `select * from t_event`;
         console.log(`Fetching event data for ${userId} user.`)
         if (eventType == 'for_judgement') {
-            
+
             getEventData = `select distinct te.event_id, te."name",te.event_type,te.description,te.start_date, te.end_date,
                             tecsm.is_score_submitted ,registration_start_date, te.registration_end_date, te.org_id
                             from t_event te 
@@ -835,7 +811,6 @@ async function getEventData(userId, eventType) {
                 eventData.push(events);
             }
             metadata.eventData = eventData;
-            //   client.end()
         }
         return ({
             data: {
@@ -846,24 +821,20 @@ async function getEventData(userId, eventType) {
         })
 
     } catch (error) {
-        //  client.end();
         console.log(`reqOperations.js::getEventData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
     } finally {
-        client.end()
+        client.release(false);
     }
 }
 
 
 
 async function processUpdateUserRoles(userData) {
-    let client = dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     //  console.log("User Data" + JSON.stringify(userData));
     try {
-        await client.connect();
         await client.query("BEGIN");
-        // console.log("1");
-
 
         if (userData.isFamilyHead == true || userData.isFamilyHead == "true") {
 
@@ -918,8 +889,6 @@ async function processUpdateUserRoles(userData) {
 
         //console.log(updateUserTbl_values);
         await client.query(updateUserTbl, updateUserTbl_values)
-
-        // console.log("3");
         /*************************** t_person********************************************* */
 
         const updatePersonTbl = `UPDATE PUBLIC.t_person
@@ -1217,7 +1186,7 @@ async function processUpdateUserRoles(userData) {
                         new Date().toISOString()
                     ]
 
-                    console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
+                    //                    console.log("insertPersonRelationshipValues", insertPersonRelationshipValues);
 
                     await client.query(insertPersonRelationship, insertPersonRelationshipValues);
 
@@ -1289,20 +1258,20 @@ async function processUpdateUserRoles(userData) {
 
 
 
-        console.log("10");
+        //console.log("10");
 
         if (userData.roles != undefined || userData.roles != null) {
-            console.log("7");
+            //  console.log("7");
             /**********************Delete -> t_user_role_mapping ************************* */
             const deleteFromRoleMapping = `DELETE FROM public.t_user_role_mapping WHERE user_id='${userData.userId}';`
             await client.query(deleteFromRoleMapping);
 
-            console.log("8");
+            //console.log("8");
             /**********************Delete -> t_user_role_context ************************* */
             const deleteFromRoleContext = `DELETE FROM public.t_user_role_context WHERE user_id='${userData.userId}';`
             client.query(deleteFromRoleContext);
 
-            console.log("9");
+            //console.log("9");
 
 
 
@@ -1353,12 +1322,12 @@ async function processUpdateUserRoles(userData) {
         }
 
 
-        console.log("11");
+        // console.log("11");
 
         console.log("Before commit");
         await client.query("COMMIT");
         console.log("After commit");
-        client.end();
+
         return ({
             data: {
                 status: 'success'
@@ -1371,17 +1340,17 @@ async function processUpdateUserRoles(userData) {
         console.error(`reqOperations.js::processUpdateUserRoles() --> error : ${err}`);
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
+    } finally {
+        client.release(false);
     }
 }
 
 async function getParishData() {
 
     return new Promise((resolve, reject) => {
-        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
         let client = dbConnections.getConnection();
-
+        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
         try {
-            client.connect();
             client.query(getParishData, (err, res) => {
                 if (err) {
                     console.log("Inside Error" + res);
@@ -1389,7 +1358,6 @@ async function getParishData() {
                     reject(errorHandling.handleDBError('queryExecutionError'));
                     return;
                 }
-                client.end()
                 if (res) {
                     console.log("In response" + res);
                     let metadata = {};
@@ -1412,6 +1380,8 @@ async function getParishData() {
         } catch (error) {
             console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
             reject(errorHandling.handleDBError('connectionError'));
+        } finally {
+            client.release(false);
         }
     });
 }
@@ -1426,7 +1396,6 @@ async function deleteUsers(userData) {
         // let deleteFromUserTable = `UPDATE t_user SET is_deleted = 'yes' where user_id in ('${usersToDelete}');`
         let deleteFromUserTable = `UPDATE t_user SET is_deleted = true where user_id in (${userData.deleteUser});`
         console.log("deleteFromUserTable : " + deleteFromUserTable)
-        await client.connect();
         await client.query(deleteFromUserTable, (err, res) => {
             if (err)
                 console.log('Error occured : ' + err)
@@ -1438,7 +1407,6 @@ async function deleteUsers(userData) {
             if (err)
                 console.log('Error occured : ' + err)
         });
-        await client.end();
         return ({
             data: {
                 status: 'success',
@@ -1450,16 +1418,18 @@ async function deleteUsers(userData) {
         console.error(`reqOperations.js::deleteUsers() --> error : ${JSON.stringify(err)}`);
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
+    } finally {
+        client.release(false);
     }
+
 }
 
 async function getProctorData(userData) {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
         let metadata = {};
-        console.log("userData", userData);
+        // console.log("userData", userData);
         let getProctorData = `select user_id, CONCAT(first_name, ' ',last_name) as name from v_user where user_org_id = ${userData};`
         let res = await client.query(getProctorData);
         if (res && res.rowCount > 0) {
@@ -1475,7 +1445,6 @@ async function getProctorData(userData) {
             metadata.proctorData = proctorData;
         }
 
-        await client.end();
         return ({
             data: {
                 status: 'success',
@@ -1484,9 +1453,11 @@ async function getProctorData(userData) {
         })
 
     } catch (error) {
-        client.end();
+
         console.error(`reqOperations.js::getProctorData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
     }
 }
 

@@ -13,8 +13,6 @@ function getCountryStates() {
     return new Promise((resolve, reject) => {
         try {
             let client = dbConnections.getConnection();
-            client.connect();
-
             let getContriesStates = `SELECT Json_agg(a.con_state) as op_json 
              FROM   (SELECT Json_build_object('countryName', country_name, 'states', Json_agg
                        (
@@ -31,9 +29,6 @@ function getCountryStates() {
 
                 if (res) {
                     let conStatejson = res.rows[0].op_json
-                    //console.log(conStatejson)
-
-                    client.end();
 
                     resolve({
                         data: {
@@ -48,74 +43,33 @@ function getCountryStates() {
         } catch (error) {
             console.error(`miscReqOperations.js::getCountryStates() --> error executing query as : ${error}`);
             reject(errorHandling.handleDBError('connectionError'));
+        } finally {
+            client.release(false);
         }
     });
 }
 
 async function getMembers(fireBaseId) {
 
-    return new Promise((resolve, reject) => {
-        try {
-            let client = dbConnections.getConnection();
-            client.connect();
+    //  return new Promise((resolve, reject) => {
+    let client = await dbConnections.getConnection();
 
-            let noOfFamilyMembers = `select count(family_member_id) member_count from t_person_relationship tpr
+    try {
+        let noOfFamilyMembers = `select count(family_member_id) member_count from t_person_relationship tpr
             where family_head_id = 
                 (select user_id from t_user tu 
                         where firebase_id = '${fireBaseId}') and is_deleted !=true;`;
 
-            client.query(noOfFamilyMembers, (err, res) => {
+        let result1 = await client.query(noOfFamilyMembers) /*, (err, res) => {
                 if (err) {
                     console.error(`miscReqOperations.js::getMembers() --> error while fetching results : ${err}`)
-                    reject(errorHandling.handleDBError('queryExecutionError'));
+                    return(errorHandling.handleDBError('queryExecutionError'));
                 }
 
-                //  console.log('Res:--->' + JSON.stringify(res))
-                // let respJSON = { status: 'success'};
-                if (res) {
-                    //   respJSON.memberCount  =  res.rows[0].member_count;
+                if (res) {*/
+        if (result1.rows[0].member_count > 0) {
 
-                    if (res.rows[0].member_count > 0) {
-
-                        //   let fetchAllMembersData = `select 
-                        //   jsonb_agg(
-                        //     jsonb_build_object(
-                        //       'userId', res.user_id, 'title', res.title, 
-                        //       'firstName', res.first_name, 'lastName', 
-                        //       res.last_name,  'role', res.role_name 
-                        //     )
-                        //   ) member_list
-                        // from 
-                        //   (
-                        //     select 
-                        //       distinct user_id, 
-                        //       title, 
-                        //       first_name, 
-                        //       last_name,
-                        //       role_name 
-                        //     from 
-                        //       v_user 
-                        //     where 
-                        //       user_id in(
-                        //         select 
-                        //           family_member_id 
-                        //         from 
-                        //           t_person_relationship tpr 
-                        //         where 
-                        //           family_head_id = (
-                        //             select 
-                        //               user_id 
-                        //             from 
-                        //               t_user 
-                        //             where 
-                        //               firebase_id = '${fireBaseId}'
-                        //           ) and is_deleted = false
-                        //       ) 
-                        //       or firebase_id = '${fireBaseId}'
-                        //   ) res;`
-
-
-                            let fetchAllMembersData = `select jsonb_agg(
+            let fetchAllMembersData = `select jsonb_agg(
                             jsonb_build_object(
                             'userId', res.user_id, 'title', res.title, 
                             'firstName', res.first_name, 'lastName', 
@@ -133,67 +87,61 @@ async function getMembers(fireBaseId) {
                         )
                         ) res`;
 
-                        client.query(fetchAllMembersData, (err, result) => {
+            let result2 = await client.query(fetchAllMembersData)/* (err, result) => {
 
                             if (err) {
                                 console.error(`miscReqOperations.js::getMembers() --> error while fetching fetchAllMembersData results : ${err}`)
-                                reject(errorHandling.handleDBError('queryExecutionError'));
+                                return(errorHandling.handleDBError('queryExecutionError'));
                             }
+*/
+            if (result2.rows[0].member_list == null)
 
-                            if (result.rows[0].member_list == null)
-
-                                client.end();
-
-                            resolve({
-                                data: {
-                                    status: 'success',
-                                    memberCount: res.rows[0].member_count,
-                                    members: result.rows[0].member_list
-                                }
-                            })
-
-                        });
-                    } else {
-                        //client.end();
-
-                        let getUserIdByFirebase = `select user_id from t_user tu where firebase_id = '${fireBaseId}';`
-                        client.query(getUserIdByFirebase, (err, result) => {
-
-                            if (err) {
-                                console.error(`miscReqOperations.js::getMembers() --> error while fetching fetchAllMembersData results : ${err}`)
-                                reject(errorHandling.handleDBError('queryExecutionError'));
-                            }
-
-                            client.end();
-
-                            resolve({
-                                data: {
-                                    status: 'success',
-                                    userId: result.rows[0].user_id,
-                                    memberCount: res.rows[0].member_count,
-                                }
-                            })
-
-                        });
-
+                return ({
+                    data: {
+                        status: 'success',
+                        memberCount: result1.rows[0].member_count,
+                        members: result2.rows[0].member_list
                     }
-                }
-            });
+                })
 
-        } catch (error) {
-            console.error(`miscReqOperations.js::getMembers() --> error executing query as : ${error}`);
-            reject(errorHandling.handleDBError('connectionError'));
+            // });
+        } else {
+
+            let getUserIdByFirebase = `select user_id from t_user tu where firebase_id = '${fireBaseId}';`
+            let result2 = await client.query(getUserIdByFirebase)/*, (err, result) => {
+
+                            if (err) {
+                                console.error(`miscReqOperations.js::getMembers() --> error while fetching fetchAllMembersData results : ${err}`)
+                                return(errorHandling.handleDBError('queryExecutionError'));
+                            }*/
+            return ({
+                data: {
+                    status: 'success',
+                    userId: result2.rows[0].user_id,
+                    memberCount: result1.rows[0].member_count,
+                }
+            })
+
+            // });
+
         }
-    });
+        //     }
+        // });
+
+    } catch (error) {
+        console.error(`miscReqOperations.js::getMembers() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
+    }
+    //  });
 
 }
 
 async function getUserApprovalStatus(fbuid) {
 
+    let client = await dbConnections.getConnection();
     try {
-        let client = dbConnections.getConnection();
-        client.connect();
-
         let userApprovedStatus = `select 
                                 case when is_approved = true then true else false end as approved,
                                 user_id as userid
@@ -202,56 +150,59 @@ async function getUserApprovalStatus(fbuid) {
                                 where 
                                     firebase_id = '${fbuid}';`;
 
-        let result  = await client.query(userApprovedStatus)
-       await client.end();
-        return{
-            data :{
-                status : 'success',
-                isapproved : result.rows[0].approved,
+        let result = await client.query(userApprovedStatus)
+
+        return {
+            data: {
+                status: 'success',
+                isapproved: result.rows[0].approved,
                 user: result.rows[0].userid
             }
         }
-              
+
 
     } catch (error) {
         console.error(`miscReqOperations.js::getUserApprovalStatus() --> error while fetching results : ${error}`)
         reject(errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
     }
+
 
 }
 
 async function handleLogIn_LogOut(reqContextData) {
 
+    let client = await dbConnections.getConnection();
     try {
-        let client = dbConnections.getConnection();
-        client.connect();
-
         let audLogEntry = `INSERT INTO t_audit_log
                             (user_id, session_id, "action", action_timestamp, ip_address, additional_details)
                            VALUES($1, $2, $3, $4 , $5, $6) returning audit_log_id;`;
 
         let audLogEntryValues = [
-                            reqContextData.userId,
-                            reqContextData.sessionId,
-                            reqContextData.actType,
-                            new Date().toUTCString(),
-                            reqContextData.ipAddr,
-                            reqContextData.userAgent
-                        ];
+            reqContextData.userId,
+            reqContextData.sessionId,
+            reqContextData.actType,
+            new Date().toUTCString(),
+            reqContextData.ipAddr,
+            reqContextData.userAgent
+        ];
 
         let result = await client.query(audLogEntry, audLogEntryValues);
-        console.log(`User ${reqContextData.userId}  ${ (reqContextData.actType == 'LOG_IN') ? ' logged in ' : ' logged out ' }, audit log entry id : ${result.rows[0].audit_log_id}`)
-        await client.end();
-        return{
-            data :{
-                status : 'success'
+        console.log(`User ${reqContextData.userId}  ${(reqContextData.actType == 'LOG_IN') ? ' logged in ' : ' logged out '}, audit log entry id : ${result.rows[0].audit_log_id}`)
+
+        return {
+            data: {
+                status: 'success'
             }
         }
-              
+
 
     } catch (error) {
         console.error(`miscReqOperations.js::handleLogIn_LogOut() --> Error : ${error}`)
         reject(errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
     }
 
 }

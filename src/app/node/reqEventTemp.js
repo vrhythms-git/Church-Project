@@ -15,11 +15,9 @@ async function getEventById(eventId) {
 
     let event = {};
     //  return new Promise((resolve, reject) => {
-
-    try {
-        let client = dbConnections.getConnection();
-        await client.connect();
-
+      
+    // try {
+        let client = await dbConnections.getConnection();  
         //client.query("BEGIN");
         try {
             let venues = [];
@@ -206,8 +204,7 @@ async function getEventById(eventId) {
 
 
             }
-            client.end()
-
+         
             return ({
                 data: {
                     status: 'success',
@@ -224,25 +221,26 @@ async function getEventById(eventId) {
             console.error(`reqOperations.js::insertevents() inner try block --> error : ${err}`)
             console.log("Transaction ROLLBACK called");
             return (errorHandling.handleDBError('transactionError'));
-        } finally {
-            //console.log('Finally block executed.. Connection closed.')
-            // client.close();
+        } finally{
+            client.release(false);
         }
-    }
-    catch (error) {
-        console.error(`reqOperations.js::insertevents() --> outer try block : ${error}`);
-        return (errorHandling.handleDBError('connectionError'));
-    } finally {
-        // console.log('Finally block executed.. Connection closed.')
-        //client.end();
-    }
+   // }
+   // catch (error) {
+    //     console.error(`reqOperations.js::insertevents() --> outer try block : ${error}`);
+    //     return (errorHandling.handleDBError('connectionError'));
+    // } finally {
+    //     // console.log('Finally block executed.. Connection closed.')
+    //      client.release(false);
+    // }
     // });
 }
 
+
 async function eventRegistration(eventData) {
-    let client = dbConnections.getConnection();
-    await client.connect();
+
+    let client = await dbConnections.getConnection();
     try {
+       
         await client.query('begin;');
 
         // Populating t_event_participant_registration table.
@@ -329,18 +327,16 @@ async function eventRegistration(eventData) {
         await client.query('rollback');
         console.error(`Rolling back the operation due to the error.`);
         return (errorHandling.handleDBError('connectionError'));
-    } finally {
-        client.end();
-        // console.log('Connection closed.')
+    } finally{
+        client.release(false);
     }
 }
 
 async function getParticipant(eventId, userId, action, judgeId, catId) {
     console.log('fetching participants for event ' + eventId + ', user : ' + userId);
 
-    let client = dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     try {
-        await client.connect();
         let getPaticipantQuery;
         if (action == 'upload') {
             getPaticipantQuery = ` select jsonb_agg(
@@ -398,18 +394,16 @@ async function getParticipant(eventId, userId, action, judgeId, catId) {
     } catch (error) {
         console.error(`eventReqOperations.js::getParticipant() : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    } finally {
-        client.end();
+    } finally{
+        client.release(false);
     }
 
 }
 
 async function getEventCatsAndStaffById(eventId) {
 
-    let client = dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     try {
-        await client.connect();
-
         let queryStmt = `select         
                                 jsonb_agg(
                                         distinct jsonb_build_object('categoryId', res.event_category_id,
@@ -436,8 +430,8 @@ async function getEventCatsAndStaffById(eventId) {
     } catch (error) {
         console.error(`eventReqOperations.js::getEventCatsAndStaffById() : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    } finally {
-        client.end();
+    } finally{
+        client.release(false);
     }
 
 }

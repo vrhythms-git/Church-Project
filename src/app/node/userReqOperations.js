@@ -7,7 +7,6 @@ const dbConnections = require(`${__dirname}/dbConnection`);
 async function setUserApprovalState(userData) {
 
     let client = await dbConnections.getConnection();
-    await client.connect();
     try {
         if (userData.isApproved == true) {
 
@@ -142,7 +141,6 @@ async function setUserApprovalState(userData) {
             await client.query(operationTblQuery, operationTblQueryValues);
             console.log('Inserted row into t_user_operation_log table for user id: ' + userData.userId);
 
-            client.end();
             return {
                 data: {
                     status: 'success'
@@ -154,15 +152,16 @@ async function setUserApprovalState(userData) {
     } catch (error) {
         console.error(`userReqOperations.js::setUserApprovalState() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    }finally{
+        client.release()
     }
 }
 
 async function updateUnApprovedUser(userData) {
     console.log("userReqOperations.js::updateUnApprovedUser called. Updating unapproved user's data...");
 
+    let client = await dbConnections.getConnection();
     try{
-    let client = dbConnections.getConnection();
-    await client.connect();
 
     let updateUserTableStmt = `UPDATE t_user
                                 SET org_id=$1, title=$2, first_name=$3, last_name=$4, about_yourself=$5, 
@@ -200,7 +199,6 @@ async function updateUnApprovedUser(userData) {
 
     await client.query(updatePersonTableStmt, updatePersonTableValues);
     console.log('t_person updated!');
-    await client.end();
 
     return {
         data : {
@@ -211,6 +209,8 @@ async function updateUnApprovedUser(userData) {
 }catch(error){
     console.error(`userReqOperations.js::updateUnApprovedUser() --> error executing query as : ${error}`);
     return (errorHandling.handleDBError('connectionError'));
+}finally{
+    client.release();
 }
 }
 

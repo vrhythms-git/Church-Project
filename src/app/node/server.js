@@ -10,9 +10,6 @@ const cors = require('cors')
 var app = express();
 var compression = require('compression')
 const path = require('path');
-const { ConsoleReporter } = require('jasmine');
-const { post } = require('jquery');
-
 let port = 8081;
 
 app.listen(process.env.PORT || port, () => {
@@ -25,6 +22,13 @@ var corsOptions = {
   "origin": '*',
   "Access-Control-Allow-Origin": '*',
 }
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server')
+  server.close(() => {
+    console.log('HTTP server closed')
+  })
+})
 
 // app.use(express.static(__dirname + '/dist/insurancekarma/'));
 

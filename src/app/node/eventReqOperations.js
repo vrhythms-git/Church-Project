@@ -11,9 +11,8 @@ const dbConnections = require(`${__dirname}/dbConnection`);
 
 
 async function deleteEvents(eventsData) {
-    let client = dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     console.log("User Data" + JSON.stringify(eventsData));
-    await client.connect();
     try {
         await client.query("BEGIN");
         try {
@@ -73,20 +72,20 @@ async function deleteEvents(eventsData) {
             console.log("Transaction ROLLBACK called");
             return (errorHandling.handleDBError('transactionError'));
         }
-    }
-    catch (error) {
+    }catch (error) {
         console.error(`reqOperations.js::deleteEvents() --> error : ${JSON.stringify(err)}`);
         return (errorHandling.handleDBError('transactionError'));
+    }finally{
+        client.release();
     }
 
 }
 
 async function updateEvent(eventsData) {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
-    await client.query("BEGIN");
+    let client =  await dbConnections.getConnection();
     try {
+        await client.query("BEGIN");
         /********************** t_event*******************************************************************************************/
         const updateEvent = `UPDATE t_event
             SET "name"=$1, event_type=$2, description=$3, start_date=$4, end_date=$5,
@@ -294,8 +293,6 @@ async function updateEvent(eventsData) {
             }
         }
 
-
-        //client.end();
         console.log("Before commit");
         await client.query("COMMIT");
 
@@ -312,13 +309,14 @@ async function updateEvent(eventsData) {
         console.error(`eventReqOperations.js::UpdateEvent() --> error : ${err}`)
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
+    }finally{
+        client.release()
     }
 }
 
 async function getVenues(venueData) {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
 
         let orgId = [];
@@ -358,18 +356,18 @@ async function getVenues(venueData) {
         })
 
     } catch (error) {
-        client.end();
         console.error(`eventReqOperations.js::getVenues() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    }finally{
+        client.release();
     }
 
 }
 
 async function insertEvents(eventsData) {
 
-    let client = dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     console.log("User Data" + JSON.stringify(eventsData));
-    await client.connect();
     try {
         await client.query("BEGIN");
         try {
@@ -533,13 +531,15 @@ async function insertEvents(eventsData) {
     catch (error) {
         console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`);
         return (errorHandling.handleDBError('transactionError'));
+    }finally{
+        client.release();
     }
 }
 
 async function getRegionAndParish() {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
+
     try {
         let metadata = {};
         let regions = [];
@@ -602,16 +602,16 @@ async function getRegionAndParish() {
         })
 
     } catch (error) {
-        client.end();
         console.error(`reqOperations.js::getProctorData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    }finally{
+        client.release();
     }
 }
 
 async function getEventType() {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
         let metadata = {};
         let eventType = [];
@@ -670,16 +670,16 @@ async function getEventType() {
         })
 
     } catch (error) {
-        client.end();
         console.error(`reqOperations.js::getEventType() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    }finally{
+        client.release();
     }
 }
 
 async function getProctorData(userData) {
 
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
         let metadata = {};
         console.log("userData", JSON.stringify(userData));
@@ -712,11 +712,10 @@ async function getProctorData(userData) {
         })
 
     } catch (error) {
-        client.end();
         console.error(`reqOperations.js::getProctorData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-
-
+    }finally{
+        client.release();
     }
 }
 
@@ -727,8 +726,7 @@ async function getProctorData(userData) {
 
 
 async function getEventQuestionnaireData() {
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
         let metadata = {};
         let getEventQuestionnaireData = `select * from t_event_questionnaire`;
@@ -745,7 +743,6 @@ async function getEventQuestionnaireData() {
                 questionData.push(questions);
             }
             metadata.questionData = questionData;
-            client.end();
         }
         return ({
             data: {
@@ -755,15 +752,15 @@ async function getEventQuestionnaireData() {
         })
 
     } catch (error) {
-        client.end();
         console.log(`reqOperations.js::getEventQuestionnaireData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    }finally{
+        client.release();
     }
 }
 /*............get all Events from db for registration purpose........*/
 async function getEventForRegistration() {
-    let client = dbConnections.getConnection();
-    await client.connect();
+    let client = await dbConnections.getConnection();
     try {
         let metadata = {};
         let getEventForRegistration = `select distinct  event_id, event_name, event_type, event_desciption, event_start_date, event_end_date, registration_start_date, registration_end_date
@@ -795,7 +792,6 @@ async function getEventForRegistration() {
             }
             metadata.eventData = eventData;
         }
-        client.end();
         return ({
             data: {
                 status: 'success',
@@ -805,10 +801,12 @@ async function getEventForRegistration() {
         })
 
     } catch (error) {
-        client.end();
         console.log(`reqOperations.js::getEventForRegistration() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
+    }finally{
+        client.release();
     }
+
 }
 
 

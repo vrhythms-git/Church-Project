@@ -10,11 +10,10 @@ const dbConnections = require(`${__dirname}/dbConnection`);
 var connCloseFlag = false;
 async function persistParticipantScore(userScoreData, userId) {
 
-    let client; 
+    let client = await dbConnections.getConnection(); 
     
     try {
-        client = dbConnections.getConnection();
-        await client.connect();
+        
         if(userScoreData.action === 'save' || userScoreData.action === 'submit')
             console.log('Judge\'s  {' + userId + ')action is : ' + userScoreData.action + ' no. of participant\'s score to update : ' + userScoreData.scoreData.length)
         else if(userScoreData.action === 'approve')
@@ -98,7 +97,7 @@ async function persistParticipantScore(userScoreData, userId) {
         }
 
     } catch (error) {
-        //client.end();
+        
         await client.query('rollback;');
         connCloseFlag = true;
         dbConnections.endConnection(client);
@@ -107,7 +106,7 @@ async function persistParticipantScore(userScoreData, userId) {
 
     } finally {
         if (connCloseFlag) {
-            dbConnections.endConnection(client);
+                client.release(false);
             connCloseFlag = false;
         }
     }
