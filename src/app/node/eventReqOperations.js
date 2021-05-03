@@ -17,42 +17,23 @@ async function deleteEvents(eventsData) {
         await client.query("BEGIN");
         try {
             if (eventsData) {
-                for (let event of eventsData.eventId) {
+                for (let event of eventsData) {
 
+                    console.log("event.event_Id", event.event_Id);
                     //t_event
-                    const deleteTblEvent = `UPDATE t_event SET is_deleted = true WHERE event_id = ${event.eventId};`
+                    const deleteTblEvent = `UPDATE t_event SET is_deleted = true WHERE event_id = ${event.event_Id};`
                     await client.query(deleteTblEvent);
-
-                    //t_event_organization
-                    let deleteTblEventOrg = `DELETE FROM t_event_organization where event_id = ${eventsData.eventId};`
-                    await client.query(deleteTblEventOrg);
-
+                   
                     //t_event_venue
-                    let deleteTblEventVenue = `UPDATE t_event_venue SET is_deleted = true where event_id = ${event.eventId};`
+                    let deleteTblEventVenue = `UPDATE t_event_venue SET is_deleted = true where event_id = ${event.event_Id};`
                     await client.query(deleteTblEventVenue);
 
-                    let eventCatMapIds;
-                    let deletedEventCatMapIds = [];
-                    //t_event_category_map
-                    let deleteTblEventCatMap = `DELETE FROM t_event_category_map where event_id = ${event.eventId} returning event_cat_map_id;`
-                    let result = await client.query(deleteTblEventCatMap);
-                    for (let id of result.rows.event_cat_map_id) {
-                        eventCatMapIds = id;
-                        deletedEventCatMapIds.push(eventCatMapIds);
-                    }
-
-                    //t_event_category_venue_map
-                    for (let eventCatMapId of deletedEventCatMapIds) {
-                        let deleteVenueMap = `DELETE FROM t_event_category_venue_map where event_cat_map_id = ${eventCatMapId};`
-                        await client.query(deleteVenueMap);
-                    }
-
                     //t_event_cat_staff_map
-                    let deleteTblEventCatStaffMap = `UPDATE t_event_cat_staff_map SET is_deleted = true where event_id = ${event.eventId};`
+                    let deleteTblEventCatStaffMap = `UPDATE t_event_cat_staff_map SET is_deleted = true where event_id = ${event.event_Id};`
                     await client.query(deleteTblEventCatStaffMap);
 
                     //t_event_questionnaire
-                    let deleteTblEventQuestionnaire = `UPDATE t_event_questionnaire SET is_deleted = true where event_id = ${event.eventId};`
+                    let deleteTblEventQuestionnaire = `UPDATE t_event_questionnaire SET is_deleted = true where event_id = ${event.event_Id};`
                     await client.query(deleteTblEventQuestionnaire);
                 }
 
@@ -63,7 +44,7 @@ async function deleteEvents(eventsData) {
                     data: {
                         status: 'success'
                     }
-                })
+                });
             }
         }
         catch (err) {

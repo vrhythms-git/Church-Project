@@ -737,7 +737,7 @@ async function getEventData(userId, eventType) {
     let client = await dbConnections.getConnection();
     try {
         let metadata = {};
-        let getEventData = `select * from t_event`;
+        let getEventData = `select * from t_event where is_deleted = false`;
         console.log(`Fetching event data for ${userId} user.`)
         if (eventType == 'for_judgement') {
 
