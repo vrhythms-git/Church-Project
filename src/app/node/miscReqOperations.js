@@ -8,11 +8,11 @@ const dbConnections = require(`${__dirname}/dbConnection`);
 
 
 
-function getCountryStates() {
+async function getCountryStates() {
 
+    let client = await dbConnections.getConnection();
     return new Promise((resolve, reject) => {
         try {
-            let client = dbConnections.getConnection();
             let getContriesStates = `SELECT Json_agg(a.con_state) as op_json 
              FROM   (SELECT Json_build_object('countryName', country_name, 'states', Json_agg
                        (
