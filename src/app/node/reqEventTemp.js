@@ -15,21 +15,21 @@ async function getEventById(eventId) {
 
     let event = {};
     //  return new Promise((resolve, reject) => {
-      
-    // try {
-        let client = await dbConnections.getConnection();  
-        //client.query("BEGIN");
-        try {
-            let venues = [];
-            let categories = [];
-            let questionnaire = [];
-            let orgIds = [];
-            let eventCategoryId = 0;
-            let eventVenueId = 0;
 
-            // console.log("1");
-            /********************** v_event*******************************************************************************************/
-            const eventQuery = `select distinct event_id, event_type, event_name, event_desciption, registration_start_date, registration_end_date, event_start_date,
+    // try {
+    let client = await dbConnections.getConnection();
+    //client.query("BEGIN");
+    try {
+        let venues = [];
+        let categories = [];
+        let questionnaire = [];
+        let orgIds = [];
+        let eventCategoryId = 0;
+        let eventVenueId = 0;
+
+        // console.log("1");
+        /********************** v_event*******************************************************************************************/
+        const eventQuery = `select distinct event_id, event_type, event_name, event_desciption, registration_start_date, registration_end_date, event_start_date,
                                 event_end_date, event_url, org_type, org_id, org_name, 
                                 event_venue_id, venue_id, event_venue_name, proctor_id, event_cat_map_id,
                                 event_category_id, category_name, category_type, school_grade_from, school_grade_to,
@@ -38,194 +38,194 @@ async function getEventById(eventId) {
                                 from v_event  where is_deleted = false and event_id = ${eventId}
                                 order by event_category_id,venue_id;`
 
-            let result = await client.query(eventQuery);
+        let result = await client.query(eventQuery);
 
-            //console.log("2");
+        //console.log("2");
 
-            if (result && result.rowCount > 0) {
-                //console.log("Event name == ", result.rows[0].event_name)
-                event.eventId = result.rows[0].event_id;
-                event.name = result.rows[0].event_name;
-                event.description = result.rows[0].event_desciption;
-                event.eventType = result.rows[0].event_type;
-                event.registrationStartDate = result.rows[0].registration_start_date;
-                event.registrationEndDate = result.rows[0].registration_end_date;
-                event.startDate = result.rows[0].event_start_date;
-                event.endDate = result.rows[0].event_end_date;
-                event.orgType = result.rows[0].org_type;
-                event.eventUrl = result.rows[0].event_url;
-                
-
-                let category = {};
-                let venue = {};
-                let judges = [];
-                let venueId = [];
-                let question = {};
+        if (result && result.rowCount > 0) {
+            //console.log("Event name == ", result.rows[0].event_name)
+            event.eventId = result.rows[0].event_id;
+            event.name = result.rows[0].event_name;
+            event.description = result.rows[0].event_desciption;
+            event.eventType = result.rows[0].event_type;
+            event.registrationStartDate = result.rows[0].registration_start_date;
+            event.registrationEndDate = result.rows[0].registration_end_date;
+            event.startDate = result.rows[0].event_start_date;
+            event.endDate = result.rows[0].event_end_date;
+            event.orgType = result.rows[0].org_type;
+            event.eventUrl = result.rows[0].event_url;
 
 
-                for (let row of result.rows) {
-
-                    // Get list of org ids
-                    //console.log("Org id===", row.org_id);
-                    if (row.org_id != null) {
-                        //     console.log("2.1");
-                        if (orgIds.indexOf(row.org_id) < 0)
-                            orgIds.push(row.org_id)
-                    }
+            let category = {};
+            let venue = {};
+            let judges = [];
+            let venueId = [];
+            let question = {};
 
 
-                    //Get list of venues
-                    if (row.venue_id != null) {
+            for (let row of result.rows) {
 
-                        if (eventVenueId == 0) {
-                            eventVenueId = row.event_venue_id;
-                        } else if (row.event_venue_id != eventVenueId) {
-
-                            if (_.findWhere(venues, venue) == null) {
-                                //  console.log("Adding venue to array ===", JSON.stringify(venue));
-                                venues.push(venue);
-                            }
-                            venue = {};
-                        }
-
-                        // console.log("4");
-
-                        venue.venueId = row.venue_id;
-                        venue.eventVenueId = row.event_venue_id;
-                        venue.event_venue_id = row.event_venue_id;
-                        venue.proctorId = row.proctor_id;
-                        //venue.name = row.event_venue_name;
-
-
-                    }
-
-                    // console.log("5");
-
-
-                    // Get categories
-                    if (eventCategoryId == 0) {
-                        eventCategoryId = row.event_category_id;
-                        //console.log("6 " , eventCategoryId);                    
-
-                    } else if (row.event_category_id != eventCategoryId) {
-                        eventCategoryId = row.event_category_id;
-
-                        // Add Venue and judges to category and add categry to categories array
-                        category.venueId = venueId;
-                        category.judges = judges;
-
-                        if (_.findWhere(categories, category) == null) {
-                            categories.push(category);
-                        }
-
-                        category = {};
-                        venueId = [];
-                        judges = [];
-                    }
-
-                    category.eventCategoryID = eventCategoryId;
-                    category.eventCatMapId = row.event_cat_map_id;
-                    category.name = row.category_name;
-                    category.schoolGradeFrom = row.school_grade_from;
-                    category.schoolGradeTo = row.school_grade_to;
-
-                    if (row.venue_id != null) {
-                        // console.log("6.2", row.venue_id);
-                        if (venueId.indexOf(row.venue_id) < 0)
-                            venueId.push(row.venue_id)
-                    }
-
-                    if (row.judge_id != null) {
-                        //console.log("6.3", row.judge_id);
-                        if (judges.indexOf(row.judge_id) < 0)
-                            judges.push(row.judge_id)
-                    }
-
-                    //Get list of questions
-                    //console.log("7");
-
-                    if (row.question_id != null) {
-                        //  console.log("7.1");
-
-                        question = {};
-                        question.questionId = row.question_id;
-                        question.question = row.question;
-                        question.responseType = row.answer_type;
-                        question.questionResponseId = row.question_response_id;
-                        question.answer = row.answer;
-
-                        if (_.findWhere(questionnaire, question) == null) {
-                            questionnaire.push(question);
-                        }
-                    }
-
-                } // End of for loop
-
-                //console.log("8");
-
-
-                // Processing for the last row
-                if (_.findWhere(venues, venue) == null) {
-                    // console.log("venue" + JSON.stringify(venue));
-                    venues.push(venue);
-                }
-
-                //console.log("9");
-
-
-                if (_.findWhere(questionnaire, question) == null) {
-                    questionnaire.push(question);
+                // Get list of org ids
+                //console.log("Org id===", row.org_id);
+                if (row.org_id != null) {
+                    //     console.log("2.1");
+                    if (orgIds.indexOf(row.org_id) < 0)
+                        orgIds.push(row.org_id)
                 }
 
 
-                //console.log("10");
+                //Get list of venues
+                if (row.venue_id != null) {
 
-                // For last row add venue and judges to category
-                category.venueId = venueId;
-                category.judges = judges;
+                    if (eventVenueId == 0) {
+                        eventVenueId = row.event_venue_id;
+                    } else if (row.event_venue_id != eventVenueId) {
 
-                if (_.findWhere(categories, category) == null) {
-                    categories.push(category);
+                        if (_.findWhere(venues, venue) == null) {
+                            //  console.log("Adding venue to array ===", JSON.stringify(venue));
+                            venues.push(venue);
+                        }
+                        venue = {};
+                    }
+
+                    // console.log("4");
+
+                    venue.venueId = row.venue_id;
+                    venue.eventVenueId = row.event_venue_id;
+                    venue.event_venue_id = row.event_venue_id;
+                    venue.proctorId = row.proctor_id;
+                    //venue.name = row.event_venue_name;
+
+
                 }
 
-                //console.log("11");
+                // console.log("5");
 
 
-                event.orgId = orgIds;
-                event.venues = venues;
-                event.categories = categories;
-                event.questionnaire = questionnaire;
+                // Get categories
+                if (eventCategoryId == 0) {
+                    eventCategoryId = row.event_category_id;
+                    //console.log("6 " , eventCategoryId);                    
+
+                } else if (row.event_category_id != eventCategoryId) {
+                    eventCategoryId = row.event_category_id;
+
+                    // Add Venue and judges to category and add categry to categories array
+                    category.venueId = venueId;
+                    category.judges = judges;
+
+                    if (_.findWhere(categories, category) == null) {
+                        categories.push(category);
+                    }
+
+                    category = {};
+                    venueId = [];
+                    judges = [];
+                }
+
+                category.eventCategoryID = eventCategoryId;
+                category.eventCatMapId = row.event_cat_map_id;
+                category.name = row.category_name;
+                category.schoolGradeFrom = row.school_grade_from;
+                category.schoolGradeTo = row.school_grade_to;
+
+                if (row.venue_id != null) {
+                    // console.log("6.2", row.venue_id);
+                    if (venueId.indexOf(row.venue_id) < 0)
+                        venueId.push(row.venue_id)
+                }
+
+                if (row.judge_id != null) {
+                    //console.log("6.3", row.judge_id);
+                    if (judges.indexOf(row.judge_id) < 0)
+                        judges.push(row.judge_id)
+                }
+
+                //Get list of questions
+                //console.log("7");
+
+                if (row.question_id != null) {
+                    //  console.log("7.1");
+
+                    question = {};
+                    question.questionId = row.question_id;
+                    question.question = row.question;
+                    question.responseType = row.answer_type;
+                    question.questionResponseId = row.question_response_id;
+                    question.answer = row.answer;
+
+                    if (_.findWhere(questionnaire, question) == null) {
+                        questionnaire.push(question);
+                    }
+                }
+
+            } // End of for loop
+
+            //console.log("8");
 
 
-                // console.log("12");
-
-                console.log(`Stringified JSON is : ` + JSON.stringify(event))
-
-
-
+            // Processing for the last row
+            if (_.findWhere(venues, venue) == null) {
+                // console.log("venue" + JSON.stringify(venue));
+                venues.push(venue);
             }
-         
-            return ({
-                data: {
-                    status: 'success',
-                    eventData: event
-                }
-            })
 
-            //console.log(`Stringified JSON is : ` + JSON.stringify(event))
+            //console.log("9");
 
-            // console.log(JSON.stringify(event));
 
-        } catch (err) {
-            // client.query("ROLLBACK");
-            console.error(`reqOperations.js::insertevents() inner try block --> error : ${err}`)
-            console.log("Transaction ROLLBACK called");
-            return (errorHandling.handleDBError('transactionError'));
-        } finally{
-            client.release(false);
+            if (_.findWhere(questionnaire, question) == null) {
+                questionnaire.push(question);
+            }
+
+
+            //console.log("10");
+
+            // For last row add venue and judges to category
+            category.venueId = venueId;
+            category.judges = judges;
+
+            if (_.findWhere(categories, category) == null) {
+                categories.push(category);
+            }
+
+            //console.log("11");
+
+
+            event.orgId = orgIds;
+            event.venues = venues;
+            event.categories = categories;
+            event.questionnaire = questionnaire;
+
+
+            // console.log("12");
+
+            console.log(`Stringified JSON is : ` + JSON.stringify(event))
+
+
+
         }
-   // }
-   // catch (error) {
+
+        return ({
+            data: {
+                status: 'success',
+                eventData: event
+            }
+        })
+
+        //console.log(`Stringified JSON is : ` + JSON.stringify(event))
+
+        // console.log(JSON.stringify(event));
+
+    } catch (err) {
+        // client.query("ROLLBACK");
+        console.error(`reqOperations.js::insertevents() inner try block --> error : ${err}`)
+        console.log("Transaction ROLLBACK called");
+        return (errorHandling.handleDBError('transactionError'));
+    } finally {
+        client.release(false);
+    }
+    // }
+    // catch (error) {
     //     console.error(`reqOperations.js::insertevents() --> outer try block : ${error}`);
     //     return (errorHandling.handleDBError('connectionError'));
     // } finally {
@@ -240,7 +240,7 @@ async function eventRegistration(eventData) {
 
     let client = await dbConnections.getConnection();
     try {
-       
+
         await client.query('begin;');
 
         // Populating t_event_participant_registration table.
@@ -327,7 +327,7 @@ async function eventRegistration(eventData) {
         await client.query('rollback');
         console.error(`Rolling back the operation due to the error.`);
         return (errorHandling.handleDBError('connectionError'));
-    } finally{
+    } finally {
         client.release(false);
     }
 }
@@ -379,6 +379,21 @@ async function getParticipant(eventId, userId, action, judgeId, catId) {
                                     and staff_id = ${judgeId}
                                     and event_category_id = ${catId}
                                     and is_score_submitted = true order by enrollment_id, 5 asc) res;`;
+        } else if (action === 'attendance') {
+
+            getPaticipantQuery = ` select jsonb_agg(
+                                                    jsonb_build_object(
+                                                        'enrollmentId', res.enrollment_id,
+                                                        'eventCategoryId', res.event_category_id,
+                                                        'eventCategoryName', res.event_category_name,
+                                                        'hasAttendend', res.has_attended
+                                                    ) 
+                                                ) participants
+                                                from (select distinct enrollment_id, event_category_name, event_category_id,has_attended 
+                                                        from v_event_participant vep 
+                                                        where event_id = ${eventId}
+                                                        and event_category_id = ${catId}) res;`
+
         } else {
             console.log('Invalid action sent to getParticipant api, action recived to process  : ' + action);
             return (errorHandling.handleDBError('connectionError'));
@@ -394,7 +409,7 @@ async function getParticipant(eventId, userId, action, judgeId, catId) {
     } catch (error) {
         console.error(`eventReqOperations.js::getParticipant() : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    } finally{
+    } finally {
         client.release(false);
     }
 
@@ -423,14 +438,14 @@ async function getEventCatsAndStaffById(eventId) {
         return {
             data: {
                 status: 'success',
-                eventData : result.rows[0]
+                eventData: result.rows[0]
             }
         }
 
     } catch (error) {
         console.error(`eventReqOperations.js::getEventCatsAndStaffById() : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    } finally{
+    } finally {
         client.release(false);
     }
 

@@ -68,7 +68,7 @@ export class ScoreReviewComponent implements OnInit {
 
     let userId = this.uiCommonUtils.getUserMetaDataJson().userId
 
-    this.apiService.callGetService(`getEventData?user=${userId}&&eventType=review_pending`).subscribe((respData: any) => {
+    this.apiService.callGetService(`getEventData?user=${userId}&eventType=review_pending`).subscribe((respData: any) => {
 
       if (respData.data.status == 'failed') {
         this.eventRowData = [];

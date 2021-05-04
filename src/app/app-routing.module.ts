@@ -17,6 +17,7 @@ import { CwcregistrationComponent } from './screens/cwcregistration/cwcregistrat
 import { EventRegistrationComponent } from './screens/event-registration/event-registration.component';
 import { ScoreComponent } from './screens/score/score.component';
 import { ScoreReviewComponent } from './screens/score-review/score-review.component';
+import { EventAttendanceComponent } from './screens/event-attendance/event-attendance.component'
 
 const routes: Routes = [
   { path: 'signup', component: SignUpComponent },
@@ -35,7 +36,8 @@ const routes: Routes = [
     { path : 'cwcregistration', component :CwcregistrationComponent},
     { path : 'eventRegistration', component:EventRegistrationComponent},
     { path : 'score', component:ScoreComponent},
-    { path : 'scoreReview', component:ScoreReviewComponent}
+    { path : 'scoreReview', component:ScoreReviewComponent},
+    { path : 'attendance', component:EventAttendanceComponent}
     // { path: 'testEvent',component:UserProfileComponent},
   ]
 },

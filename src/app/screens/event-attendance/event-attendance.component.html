@@ -1,0 +1,75 @@
+<div class="container mt-3" style="overflow: hidden;">
+
+    <div class="form-group form-inline row m-0 p-0">
+        <h4 style="font-family: poppins;"><b> Select event to mark attendance.</b></h4>
+    </div>
+
+    <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3"
+        [rowData]="eventRowData | filter:term " [columnDefs]="eventColumnDefs " [pagination]="true"
+        [checkboxSelection]="true" [gridOptions]="eventGridOption" (rowClicked)='onRowClicked($event)'>
+        <!-- (selectionChanged)="onSelectionChanged($event)"
+              (gridReady)="onGridReady($event)"
+              rowSelection='multiple'
+              -->
+    </ag-grid-angular>
+
+
+
+    <div class="col-md-12">
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+            aria-hidden="true" data-backdrop="false"
+            style="padding-left:5%!important;padding-top:2%!important;margin-left: 4%;">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Mark attendance for <b>{{selectedEvent.eventname}}</b></h4>
+                        <button mat-button class="ml-auto" data-dismiss="modal">
+                            <mat-icon>clear</mat-icon>
+                        </button>
+                        <!-- (click)="" -->
+                    </div>
+                    <div class="modal-body border rounded">
+
+                        <div class="row" style="padding: 0px;justify-content: space-evenly;">
+                            <mat-form-field>
+                                <mat-label>Category</mat-label>
+                                <mat-select (selectionChange)="onDropdowwnSelChange($event)"
+                                    [(value)]="selectedCategory">
+                                    <mat-option *ngFor="let cat of categoriesArr" [value]="cat.catId">
+                                        {{cat.catName}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                     
+                        <ag-grid-angular style="width: auto; height: 425px;" class="ag-theme-alpine mt-3"
+                                [rowData]="attendanceRowData | filter:term " [columnDefs]="attendanceColDef" [pagination]="true"
+                                [checkboxSelection]="true" [gridOptions]="attendanceGridOption">
+                                (selectionChanged)="onSelectionChanged($event)"
+                                    (rowClicked)='onRowClicked($event)'
+                        </ag-grid-angular>
+
+                        <div style="padding: 9px; text-align-last: center;">
+                            <button mat-button class="ml-auto border" style="background: #d68165;" data-dismiss="modal">
+                                Cancel
+                                <!-- <mat-icon>clear</mat-icon> -->
+                            </button>
+
+                            <button mat-button class="ml-auto border" (click)="handleAttendanceSaveBtnClick($event)"
+                                style="background: #d68165;">
+                                Save
+                                <!-- <mat-icon>clear</mat-icon> -->
+                            </button>
+
+                            <button mat-button class="ml-auto border" (click)="handleAttendanceSubmitBtnClick($event)"
+                                style="background: #d68165;">
+                                Submit
+                                <!-- <mat-icon>clear</mat-icon> -->
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

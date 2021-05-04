@@ -67,6 +67,7 @@ import { ScoreComponent } from './screens/score/score.component';
 import { ScoreUploadComponent } from './screens/renderers/score-upload/score-upload.component';
 import { ScoreUploadInputComponent } from './screens/renderers/score-upload-input/score-upload-input.component';
 import { ScoreReviewComponent } from './screens/score-review/score-review.component';
+import { EventAttendanceComponent } from './screens/event-attendance/event-attendance.component';
 
 
 
@@ -86,7 +87,7 @@ import { ScoreReviewComponent } from './screens/score-review/score-review.compon
     MyProfileComponent,
     ApprovalRequestsComponent,
     ReqRendererComponent,  
-    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent, ScoreComponent, ScoreUploadComponent, ScoreUploadInputComponent, ScoreReviewComponent
+    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent, ScoreComponent, ScoreUploadComponent, ScoreUploadInputComponent, ScoreReviewComponent, EventAttendanceComponent
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],

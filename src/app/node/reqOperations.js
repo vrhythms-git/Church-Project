@@ -4,6 +4,7 @@ const firebase = require('firebase');
 const firebaseConfig = require('./firebase/firebaseAdminUtils');
 const errorHandling = require('./ErrorHandling/commonDBError');
 const { result } = require('underscore');
+const { event } = require('jquery');
 const dbConnections = require(`${__dirname}/dbConnection`);
 
 
@@ -698,37 +699,37 @@ async function getEventCategory() {
 async function getParishData() {
 
     let client = await dbConnections.getConnection();
-  //  return new Promise((resolve, reject) => {
-    
-        try {
-            let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`        
-         let result = await client.query(getParishData)
+    //  return new Promise((resolve, reject) => {
 
-               
-                    console.log("In response" + res);
-                    let metadata = {};
-                    let Parish = [];
-                    for (let row of result.rows) {
-                        let data = {};
-                        data.id = row.id;
-                        data.name = row.name;
-                        Parish.push(data);
-                    }
-                    metadata.Parish = Parish;
-                    return({
-                        data: {
-                            status: 'success',
-                            metaData: metadata
-                        }
-                    })
-            
-            //});
-        } catch (error) {
-            console.error(`reqOperations.js::getParishData() --> error executing query as : ${error}`);
-            return(errorHandling.handleDBError('connectionError'));
-        } finally {
-            client.release(false);
+    try {
+        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
+        let result = await client.query(getParishData)
+
+
+        console.log("In response" + res);
+        let metadata = {};
+        let Parish = [];
+        for (let row of result.rows) {
+            let data = {};
+            data.id = row.id;
+            data.name = row.name;
+            Parish.push(data);
         }
+        metadata.Parish = Parish;
+        return ({
+            data: {
+                status: 'success',
+                metaData: metadata
+            }
+        })
+
+        //});
+    } catch (error) {
+        console.error(`reqOperations.js::getParishData() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
+    }
     //});
 }
 
@@ -739,7 +740,7 @@ async function getEventData(userId, eventType) {
         let metadata = {};
         let getEventData = `select * from t_event where is_deleted = false`;
         console.log(`Fetching event data for ${userId} user.`)
-        if (eventType == 'for_judgement') {
+        if (eventType === 'for_judgement') {
 
             getEventData = `select distinct te.event_id, te."name",te.event_type,te.description,te.start_date, te.end_date,
                             tecsm.is_score_submitted ,registration_start_date, te.registration_end_date, te.org_id
@@ -749,7 +750,7 @@ async function getEventData(userId, eventType) {
                             and te.is_deleted = false
                             order by event_id desc;`
         }
-        if (eventType == 'review_pending') {
+        if (eventType === 'review_pending') {
 
             getEventData = ` select distinct te.event_id,
                                     te."name",
@@ -784,27 +785,77 @@ async function getEventData(userId, eventType) {
                         where tecsm.is_score_submitted = true
                         order by te."name" asc`;
         }
+        if (eventType === 'attendance') {
+
+            getEventData = `
+                        select distinct 
+                                to_char(event_start_date, 'DD-MM-YYYY') startDate,
+                                to_char(event_end_date, 'DD-MM-YYYY') endDate,
+                                 event_type eventType,
+                                 event_id eventId,
+                                 event_name eventName, 
+                                 event_category_id catId, 
+                                 category_name catName 
+                        from v_event ve 
+                        where proctor_id = ${userId} 
+                        and event_cat_map_id is not null
+                        and event_start_date >= current_date;`
+
+        }
 
 
         let res = await client.query(getEventData);
-        if (res && res.rowCount > 0) {
-            //  console.log("In Event response : " + res);
-            let eventData = [];
-            for (let row of res.rows) {
-                let events = {};
-                events.event_Id = row.event_id;
-                events.name = row.name;
-                events.event_type = row.event_type;
-                events.description = row.description;
-                events.startDate = row.start_date;
-                events.endDate = row.end_date;
-                events.registrationStartDate = row.registration_start_date;
-                events.registrationEndDate = row.registration_end_date;
-                events.orgId = row.org_id;
-                events.isScoreSubmitted = row.is_score_submitted
-                eventData.push(events);
+
+        if (eventType === 'attendance') {
+
+            if (res.rowCount == 0) {
+                return ({
+                    data: {
+                        events: []
+                    }
+                })
+            } else {
+
+                let events = [];
+
+                for (let row of res.rows) {
+                    let index = events.findIndex((event) => event.eventid == row.eventid)
+                    if (index < 0) {
+                        let temp = { 'catId': row.catid, 'catName': row.catname }
+                        let catagories = [temp]
+                        row.catagories = catagories;
+                        events.push(row);
+                    } else {
+                        let catIndex = events[index].catagories.findIndex((cat) => cat.catid == row.catid);
+                        if (catIndex < 0) {
+                            let temp = { 'catId': row.catid, 'catName': row.catname }
+                            events[index].catagories.push(temp)
+                        }
+                    }
+                }
+                metadata.events = events;
+
             }
-            metadata.eventData = eventData;
+        } else {
+            if (res && res.rowCount > 0) {
+                //  console.log("In Event response : " + res);
+                let eventData = [];
+                for (let row of res.rows) {
+                    let events = {};
+                    events.event_Id = row.event_id;
+                    events.name = row.name;
+                    events.event_type = row.event_type;
+                    events.description = row.description;
+                    events.startDate = row.start_date;
+                    events.endDate = row.end_date;
+                    events.registrationStartDate = row.registration_start_date;
+                    events.registrationEndDate = row.registration_end_date;
+                    events.orgId = row.org_id;
+                    events.isScoreSubmitted = row.is_score_submitted,
+                        eventData.push(events);
+                }
+                metadata.eventData = eventData;
+            }
         }
         return ({
             data: {
@@ -821,8 +872,6 @@ async function getEventData(userId, eventType) {
         client.release(false);
     }
 }
-
-
 
 async function processUpdateUserRoles(userData) {
     let client = await dbConnections.getConnection();
@@ -1342,36 +1391,36 @@ async function processUpdateUserRoles(userData) {
 async function getParishData() {
 
     let client = await dbConnections.getConnection();
-   // return new Promise((resolve, reject) => {
-    
-        try {
+    // return new Promise((resolve, reject) => {
 
-            let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
-          let result = await client.query(getParishData)
-              
-                    let metadata = {};
-                    let Parish = [];
-                    for (let row of result.rows) {
-                        let data = {};
-                        data.id = row.id;
-                        data.name = row.name;
-                        Parish.push(data);
-                    }
-                    metadata.Parish = Parish;
-                    return({
-                        data: {
-                            status: 'success',
-                            metaData: metadata
-                        }
-                    })
-                
-        } catch (error) {
-            console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
-            return(errorHandling.handleDBError('connectionError'));
-        } finally {
-            client.release(false);
+    try {
+
+        let getParishData = `select org_id id, name from t_organization where org_type = 'Parish'`
+        let result = await client.query(getParishData)
+
+        let metadata = {};
+        let Parish = [];
+        for (let row of result.rows) {
+            let data = {};
+            data.id = row.id;
+            data.name = row.name;
+            Parish.push(data);
         }
-   // });
+        metadata.Parish = Parish;
+        return ({
+            data: {
+                status: 'success',
+                metaData: metadata
+            }
+        })
+
+    } catch (error) {
+        console.error(`reqOperations.js::processSignInRequest() --> error executing query as : ${error}`);
+        return (errorHandling.handleDBError('connectionError'));
+    } finally {
+        client.release(false);
+    }
+    // });
 }
 
 
