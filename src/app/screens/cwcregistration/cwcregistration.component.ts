@@ -184,7 +184,7 @@ export class CwcregistrationComponent implements OnInit {
       this.uiCommonUtils.showSnackBar('You should select atleast one category', 'Dismiss', 3000);
     }
 
-    /*
+    
     this.apiService.callPostService('registerEvent',payLoad ).subscribe((res: any) => {
       if (res.data.status == "success") {
         this.uiCommonUtils.showSnackBar("Registered for event successfully!", "success", 3000);
@@ -192,7 +192,7 @@ export class CwcregistrationComponent implements OnInit {
       else
         this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
     });
-    */
+    
   }
 
 

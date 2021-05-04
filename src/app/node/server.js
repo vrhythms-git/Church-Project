@@ -4,6 +4,7 @@ const processMiscRequest = require(`${__dirname}/miscReqOperations`)
 const processEventTemp = require(`${__dirname}/reqEventTemp`)
 const processEventRequest = require(`./eventReqOperations`)
 const processScoreRequest = require(`./reqScoreOperations`)
+const processAttendaceRequest = require(`./reqAttendanceOperartions`)
 const dbConnections = require(`${__dirname}/dbConnection`);
 express = require('express')
 const cors = require('cors')
@@ -540,6 +541,7 @@ app.post('/api/registerEvent', function (req, res) {
         res.send(data);
         res.end();
       }).catch((error) => {
+        
         res.send(error);
         res.end();
       })
@@ -562,6 +564,7 @@ app.get('/api/getParticipants', function (req, res) {
         res.send(data);
         res.end();
       }).catch((error) => {
+        console.log(`Error with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -580,7 +583,7 @@ app.post('/api/postScore', function (req, res) {
         res.send(data);
         res.end();
       }).catch((error) => {
-        //console.log(`Returning with resonse : ${error}`)
+        console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -628,6 +631,25 @@ app.post('/api/deleteEvents', function (req, res) {
   }
 });
 
+
+app.post('/api/postAttendance', function (req, res) {
+  console.log("postAttendance called...");
+  let loggedInUser =  decodeUser(req)
+  try {
+    processAttendaceRequest.persistParticipantAttendance(req.body.data, loggedInUser)
+      .then((data) => {
+        //console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        res.send(data);
+        res.end();
+      }).catch((error) => {
+        //console.log(`Returning with resonse : ${error}`)
+        res.send(error);
+        res.end();
+      })
+  } catch (error) {
+    console.error('Error in postAttendance as : ' + error)
+  }
+});
 
 
 //to decode loggedin user Id from the request context.

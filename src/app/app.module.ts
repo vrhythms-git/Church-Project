@@ -68,6 +68,7 @@ import { ScoreUploadComponent } from './screens/renderers/score-upload/score-upl
 import { ScoreUploadInputComponent } from './screens/renderers/score-upload-input/score-upload-input.component';
 import { ScoreReviewComponent } from './screens/score-review/score-review.component';
 import { EventAttendanceComponent } from './screens/event-attendance/event-attendance.component';
+import { CheckboxRendererComponent } from './screens/renderers/checkbox-renderer/checkbox-renderer.component';
 
 
 
@@ -87,7 +88,13 @@ import { EventAttendanceComponent } from './screens/event-attendance/event-atten
     MyProfileComponent,
     ApprovalRequestsComponent,
     ReqRendererComponent,  
-    customSnackBar, LoginAccListComponent, CwcregistrationComponent, EventRegistrationComponent, ScoreComponent, ScoreUploadComponent, ScoreUploadInputComponent, ScoreReviewComponent, EventAttendanceComponent
+    customSnackBar, 
+    LoginAccListComponent, 
+    CwcregistrationComponent, 
+    EventRegistrationComponent,
+     ScoreComponent, 
+     ScoreUploadComponent,
+      ScoreUploadInputComponent, ScoreReviewComponent, EventAttendanceComponent
     //UserProfileComponent,
     //OvbsRegistrationComponent
   ],
@@ -137,6 +144,7 @@ import { EventAttendanceComponent } from './screens/event-attendance/event-atten
   ],
   providers: [AuthService,  { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true },EventDataService],
   bootstrap: [AppComponent],
+  entryComponents: [CheckboxRendererComponent],
   schemas:[CUSTOM_ELEMENTS_SCHEMA ]
 })
 export class AppModule { }

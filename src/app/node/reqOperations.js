@@ -798,8 +798,8 @@ async function getEventData(userId, eventType) {
                                  category_name catName 
                         from v_event ve 
                         where proctor_id = ${userId} 
-                        and event_cat_map_id is not null
-                        and event_start_date >= current_date;`
+                        and event_cat_map_id is not null;`
+                        // and event_start_date >= current_date
 
         }
 

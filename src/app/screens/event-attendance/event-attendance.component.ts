@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { uiCommonUtils } from '../../common/uiCommonUtils'
 import { ApiService } from '../../services/api.service'
+import { CheckboxRendererComponent } from '../renderers/checkbox-renderer/checkbox-renderer.component'
 
 declare let $: any;
 
@@ -25,6 +26,8 @@ export class EventAttendanceComponent implements OnInit {
   attendanceColDef: any;
   attendanceRowData: any;
   attendanceGridOption: any;
+
+  disableSaveSubmitBtn: boolean = false;
 
   constructor(private apiService: ApiService, private uiCommonUtils: uiCommonUtils) { }
 
@@ -64,11 +67,10 @@ export class EventAttendanceComponent implements OnInit {
       { headerName: 'End Date', field: 'enddate', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true },
     ];
 
-
     this.attendanceColDef = [
       { headerName: 'Enrollment Id', field: 'enrollmentId', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true, },
       { headerName: 'Category', field: 'eventCategoryName', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true, },
-      { headerName: 'Attendance', field: '', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true, checkboxSelection: true },
+      { headerName: 'Mark Here', cellRendererFramework: CheckboxRendererComponent, field: 'hasAttended', editable: false },
     ];
 
 
@@ -76,7 +78,7 @@ export class EventAttendanceComponent implements OnInit {
     this.apiService.callGetService(`getEventData?user=${userId}&eventType=attendance`).subscribe((respData) => {
 
       if (respData.data.status == 'failed') {
-        this.eventRowData = [];
+        this.eventRowData = []
         this.categoriesArr = []
         this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
         return;
@@ -84,8 +86,6 @@ export class EventAttendanceComponent implements OnInit {
 
       if (respData.data.metaData) {
         this.eventRowData = respData.data.metaData.events
-        // this.categoriesArr = respData.data.metaData.categories
-        // this.selectedCategory = respData.data.metaData.categories[0].categoryId
       } else
         this.eventRowData = [];
 
@@ -96,6 +96,7 @@ export class EventAttendanceComponent implements OnInit {
   selectedEvent: any = {};
   onRowClicked(event: any) {
 
+    this.attendanceRowData = []
     this.selectedEvent = event.data;
     this.categoriesArr = event.data.catagories;
     this.selectedCategory = event.data.catagories[0].catId;
@@ -106,9 +107,34 @@ export class EventAttendanceComponent implements OnInit {
 
   handleAttendanceSubmitBtnClick(event: any) {
 
+    let confmMsgSt = `Attendance cannot be updated after submission, Please click \'Ok\' to proceed.`;
+    if (confirm(confmMsgSt)) {
+      this.handleAttendanceSaveBtnClick('submit');
+      $("#imagemodal").modal("hide");
+    }
   }
 
   handleAttendanceSaveBtnClick(event: any) {
+
+    let payload: any = {}
+    if (event === 'submit')
+      payload.action = 'submit';
+    else payload.action = 'save';
+
+    payload.eventId = this.selectedEvent.eventid;
+    payload.category = this.selectedCategory;
+    payload.attendance = this.getParicipantAttendaneArr();
+
+    this.apiService.callPostService('postAttendance', payload).subscribe((response) => {
+
+      if (response.data.status == 'failed') {
+        this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
+        return;
+      } else {
+        this.uiCommonUtils.showSnackBar('Score recorded successfully!', 'success', 3000);
+        this.getParicipantData(this.selectedEvent.eventid, this.selectedCategory);
+      }
+    })
 
   }
 
@@ -128,14 +154,31 @@ export class EventAttendanceComponent implements OnInit {
         return;
       } else {
         this.attendanceRowData = respData.data.paticipants
-        if (this.attendanceRowData == null)
+        if (this.attendanceRowData == null) {
           this.uiCommonUtils.showSnackBar('No one participated in this category!', 'error', 3000);
+          this.disableSaveSubmitBtn = true;
+        } else {
+          if (this.attendanceRowData[0].isAttendanceSubmitted)
+            this.disableSaveSubmitBtn = true;
+          else
+            this.disableSaveSubmitBtn = false;
+        }
       }
     });
 
   }
 
-  onCellValueChanged(event: any) {
-    alert(`Value change..`)
+  getParicipantAttendaneArr(): any[] {
+
+    let participants = [];
+    for (let part of this.attendanceRowData) {
+      let temp: any = {};
+      temp.participantId = part.participantId;
+      temp.eventPartRegId = part.eventPartRegId;
+      temp.hasAttended = part.hasAttended;
+      participants.push(temp)
+    }
+
+    return participants;
   }
 }

@@ -386,13 +386,18 @@ async function getParticipant(eventId, userId, action, judgeId, catId) {
                                                         'enrollmentId', res.enrollment_id,
                                                         'eventCategoryId', res.event_category_id,
                                                         'eventCategoryName', res.event_category_name,
-                                                        'hasAttendend', res.has_attended
+                                                        'hasAttended', res.has_attended,
+                                                        'participantId', res.participant_id,
+                                                        'eventPartRegId', res.event_participant_registration_id,
+                                                        'isAttendanceSubmitted', res.is_attendance_submitted
                                                     ) 
                                                 ) participants
-                                                from (select distinct enrollment_id, event_category_name, event_category_id,has_attended 
+                                                from (select distinct is_attendance_submitted, event_participant_registration_id, participant_id, enrollment_id, event_category_name, event_category_id,has_attended 
                                                         from v_event_participant vep 
                                                         where event_id = ${eventId}
-                                                        and event_category_id = ${catId}) res;`
+                                                        and event_category_id = ${catId}
+                                                        order by enrollment_id asc
+                                                        ) res;`
 
         } else {
             console.log('Invalid action sent to getParticipant api, action recived to process  : ' + action);
