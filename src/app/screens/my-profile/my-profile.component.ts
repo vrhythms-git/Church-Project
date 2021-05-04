@@ -14,7 +14,13 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./my-profile.component.css']
 })
 export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
-
+  selectedUserRole: any;
+  rolesArr: never[] | undefined;
+  orgs: any;
+  /*MarrirdOptions: any[] = [
+    { value: "unmarried", viewValue: "unmarried" },
+    { value: "married", viewValue: "married" }
+  ];*/
   constructor(private apiService: ApiService,
     private http: HttpClient, private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils,
     public router: Router) { }
@@ -43,7 +49,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
   isApprovedUserLoggedIn: boolean = false;
   contactNo: any;
   max_date!: any;
-
+  maxDate = new Date();
 
   ngOnInit(): void {
     this.myprofileform = this.formBuilder.group({
@@ -67,7 +73,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       parish: new FormControl(''),
       memberDetails: this.formBuilder.array([this.addfamilyMembers()]),
       maritalStatus: new FormControl('', Validators.required),
-      dateofMarriage: new FormControl('', Validators.required),
+      dateofMarriage: new FormControl('',[ Validators.required]),
       aboutYourself: new FormControl('', Validators.required),
       userId: new FormControl(''),
       isFamilyHead: new FormControl(''),
@@ -115,7 +121,8 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       })
 
       this.myprofileform.patchValue({
-        country: this.alluserdata.country,
+        //country: this.alluserdata.country,
+       
         title: this.alluserdata.title,
         firstName: this.alluserdata.firstName,
         middleName: this.alluserdata.middleName,
@@ -131,14 +138,16 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
         addressLine3: this.alluserdata.addressLine3,
         city: this.alluserdata.city,
         postalCode: this.alluserdata.postalCode,
+        country: this.alluserdata.country,
         state: this.alluserdata.state,
         parish: this.alluserdata.orgName,
         //memberDetails: this.alluserdata.memberDetails,
         maritalStatus: this.alluserdata.maritalStatus,
-        dateofMarriage: this.alluserdata.dateofMarriage,
+        dateofMarriage: this.alluserdata.dateOfMarriage,
         aboutYourself: this.alluserdata.aboutYourself,
         userId: this.alluserdata.userId,
       });
+      this.patchCountryState(this.alluserdata.country);
     } if (this.isApprovedUserLoggedIn == false) {
 
       this.signUpForm = this.formBuilder.group({

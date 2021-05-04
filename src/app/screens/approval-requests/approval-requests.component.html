@@ -2,9 +2,9 @@
 
     <div class="row ml-1 mt-2 d-flex" style="justify-content: center;margin: 5px;">
         <mat-radio-group (change)='onFilteringRadioButtonChange($event)' aria-label="Select User Types to filter">
-            <mat-radio-button  value="approval_requests" checked>Approval Requests</mat-radio-button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <mat-radio-button  value="approval_requests" checked>Pending Approval Requests</mat-radio-button>&nbsp;&nbsp;&nbsp;&nbsp;
             <!-- <mat-radio-button  value="approved">Approved</mat-radio-button>&nbsp;&nbsp;&nbsp;&nbsp; -->
-            <mat-radio-button  value="rejected">Rejected</mat-radio-button>
+            <mat-radio-button  value="rejected">Rejected Users</mat-radio-button>
         </mat-radio-group>
     </div>
 
@@ -52,27 +52,27 @@
                             </mat-form-field>
                             <mat-form-field class="col">
                                 <mat-label>First Name</mat-label>
-                                <input id="firstName" matInput formControlName="firstName" required />
+                                <input style="text-transform: capitalize;" id="firstName" matInput formControlName="firstName" required />
                             </mat-form-field>
 
                             <mat-form-field class="col-md">
                                 <mat-label>Middle Name</mat-label>
-                                <input id="middleName" matInput formControlName="middleName" required />
+                                <input style="text-transform: capitalize;" id="middleName" matInput formControlName="middleName" required />
                             </mat-form-field>
                             <mat-form-field class="col-md">
                                 <mat-label>Last Name</mat-label>
-                                <input id="lastName" matInput formControlName="lastName" required />
+                                <input style="text-transform: capitalize;" id="lastName" matInput formControlName="lastName" required />
                             </mat-form-field>
                             <!-- </div> -->
                         </div>
                         <div class="row">
                             <mat-form-field class="col-md">
                                 <mat-label>Nick Name</mat-label>
-                                <input id="lastName" matInput formControlName="nickName" />
+                                <input style="text-transform: capitalize;" id="lastName" matInput formControlName="nickName" />
                             </mat-form-field>
                             <mat-form-field class="col-md">
                                 <mat-label>Baptismal Name</mat-label>
-                                <input id="batismalName" matInput formControlName="batismalName" />
+                                <input style="text-transform: capitalize;" id="batismalName" matInput formControlName="batismalName" />
                             </mat-form-field>
                             <mat-form-field class="col-md">
                                 <mat-label>Date of Birth</mat-label>
@@ -191,7 +191,7 @@
                         </div>
 
                         <div class="row" style="color:gray">
-                            <label id="example-radio-group-label" class="ml-3">Are you Family Head? </label>
+                            <label id="example-radio-group-label" class="ml-3">Is Family Head? </label>
                             <mat-radio-group aria-label="Select an option" formControlName="isFamilyHead">
                                 <mat-radio-button class="ml-1" value="true">Yes</mat-radio-button>
                                 <mat-radio-button class="ml-1" value="false" [checked]=true>No</mat-radio-button>

@@ -1,5 +1,5 @@
 <div class="container-fluid d-flex row col align-items-center m-0 p-0">
-        <div class="container col-md-4 col-sm-4 border rounded-lg box-shadow">
+        <div class="container col-md-6 col-sm-4 border rounded-lg box-shadow">
 
 
         <div class="row" style="background-color: #bd34069e;">
@@ -28,7 +28,7 @@
                             </mat-select>
                     </mat-form-field>
                     <mat-form-field class="form-field col-md-5">
-                        <input matInput formControlName="firstName" id="firstname" placeholder="First Name" maxlength="25" required>
+                        <input style="text-transform: capitalize;" matInput formControlName="firstName" id="firstname" placeholder="First Name" maxlength="25" required>
                         <mat-error *ngIf="signUpForm.controls.firstName.touched && signUpForm.controls.firstName.invalid">
                             <span *ngIf="signUpForm.controls.firstName.errors.required">This field is mandatory.</span>
                             <span *ngIf="signUpForm.controls.firstName.errors.pattern">This field is invalid.</span>
@@ -36,7 +36,7 @@
                     </mat-form-field>
 
                     <mat-form-field class="form-field col-md-5">
-                        <input type="text" matInput formControlName="lastName" id="lastname" placeholder="Last Name" maxlength="25" required>
+                        <input style="text-transform: capitalize;" type="text" matInput formControlName="lastName" id="lastname" placeholder="Last Name" maxlength="25" required>
                         <mat-error *ngIf="signUpForm.controls.lastName.touched && signUpForm.controls.lastName.invalid">
                             <span *ngIf="signUpForm.controls.lastName.errors.required">This field is mandatory.</span>
                             <span *ngIf="signUpForm.controls.lastName.errors.pattern">This field is invalid.</span>
@@ -84,35 +84,42 @@
                     </mat-form-field>
                 </div> -->
                 <div class="row justify-content-center">
-                    <mat-form-field class="form-field col-md">
-                        <input type="password" matInput formControlName="password" id="password" placeholder="Password" minlength="8" required>
-                        <mat-error *ngIf="signUpForm.controls.password.touched && signUpForm.controls.password.invalid">
-                            <span *ngIf="signUpForm.controls.password.errors.required">This field is mandatory.</span>
-                            <span *ngIf="signUpForm.controls.password.errors.pattern">Enter strong password.</span>
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="form-field col-md">
-                        <input type="password" matInput formControlName="cnfmpwd" id="cnfmpwd" placeholder="Confirm Password" required>
-                        <mat-error *ngIf="signUpForm.controls.cnfmpwd.touched && signUpForm.controls.cnfmpwd.invalid">
-                            <span *ngIf="signUpForm.controls.cnfmpwd.errors.required">This field is mandatory.</span>
-                            <span *ngIf="signUpForm.controls.cnfmpwd.errors.pattern">This field is invalid.</span>
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-                <div class="form-group row">
                         <mat-form-field class="form-field col-md">
-                                <mat-select formControlName="memberType" id="memberType" placeholder="Member Type">
-                                        <mat-option value="member">Member</mat-option>
-                                        <mat-option value="non-member">Non-member</mat-option>
-                                        <mat-option value="guest">Guest</mat-option>
-                                </mat-select>
+                            <!--type="password"-->
+                            <input [type]="hide ? 'password' : 'text'"  matInput formControlName="password" id="password" placeholder="Password" minlength="8" required>
+                            <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            <mat-error *ngIf="signUpForm.controls.password.touched && signUpForm.controls.password.invalid">
+                                <span *ngIf="signUpForm.controls.password.errors.required">This field is mandatory.</span>
+                                <span *ngIf="signUpForm.controls.password.errors.pattern">Please Enter valid password(e.g Test@123).</span>
+                            </mat-error>
                         </mat-form-field>
-                        <mat-form-field class="form-field col-md" >
-                                <mat-select id="orgId" formControlName = "orgId" placeholder="Parish" required>
-                                  <mat-option *ngFor = "let parish of parishList" [value]=parish.id>{{parish.name}} </mat-option>
-                                </mat-select>
-                              </mat-form-field>
-                </div>
+                        <mat-form-field class="form-field col-md">
+                            <input [type]="hide1 ? 'password' : 'text'" matInput formControlName="cnfmpwd" id="cnfmpwd" placeholder="Confirm Password" required>
+                            <mat-icon matSuffix (click)="hide1 = !hide1">{{hide1 ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            <mat-error *ngIf="signUpForm.controls.cnfmpwd.touched && signUpForm.controls.cnfmpwd.invalid">
+                                <span *ngIf="signUpForm.controls.cnfmpwd.errors.required">This field is mandatory.</span>
+                                <span *ngIf="signUpForm.controls.cnfmpwd.errors.pattern">Please Enter valid password(e.g Test@123).</span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="form-group row">
+                            <mat-form-field class="form-field col-md">
+                                    <mat-select formControlName="memberType" id="memberType" placeholder="Member Type">
+                                            <mat-option value="member">Member</mat-option>
+                                            <mat-option value="non-member">Non-member</mat-option>
+                                            <mat-option value="guest">Guest</mat-option>
+                                    </mat-select>
+                            </mat-form-field>
+                           
+                    </div>
+                    <div class="form-group row">
+                            
+                            <mat-form-field class="form-field col-md" >
+                                    <mat-select id="orgId" formControlName = "orgId" placeholder="Parish" required>
+                                      <mat-option *ngFor = "let parish of parishList" [value]=parish.id>{{parish.name}} </mat-option>
+                                    </mat-select>
+                                  </mat-form-field>
+                    </div>
 
                 <div class="form-group row justify-content-center">
                     <mat-form-field class="form-field col-md">

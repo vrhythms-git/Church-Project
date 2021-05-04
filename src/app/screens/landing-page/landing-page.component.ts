@@ -54,6 +54,7 @@ export class LandingPageComponent implements OnInit {
   mobileNumber: any;
   homePhoneNumber: any;
   alluserdata: any;
+  minDate = new Date();
 
   constructor(private apiService: ApiService, private uiCommonUtils: uiCommonUtils,
     private http: HttpClient, private formBuilder: FormBuilder) { }

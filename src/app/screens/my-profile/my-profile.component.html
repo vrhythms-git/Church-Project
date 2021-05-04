@@ -27,17 +27,17 @@
 
         <mat-form-field style="width:30%;padding-left: 1%;">
           <mat-label>First Name</mat-label>
-          <input required id="firstName" matInput formControlName="firstName" placeholder="Enter First Name" />
+          <input style="text-transform: capitalize;" required id="firstName" matInput formControlName="firstName" placeholder="Enter First Name" />
         </mat-form-field>
 
         <mat-form-field style="width:30%;padding-left: 1%;">
           <mat-label>Middle Name</mat-label>
-          <input required id="middleName" matInput formControlName="middleName" placeholder="Enter Middle Name" />
+          <input style="text-transform: capitalize;" required id="middleName" matInput formControlName="middleName" placeholder="Enter Middle Name" />
         </mat-form-field>
 
         <mat-form-field style="width:30%;padding-left: 1%;padding-right: 1.4%;">
           <mat-label>Last Name</mat-label>
-          <input required id="lastName" matInput formControlName="lastName" placeholder="Enter Last Name" />
+          <input style="text-transform: capitalize;" required id="lastName" matInput formControlName="lastName" placeholder="Enter Last Name" />
         </mat-form-field>
 
       </div>
@@ -47,18 +47,18 @@
       <div class="row">
         <mat-form-field class="col-md">
           <mat-label>Nick Name</mat-label>
-          <input id="lastName" matInput formControlName="nickName" />
+          <input style="text-transform: capitalize;" id="lastName" matInput formControlName="nickName" />
         </mat-form-field>
 
         <mat-form-field class="col-md">
           <mat-label>Baptismal Name</mat-label>
-          <input id="baptismalName" matInput formControlName="baptismalName" />
+          <input style="text-transform: capitalize;" id="baptismalName" matInput formControlName="baptismalName" />
         </mat-form-field>
 
 
         <mat-form-field class="col-md">
           <mat-label>Date of Birth</mat-label>
-          <input matInput type="input" [matDatepicker]="picker" required id="dob" formControlName="dob">
+          <input [max]="maxDate" matInput type="input" [matDatepicker]="picker" required id="dob" formControlName="dob">
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
@@ -130,37 +130,41 @@
       </div>
       <div class="row">
 
+          <mat-form-field class="col-md-6">
+              <mat-label>Country</mat-label>
+              <select matNativeControl required id="country" formControlName="country" placeholder="Select Country" [(ngModel)]="selectedCountry" (change)="changeCountry($event)">
+                      <option *ngFor="let country of countries" [value]="country.countryName">{{country.countryName}}</option>
+              </select>
+      </mat-form-field>
         <mat-form-field class="col-md-6">
-          <mat-label>Country</mat-label>
-          <select matNativeControl required id="country" formControlName="country" placeholder="Select Country"
-            [(ngModel)]="selectedCountry" (change)="changeCountry($event)">
-            <option *ngFor="let country of countries" [value]="country.countryName">{{country.countryName}}</option>
-          </select>
-        </mat-form-field>
-        <mat-form-field class="col-md-6">
-          <mat-label>State/Province</mat-label>
-          <select matNativeControl required id="state" formControlName="state" placeholder="Select State/Province">
-            <option *ngFor="let state of states" [value]="state">{{state}}</option>
-          </select>
-        </mat-form-field>
+            <mat-label>State/Province</mat-label>
+            <select matNativeControl required id="state" formControlName="state" placeholder="Select State/Province">
+              <option *ngFor="let state of states" [value]="state">{{state}}</option>
+            </select>
+          </mat-form-field>
       </div>
 
       <div class="row">
         <mat-form-field class="col-md">
           <mat-label>Marital Status</mat-label>
           <select matNativeControl required id="maritalStatus" formControlName="maritalStatus"
-            placeholder="Enter Country">
+           placeholder="Enter Country">
             <option value="married">Married</option>
             <option value="unmarried">Unmarried</option>
+
+         <!-- (selectionChange)="onSelectionChanged($event)"
+            <mat-option *ngFor="let married of MarrirdOptions" [value]="married.value">
+                {{married.viewValue}}
+              </mat-option>-->
           </select>
         </mat-form-field>
         <mat-form-field class="col-md">
-          <mat-label>Date of Marriage</mat-label>
-          <input matInput type="input" [matDatepicker]="marriageDatepicker" required id="dateofMarriage"
+            <mat-label>Date of Marriage</mat-label>
+            <input [max]="maxDate" matInput type="input" [matDatepicker]="marriageDatepicker" required id="dateofMarriage"
             formControlName="dateofMarriage">
-          <mat-datepicker-toggle matSuffix [for]="marriageDatepicker"></mat-datepicker-toggle>
-          <mat-datepicker #marriageDatepicker></mat-datepicker>
-        </mat-form-field>
+            <mat-datepicker-toggle matSuffix [for]="marriageDatepicker"></mat-datepicker-toggle>
+            <mat-datepicker #marriageDatepicker></mat-datepicker>
+          </mat-form-field>
       </div>
       <div class="row">
         <mat-form-field class="col-md-12">
@@ -171,17 +175,27 @@
       </div>
 
 
-      <div *ngIf="showFamilyHeadQuestion" class="row">
+     <!--<div *ngIf="showFamilyHeadQuestion" class="row">
         <div class="col-md-2">
-          <h3>Is family head ?</h3>
+          <h3>Are you family head ?</h3>
         </div>
         <div class="col-md-4" style="padding-top: 0.4%;margin-left: -4%;">
+            <label id="example-radio-group-label" class="ml-3">Is Family Head? </label>
           <mat-radio-group formControlName="isFamilyHead" aria-label="Select an option">
             <mat-radio-button [checked]=isFamilyHead value=true>Yes</mat-radio-button>&nbsp;
-            <mat-radio-button [checked]=!isFamilyHead value=false>No</mat-radio-button>
+            <mat-radio-button [checked]=!isFamilyHead value=false >No</mat-radio-button>
           </mat-radio-group>
         </div>
       </div>
+-->
+<div *ngIf="showFamilyHeadQuestion" class="row" >
+    <label id="example-radio-group-label" class="ml-3">Are you Family Head? </label>
+    <mat-radio-group  aria-label="Select an option" formControlName="isFamilyHead" id="isFamilyHead ">
+            <mat-radio-button class="ml-1" [checked]=isFamilyHead value=true  >Yes</mat-radio-button>
+            <mat-radio-button class="ml-1" [checked]=!isFamilyHead value=false>No</mat-radio-button>
+          </mat-radio-group>
+</div>
+
 
       <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
       </mat-divider>
@@ -222,12 +236,12 @@
                 <div class="col-md-6">
                   <mat-form-field class="col-md-12">
                     <mat-label>Baptismal Name</mat-label>
-                    <input required id="baptismalName" matInput formControlName="baptismalName" placeholder="Enter Baptismal Name" />
+                    <input style="text-transform: capitalize;" required id="baptismalName" matInput formControlName="baptismalName" placeholder="Enter Baptismal Name" />
                   </mat-form-field>
                 </div>
 
 
-                <div class="col-md-8">
+                <div class="col-md-2" style="padding-top: 2%;padding-right: 4%;">
                   <div class="col text-right">
                     <button (click)="onremovebtnclick(i)" mat-button>
                       <mat-icon>delete</mat-icon><span>Delete</span>
@@ -259,19 +273,19 @@
 
                 <mat-form-field style="width:30%;padding-left: 1%;">
                   <mat-label>First Name</mat-label>
-                  <input required id="firstName" matInput formControlName="firstName" placeholder="Enter First Name" />
+                  <input style="text-transform: capitalize;" required id="firstName" matInput formControlName="firstName" placeholder="Enter First Name" />
                 </mat-form-field>
 
                 <mat-form-field style="width:30%;padding-left: 1%;">
                   <mat-label>Middle Name</mat-label>
-                  <input required id="middleName" matInput formControlName="middleName"
+                  <input style="text-transform: capitalize;" required id="middleName" matInput formControlName="middleName"
                     placeholder="Enter Middle Name" />
 
                 </mat-form-field>
 
                 <mat-form-field style="width:30%;padding-left: 1%;padding-right: 2%;">
                   <mat-label>Last Name</mat-label>
-                  <input required id="lastName" matInput formControlName="lastName" placeholder="Enter Last Name" />
+                  <input style="text-transform: capitalize;" required id="lastName" matInput formControlName="lastName" placeholder="Enter Last Name" />
                 </mat-form-field>
 
               </div>
@@ -281,7 +295,7 @@
               <div class="row" style="padding-left: 1%;">
                 <mat-form-field class="col-md-4">
                   <mat-label>Date of Birth</mat-label>
-                  <input matInput type="input" [matDatepicker]="picker" required id="dob" formControlName="dob">
+                  <input [max]="maxDate" matInput type="input" [matDatepicker]="picker" required id="dob" formControlName="dob">
                   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
 
@@ -370,17 +384,19 @@
             </mat-form-field>
         </div>
         <div class="row">
+
             <mat-form-field class="form-field col col-md">
                 <mat-label style="padding-left: 23%;">Mobile Number</mat-label>
-                <input matInput type="text" ng2TelInput (ng2TelOutput)="getNumber($event)" formControlName="mobileNo" id="mobileNo" maxLength="10" (keypress)="keyPress($event)" required style="width: fit-content;"/>
+                <input matInput type="text" ng2TelInput (ng2TelOutput)="getNumber($event)" formControlName="mobileNo" id="mobileNo" length="10" (keypress)="keyPress($event)" required style="width: fit-content;"/>
                 <mat-error *ngIf="signUpForm.controls.mobileNo.touched && signUpForm.controls.mobileNo.invalid">
                     <span *ngIf="signUpForm.controls.mobileNo.errors.required">This field is mandatory.</span>
                     <span *ngIf="signUpForm.controls.mobileNo.errors.pattern">Enter 10 digit number.</span>
                 </mat-error>
             </mat-form-field>
+           
 
             <mat-form-field class="form-field col-12 col-md-6">
-                <input matInput type="input" [matDatepicker]="picker" [max]="max_date" formControlName="dob" id="dob" placeholder="DoB" required>
+                <input matInput type="input" [matDatepicker]="picker" [max]="maxDate" formControlName="dob" id="dob" placeholder="DoB" required>
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
                 <mat-error *ngIf="signUpForm.controls.dob.touched && signUpForm.controls.dob.invalid">

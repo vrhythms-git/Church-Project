@@ -6,6 +6,9 @@ import { uiCommonUtils } from '../../common/uiCommonUtils';
 import * as moment from 'moment';
 import { Moment } from 'moment';
 import { EventRegistrationDataService } from '../event-registration/event.registrationDataService';
+import { Router } from '@angular/router';
+
+
 
 @Component({
   selector: 'app-cwcregistration',
@@ -14,149 +17,184 @@ import { EventRegistrationDataService } from '../event-registration/event.regist
 })
 export class CwcregistrationComponent implements OnInit {
 
-  cwcRegistrationForm: any;
-  parishList!: any[];
-  venuesList!: any[];
-  questionnaire: any;
+  //cwcRegistrationForm: any;
+  categoriesDataFormGroup: any;
+  questionnaireDataFormGroup: any;
+  userMetaData: any;
+  loggedInUser: any;
   eventcategorydata!: any[];
-  allUsersData:any;
-  loggedInUser : any;
-  userMetaData : any;
-  allEventsData:any ={};
-
-  categories: any;
-  eventId:any;
-  eventNameList! : any[];
-  eventTypeList! : any[];
   eventQuestionnaireData!: any[];
+  answer: any;
 
-  answerTypeList!: any[];
+  event: any;
+  item: any;
+  
+  startDate:any;
+  endDate:any;
+  registrationStartDate:any;
+  registrationEndDate:any;
 
-  constructor(private apiService: ApiService,private formBuilder: FormBuilder,
-  private uiCommonUtils :uiCommonUtils,private eventRegistrationDataService:EventRegistrationDataService) { }
 
-    selected!: { startDate: Moment; endDate: Moment; };
-    selectedRowJson:any ={};
+  constructor(private router: Router, private apiService: ApiService, private formBuilder: FormBuilder,
+    private uiCommonUtils: uiCommonUtils, private eventRegistrationDataService: EventRegistrationDataService) { }
+
+  selected!: { startDate: Moment; endDate: Moment; };
+  selectedRowJson: any = {};
   ngOnInit(): void {
 
-    if( this.eventRegistrationDataService.getSelectedRowData() != undefined )
+    if (this.eventRegistrationDataService.getSelectedRowData() != undefined)
       this.selectedRowJson = this.eventRegistrationDataService.getSelectedRowData();
-      console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson));
+    console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson));
 
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
     this.loggedInUser = this.userMetaData.userId;
 
-    this.cwcRegistrationForm = this.formBuilder.group({
-      title: new FormControl(this.userMetaData.title, Validators.required),
-      firstName: new FormControl(this.userMetaData.firstName, Validators.required),
-      middleName: new FormControl(this.userMetaData.middleName, Validators.required),
-      lastName: new FormControl(this.userMetaData.lastName, Validators.required),
-      emailId: new FormControl(this.userMetaData.emailId, [Validators.required]),
-      //parish: new FormControl('', Validators.required),
-      currentGradeOfStudent: new FormControl('', Validators.required),
-      testingCenter : new FormControl('',Validators.required),
-      testingLocation : new FormControl('',Validators.required),
-      cwcdate : new FormControl('',Validators.required),
-      cwcstudentGroup : new FormControl('',Validators.required),
-      questionnaire: this.formBuilder.array([this.adduserquestionary()]),
-      eventName: new FormControl(this.selectedRowJson.name,Validators.required),
-      eventType: new FormControl(this.selectedRowJson.event_type,Validators.required),
-
-      startDate: new FormControl(this.selectedRowJson.startDate, Validators.required),
-      endDate: new FormControl(this.selectedRowJson.endDate, Validators.required),
-      registrationStartDate: new FormControl(this.selectedRowJson.registrationStartDate, Validators.required),
-      registrationEndDate: new FormControl(this.selectedRowJson.registrationEndDate, Validators.required),
-      //yescheckBox : new FormControl('', Validators.required),
-      //noCheckBox: new FormControl('', Validators.required),
-      
-    });
-
-  
     
+    
+    this.startDate = new Date(this.selectedRowJson.startDate).toLocaleDateString("en-us");
+    this.endDate = new Date(this.selectedRowJson.endDate).toLocaleDateString("en-us");
 
-    this.apiService.getParishListData().subscribe(res => {
-      for (let i = 0; i < res.data.metaData.Parish.length; i++) {
-        this.parishList = res.data.metaData.Parish;
-      }
-      console.log(this.parishList);
-    })
+    this.registrationStartDate = new Date(this.selectedRowJson.registrationStartDate).toLocaleDateString("en-us");
+    this.registrationEndDate = new Date(this.selectedRowJson.registrationEndDate).toLocaleDateString("en-us");
 
-    this.apiService.getEventCategoryData().subscribe((res) => {
-      console.log('These are Event category from database : ');
-      console.log(res.data.metaData);
- 
-      this.venuesList = res.data.metaData.venuesData;
+    console.log("Event Id is mamamamam : " + this.selectedRowJson.event_Id);
 
-      this.eventcategorydata = res.data.metaData.eventCategory;
-      console.log(this.eventcategorydata.length);
+    this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}`).subscribe((res) => {
 
-      //this.eventTypeList = this.eventcategorydata;
+      this.eventcategorydata = res.data.eventData.categories
 
-    });
+      this.eventQuestionnaireData = res.data.eventData.questionnaire;
 
-    /*
-    this.apiService.getUsersData( this.loggedInUser ).subscribe((res) => {
-      console.log('These are users from database : ');
-      console.log(res.data.metaData);
-      this.allUsersData = res.data.metaData;
-      //console.log("First Name of user is : "+this.allUsersData);
-      //console.log("this.loggedInUser : "+this.loggedInUser.firstName);
-    });
-    */
-   /*
-    this.apiService.getEventsData().subscribe((res) => {
-      console.log('These are all the events from database : ');
-      console.log(res.data.metaData);
-      this.allEventsData = res.data.metaData.eventData;
-      this.eventId = res.data.metaData.eventData[0].event_Id;
-      console.log("Event Id is : " +this.eventId);
+      console.log("eventcategorydata is : " + this.eventcategorydata);
 
-      //this.events = this.rowData
-    });
-    */
-    this.apiService.getEventQuestionnaireData().subscribe((res) => {
-      console.log("This are questionnaires data : ");
-      console.log(res.data.metaData); 
-      this.eventQuestionnaireData = res.data.metaData.questionData;
 
-      console.log(this.eventQuestionnaireData[0].answerType);
+      this.categoriesDataFormGroup.setControl('categories', this.setDataForCategories(this.eventcategorydata));
+      this.questionnaireDataFormGroup.setControl('questionnaire', this.setQuestionnairesData(this.eventQuestionnaireData))
+
       
-      this.cwcRegistrationForm.setControl('questionnaire', this.setQuestionnaires(this.eventQuestionnaireData));
+
+
+
+    });
+
+    this.categoriesDataFormGroup = this.formBuilder.group({
+      categories: this.formBuilder.array([this.addeventCategory()]),
+
+    });
+    this.questionnaireDataFormGroup = this.formBuilder.group({
+      questionnaire: this.formBuilder.array([this.addeventquestionnaire()])
     });
 
 
   }
+  addeventCategory(): FormGroup {
+    return this.formBuilder.group({
+      eventCategoryID: '',
+      name: '',
 
-  setQuestionnaires(eventQuestionnaireData: any): FormArray {
+    });
+  }
+  addeventquestionnaire(): FormGroup {
+    return this.formBuilder.group({
+      questionId: '',
+      answer: '',
+      question: '',
+      responseType: ''
+    });
+  }
+
+  setDataForCategories(eventcategorydata: any): FormArray {
     const formArray = new FormArray([]);
-    eventQuestionnaireData.forEach((e: any) => {
+    eventcategorydata.forEach((e: any) => {
       formArray.push(this.formBuilder.group({
-        questionId: e.question_id,
-        eventId: e.event_id,
-        question: e.question,
-        answerType: e.answerType,
-        
+        eventCategoryID: e.eventCategoryID,
+        name: e.name
+
       }));
     });
     return formArray;
   }
+  setQuestionnairesData(eventQuestionnaireData: any): FormArray {
+    const formArray = new FormArray([]);
+    eventQuestionnaireData.forEach((e: any) => {
+      formArray.push(this.formBuilder.group({
+        questionId: e.questionId,
+        answer: '',
+        question: e.question,
+        responseType: e.responseType
+
+      }));
+    });
+    return formArray;
+  }
+  onCancelRegistrationClick() {
+    this.router.navigate(['/dashboard/eventRegistration/']);
+  }
 
   /*
-  onQuestionAdd() {
-    this.questionnaire = this.cwcRegistrationForm.get('questionnaire') as FormArray;
-    this.questionnaire.push(this.adduserquestionary());
+    updateCheckedOptions(categories:any, event:any) {
+      this.categoriesDataFormGroup[categories] = event.target.checked;
+   }
+   */
+  /*
+   checked(item:Boolean){
+    if(this.categoriesDataFormGroup.indexOf(item) != -1){
+      return true;
+    }
   }
   */
-  onRemoveButtonClickQuestion(index: any) {
-    (<FormArray>this.cwcRegistrationForm.get('questionnaire').removeAt(index));
+  catArray: any = [];
+  onChange(event: any) {
+    console.log("Inside the on Change " + JSON.stringify(event.item) + "Seletion : " + event.event.checked);
+    if (event.event.checked == true) {
+      // if(this.catArray.indexOf(event.item.eventCategoryID) < 0)
+      this.catArray.push(event.item.eventCategoryID)
+    } else {
+      this.catArray.splice(this.catArray.indexOf(event.item.eventCategoryID), 1)
+    }
+    console.log("catArray : " + this.catArray);
+  }
+  registerEvent() {
+    let eventRegistrationForm: any = {};
+    eventRegistrationForm = { ...this.questionnaireDataFormGroup.value }
+    console.log("this.registration form", eventRegistrationForm);
+
+    //this.cwcRegistrationForm.value.eventId = this.eventId;
+    /*
+        let catArray : any = []
+        eventRegistrationForm.categories.filter((item:any) => {
+          catArray.push(item.eventCategoryID)
+        });
+        */
+    eventRegistrationForm.categories = this.catArray;
+
+    let payLoad = {
+      categories: this.catArray,
+      questionnaire: this.questionnaireDataFormGroup.value.questionnaire,
+      eventId: this.selectedRowJson.event_Id,
+      participantId: this.loggedInUser,
+      schoolGrade: '',
+    }
+    console.log("Payload : " + JSON.stringify(payLoad));
+    //console.log("eventRegistrationForm : " + eventRegistrationForm);
+
+
+    //console.log("this.categoriesDataFormGroup.value.categories.length" + this.categoriesDataFormGroup.value.categories.length);
+    if (this.categoriesDataFormGroup.value.categories.length == 0) {
+      this.uiCommonUtils.showSnackBar('You should select atleast one category', 'Dismiss', 3000);
+    }
+
+    /*
+    this.apiService.callPostService('registerEvent',payLoad ).subscribe((res: any) => {
+      if (res.data.status == "success") {
+        this.uiCommonUtils.showSnackBar("Registered for event successfully!", "success", 3000);
+      }
+      else
+        this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
+    });
+    */
   }
 
-  
-  adduserquestionary(): FormGroup {
-    return this.formBuilder.group({
-      question: '',
-      answerType: '',
-    });
-  }
-  
+
+
 }

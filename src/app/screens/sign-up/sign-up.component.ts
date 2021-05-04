@@ -15,6 +15,9 @@ export class SignUpComponent implements OnInit {
   contactNo: any;
   max_date!: any;
   parishList!: any[];
+  hide = true;
+  hide1 = true;
+  minDate = new Date();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -32,7 +35,7 @@ export class SignUpComponent implements OnInit {
       email: new FormControl('', [Validators.required, Validators.email]),
       dob: new FormControl('', Validators.required),
       password: new FormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[@])(?=.*?[0-9]).{8,}$')]),
-      cnfmpwd: new FormControl('', Validators.required),
+      cnfmpwd: new FormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[@])(?=.*?[0-9]).{8,}$')]),
       mobileNo: new FormControl('', [Validators.required, Validators.pattern('[0-9].{9}')]),
       memberType : new FormControl('',Validators.required),
       orgId: new FormControl('',Validators.required),

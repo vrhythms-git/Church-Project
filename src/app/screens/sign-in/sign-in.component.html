@@ -1,5 +1,5 @@
 <div class="container-fluid d-flex row col align-items-center m-0 p-0">
-    <div class="container col-md-4 col-sm-4 border rounded-lg box-shadow">
+    <div class="container col-md-6 col-sm-4 border rounded-lg box-shadow">
 
         <div class="row" style="background-color: #bd34069e;">
             <button mat-button class="col mbutton m-1" style="background-color: #bd34069e">
@@ -23,15 +23,17 @@
                 </div>
 
                 <div class="form-group row justify-content-center">
-                    <mat-icon class="col-1 mt-3">lock</mat-icon>
-                    <mat-form-field class="form-field col-10">
-                        <input type="password" matInput formControlName="password" id="password" placeholder="Your Password" required>
-                        <mat-error *ngIf="signInForm.controls.password.touched && signInForm.controls.password.invalid">
-                            <span *ngIf="signInForm.controls.password.errors.required">This field is mandatory.</span>
-                            <span *ngIf="signInForm.controls.password.errors.pattern">This field is invalid.</span>
-                        </mat-error>
-                    </mat-form-field>
-                </div>
+                        <mat-icon class="col-1 mt-3">lock</mat-icon>
+                        <!--type="password"-->
+                        <mat-form-field class="form-field col-10">
+                            <input [type]="hide ? 'password' : 'text'"  matInput formControlName="password" id="password" placeholder="Your Password" required>
+                            <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            <mat-error *ngIf="signInForm.controls.password.touched && signInForm.controls.password.invalid">
+                                <span *ngIf="signInForm.controls.password.errors.required">This field is mandatory.</span>
+                                <span *ngIf="signInForm.controls.password.errors.pattern">This field is invalid.</span>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
 
 
                 <div class="form-group text-center">
