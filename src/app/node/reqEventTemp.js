@@ -29,14 +29,14 @@ async function getEventById(eventId) {
 
         // console.log("1");
         /********************** v_event*******************************************************************************************/
-        const eventQuery = `select distinct event_id, event_type, event_name, event_desciption, registration_start_date, registration_end_date, event_start_date,
-                                event_end_date, event_url, org_type, org_id, org_name, 
-                                event_venue_id, venue_id, event_venue_name, proctor_id, event_cat_map_id,
-                                event_category_id, category_name, category_type, school_grade_from, school_grade_to,
-                                event_category_id, event_cat_staff_map_id, judge_id,
-                                question_id, question, question_response_id , answer_type , answer 
-                                from v_event  where is_deleted = false and event_id = ${eventId}
-                                order by event_category_id,venue_id;`
+            const eventQuery = `select distinct event_id, event_type, event_name, event_desciption, registration_start_date, registration_end_date, event_start_date,
+                                    event_end_date, event_url, org_type, org_id, org_name, 
+                                    event_venue_id, venue_id, event_venue_name, proctor_id, event_cat_map_id,
+                                    event_category_id, category_name, category_type, school_grade_from, school_grade_to,
+                                    event_category_id, event_cat_staff_map_id, judge_id,
+                                    question_id, question, answer_type  
+                                    from v_event  where is_deleted = false and event_id = ${eventId}
+                                    order by event_category_id,venue_id;`
 
         let result = await client.query(eventQuery);
 
@@ -151,8 +151,8 @@ async function getEventById(eventId) {
                     question.questionId = row.question_id;
                     question.question = row.question;
                     question.responseType = row.answer_type;
-                    question.questionResponseId = row.question_response_id;
-                    question.answer = row.answer;
+                    // question.questionResponseId = row.question_response_id;
+                    // question.answer = row.answer;
 
                     if (_.findWhere(questionnaire, question) == null) {
                         questionnaire.push(question);

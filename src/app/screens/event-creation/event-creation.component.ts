@@ -64,6 +64,25 @@ export class EventCreationComponent implements OnInit {
     private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils, 
     private eventDataService: EventDataService, private router : Router) { }
 
+ getData() {
+
+ this.apiService.getRegionAndParish().subscribe((res: any) => {
+    this.regionList = res.data.metaData.regions;
+  });
+
+ this.apiService.getEventType().subscribe((res: any) => {
+    this.eventList = res.data.metaData.eventType;
+    this.eventcategorydata = res.data.metaData.eventType;
+  });
+
+this.apiService.getUserRoleData().subscribe(res => {
+    this.orgs = res.data.metadata.orgs;
+    let temp = {value: this.eventsDataUpdate.orgType, id: this.eventsDataUpdate.orgId[0]};
+    this.onOrgSelect(temp);
+  });
+
+}
+
 
   ngOnInit(): void {
 
@@ -74,6 +93,15 @@ export class EventCreationComponent implements OnInit {
       console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson))
     }
 
+    this.categoriesDataFormGroup = this.formBuilder.group({
+      categories: this.formBuilder.array([this.addeventCategory()])
+    });
+  
+    this.questionnaireDataFormGroup = this.formBuilder.group({
+      questionnaire: this.formBuilder.array([this.adduserquestionary()])
+    });
+  
+  
 
     this.alluserdata = this.uiCommonUtils.getUserMetaDataJson();
     this.orgId = this.alluserdata.orgId;
@@ -98,36 +126,12 @@ export class EventCreationComponent implements OnInit {
         venues: this.formBuilder.array([this.adduserVenuAndProcter()])
     });
 
-    this.categoriesDataFormGroup = this.formBuilder.group({
-      categories: this.formBuilder.array([this.addeventCategory()])
-    });
-
-    this.questionnaireDataFormGroup = this.formBuilder.group({
-      questionnaire: this.formBuilder.array([this.adduserquestionary()])
-    });
-
-    this.apiService.getRegionAndParish().subscribe((res: any) => {
-      this.regionList = res.data.metaData.regions;
-    });
-
-    this.apiService.getEventType().subscribe((res: any) => {
-      this.eventList = res.data.metaData.eventType;
-      this.eventcategorydata = res.data.metaData.eventType;
-    });
-
-    this.apiService.getUserRoleData().subscribe(res => {
-      this.orgs = res.data.metadata.orgs;
-    });
-
-  
-
     // For getting event data by event id 
     this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}`).subscribe((res) => {
       console.log("event Id data : " + res.data.eventData);
       this.eventsDataUpdate = res.data.eventData;
-    
+      this.getData();
      
-
       // For binding data on update screen
       if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
         console.log("Patch Values event_Id = " + this.selectedRowJson.event_Id);
@@ -178,8 +182,7 @@ export class EventCreationComponent implements OnInit {
     
       // let abc = {value: "Parish"};
       // this.onOrgSelectBinding(abc);
-      // abc = {value: "Region"};
-      // this.onOrgSelect(abc);
+      
       // abc = {value: "Parish"};
       // this.onOrgSelect(abc);
     });
@@ -446,10 +449,10 @@ export class EventCreationComponent implements OnInit {
       formArray.push(this.formBuilder.group({
         eventCategoryID: e.id,
         name: e.name,
-        schoolGradeFrom: e.schoolGradeFrom,
-        schoolGradeTo: e.schoolGradeTo,
-        judges: '',
-        venueId: '',
+        schoolGradeFrom: e.schoolGradeFrom, 
+        schoolGradeTo: e.schoolGradeTo, 
+        judges: [e.judges],
+        venueId: [e.venueId],
         eventCatMapId: e.eventCatMapId
       }));
     });
@@ -560,6 +563,7 @@ export class EventCreationComponent implements OnInit {
         });
       }
     }
-   
+  
+    this.onCloseBtnClick();
   }
 }

@@ -61,16 +61,15 @@ async function processSignInRequest(userInfo) {
 
 
         let newPersonTblInsQuery = `INSERT INTO public.t_person
-            (user_id, dob,  mobile_no, created_by, created_date, membership_type)
-            VALUES($1 , $2, $3, $4, $5, $6);`;
+            (user_id, dob,  mobile_no, created_by, created_date)
+            VALUES($1 , $2, $3, $4, $5);`;
 
         let newPersonTblInsQueryValue = [
             newUserId,
             userInfo.data.dob,
             userInfo.data.mobileNo,
             newUserId,
-            new Date().toISOString(),
-            userInfo.data.memberType
+            new Date().toISOString()
         ];
 
         await client.query(newPersonTblInsQuery, newPersonTblInsQueryValue);
