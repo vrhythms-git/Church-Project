@@ -172,7 +172,8 @@ export class ScoreReviewComponent implements OnInit {
         action: 'approve',
         eventId: this.selectedEventData.event_Id,
         judgeId: this.selectedJudge,
-        catId: this.selectedCat
+        catId: this.selectedCat,
+        catMapId: this.scoreApprovalRowData[0].catMapId
       };
 
       this.apiService.callPostService('postScore', payload).subscribe((response) => {

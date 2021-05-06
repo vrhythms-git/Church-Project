@@ -741,13 +741,17 @@ async function getEventData(userId, eventType) {
         console.log(`Fetching event data for ${userId} user.`)
         if (eventType === 'for_judgement') {
 
-            getEventData = `select distinct te.event_id, te."name",te.event_type,te.description,te.start_date, te.end_date,
-                            tecsm.is_score_submitted ,registration_start_date, te.registration_end_date, te.org_id
-                            from t_event te 
-                            join t_event_cat_staff_map tecsm on te.event_id = tecsm.event_id 
-                            where tecsm.user_id = ${userId} 
-                            and te.is_deleted = false
-                            order by event_id desc;`
+             getEventData = ` select distinct   event_id,
+                                                event_name "name",
+                                                event_type, 
+                                                to_char(event_start_date, 'DD-MM-YYYY') start_date,
+                                                to_char(event_end_date, 'DD-MM-YYYY') end_date,
+                                                event_end_date
+                                        from v_event  
+                                        where judge_id = ${userId}
+                                        and is_deleted = false
+                                        and is_attendance_submitted  = true
+                                        order by event_end_date desc;`
         }
         if (eventType === 'review_pending') {
 
@@ -755,12 +759,12 @@ async function getEventData(userId, eventType) {
                                     te."name",
                                     te.event_type,
                                     te.description,
-                                    te.start_date, 
-                                    te.end_date,
+                                    to_char(te.start_date, 'DD-MM-YYYY') start_date,
+                                    to_char(te.end_date, 'DD-MM-YYYY') end_date,
                                 tecsm.is_score_submitted,
                                 registration_start_date,
                                 te.registration_end_date,
-                                te.org_id
+                                te.end_date
                         from t_event_organization teo              
                         join  (WITH recursive child_orgs 
                                         AS (
@@ -782,7 +786,7 @@ async function getEventData(userId, eventType) {
                         join t_event_cat_staff_map tecsm on tecsm.event_id = te.event_id 
                         join t_event_category_map tecm on tecm.event_cat_map_id = tecsm.event_category_map_id 
                         where tecsm.is_score_submitted = true
-                        order by te."name" asc`;
+                        order by te.end_date desc`;
         }
         if (eventType === 'attendance') {
 

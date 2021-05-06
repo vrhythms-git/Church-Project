@@ -54,9 +54,11 @@ export class ScoreComponent implements OnInit {
     }
 
     this.eventColumnDefs = [
-      { headerName: 'Event Name', field: 'name',  suppressSizeToFit: true, flex:1,resizable: true, sortable: true, filter: true, },
-      { headerName: 'Event Type', field: 'event_type',  suppressSizeToFit: true, flex:1, resizable: true, sortable: true, filter: true, },
-      { headerName: 'Upload Score', field: 'action', suppressSizeToFit: true, flex:1, resizable: true, cellRendererFramework: ScoreUploadComponent, width: 170 }
+      { headerName: 'Event Name', field: 'name', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true, },
+      { headerName: 'Event Type', field: 'event_type', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true, },
+      { headerName: 'Event Type', field: 'startDate', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true, },
+      { headerName: 'Event Type', field: 'endDate', suppressSizeToFit: true, flex: 1, resizable: true, sortable: true, filter: true, },
+      { headerName: 'Upload Score', field: 'action', suppressSizeToFit: true, flex: 1, resizable: true, cellRendererFramework: ScoreUploadComponent }
     ];
 
     this.participantColumnDefs = this.getParticipantDefArr(false)
@@ -84,16 +86,11 @@ export class ScoreComponent implements OnInit {
   selectedEventName: any;
   selectedEvtIsScrSubmted: boolean = false;
   onRowClicked(event: any) {
-   
+
     this.participantRowData = [];
     $("#imagemodal").modal("show");
     this.selectedEventId = event.data.event_Id;
     this.selectedEventName = event.data.name;
-    this.selectedEvtIsScrSubmted = event.data.isScoreSubmitted;
-    if (this.selectedEvtIsScrSubmted === true) 
-      this.participantColumnDefs = this.getParticipantDefArr(false);
-    else
-      this.participantColumnDefs = this.getParticipantDefArr(true);
     this.apiService.callGetService(`getParticipants?event=${event.data.event_Id}&to=upload`).subscribe((respData) => {
 
       if (respData.data.status === 'failed') {
@@ -101,8 +98,14 @@ export class ScoreComponent implements OnInit {
         this.selectedEvtIsScrSubmted = true;
         this.uiCommonUtils.showSnackBar('Something went wrong!', 'error', 3000);
         return;
-      } else
-        this.participantRowData = respData.data.paticipants       
+      } else {
+        this.participantRowData = respData.data.paticipants
+        this.selectedEvtIsScrSubmted = this.participantRowData[0].isScoreSubmitted;
+        if (this.selectedEvtIsScrSubmted === true)
+          this.participantColumnDefs = this.getParticipantDefArr(false);
+        else
+          this.participantColumnDefs = this.getParticipantDefArr(true);
+      }
     });
   }
 
@@ -116,9 +119,10 @@ export class ScoreComponent implements OnInit {
   getParticipantDefArr(isEditable: boolean) {
 
     return ([
-      { headerName: 'Enrollment Id', field: 'enrollmentId', flex:1, suppressSizeToFit: true, resizable: true, sortable: true, filter: true },
-      { headerName: 'Category', field: 'category', suppressSizeToFit: true, flex:1, sortable: true, resizable: true, filter: true, },
-      { headerName: 'Score', field: 'score', suppressSizeToFit: true, flex:1, editable: isEditable, resizable: true,
+      { headerName: 'Enrollment Id', field: 'enrollmentId', flex: 1, suppressSizeToFit: true, resizable: true, sortable: true, filter: true },
+      { headerName: 'Category', field: 'category', suppressSizeToFit: true, flex: 1, sortable: true, resizable: true, filter: true, },
+      {
+        headerName: 'Score', field: 'score', suppressSizeToFit: true, flex: 1, editable: isEditable, resizable: true,
 
         valueGetter: function (params: any) {
           return params.data.score;

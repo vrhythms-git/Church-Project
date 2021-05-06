@@ -348,15 +348,19 @@ async function getParticipant(eventId, userId, action, judgeId, catId) {
                                                     'categoryId', res.event_category_id,
                                                     'catStaffMapId',res.event_cat_staff_map_id,
                                                     'scoreRefId' , res.participant_event_score_id,
-                                                    'partEveRegCatId', res.participant_event_reg_cat_id              
+                                                    'partEveRegCatId', res.participant_event_reg_cat_id,
+                                                    'isScoreSubmitted', res.is_score_submitted              
                                                     ) 
                                             ) participants from (
-                                        select distinct event_participant_registration_id,
-                                        event_category_id, score, event_cat_staff_map_id, participant_event_reg_cat_id,
-                                        event_category_name, enrollment_id, participant_event_score_id 
-                                        from v_event_participant vep
-                                        where event_id = ${eventId}
-                                        and staff_id = ${userId}) res;`;
+                                                select distinct event_participant_registration_id,
+                                                event_category_id, score, event_cat_staff_map_id, participant_event_reg_cat_id,
+                                                event_category_name, enrollment_id, participant_event_score_id, 
+                                                is_score_submitted, is_attendance_submitted 
+                                                from v_event_participant vep
+                                                where event_id = ${eventId}
+                                                and is_attendance_submitted = true
+                                                and has_attended = true
+                                                and staff_id = ${userId} order by event_category_id, enrollment_id asc) res;`;
         } else if (action == 'approve') {
 
             getPaticipantQuery = `select jsonb_agg(
@@ -368,18 +372,21 @@ async function getParticipant(eventId, userId, action, judgeId, catId) {
                                                     'isScoreApproved', res.is_score_approved,
                                                     'judgeId', res.staff_id,
                                                     'judgeName', res.judge_name,
-                                                    'catStaffMapId', res.event_cat_staff_map_id
+                                                    'catStaffMapId', res.event_cat_staff_map_id,
+                                                    'catMapId', res.event_cat_map_id
                                                     ) 
                                                 ) participants                                  
-                                    from (  select staff_id, enrollment_id, score, event_category_id, event_category_name,
+                                    from (  select staff_id, event_cat_map_id, enrollment_id, score, event_category_id, event_category_name,
                                         concat(staff_first_name, ' ', staff_last_name ) judge_name,
                                          is_score_approved, event_cat_staff_map_id 
                                     from v_event_participant vep 
                                     where event_id = ${eventId} 
                                     and staff_id = ${judgeId}
                                     and event_category_id = ${catId}
-                                    and is_score_submitted = true order by enrollment_id, 5 asc) res;`;
-        } else if (action === 'attendance') {
+                                    and has_attended = true
+                                    and is_score_submitted = true order by enrollment_id, event_category_name asc) res;`;
+      
+          } else if (action === 'attendance') {
 
             getPaticipantQuery = ` select jsonb_agg(
                                                     jsonb_build_object(
