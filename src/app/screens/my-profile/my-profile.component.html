@@ -406,8 +406,10 @@
               <mat-label>Academic Year Start Date</mat-label>
               <input matInput [matDatepicker]="pickerstartdate"  id="studntAcaYrStrtDate" formControlName ="studntAcaYrStrtDate" placeholder="Enter Academic Year Start Date">
               <mat-datepicker-toggle matSuffix [for]="pickerstartdate"></mat-datepicker-toggle>
-              <mat-datepicker (monthSelected)="monthSelected($event)" startView="multi-year" #pickerstartdate></mat-datepicker>
+              <mat-datepicker startView="multi-year" #pickerstartdate></mat-datepicker>
             </mat-form-field>
+
+            <!-- (monthSelected)="monthSelected($event)"  -->
 
             
   

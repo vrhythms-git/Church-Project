@@ -274,12 +274,12 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
     //this.isStudentvar = !this.isStudentvar;
   }
 
-  @ViewChild(MatDatepicker) picker:any;
+  // @ViewChild(MatDatepicker) picker:any;
 
-  monthSelected(event : any) {
-    this.studentDetailsForm.studntAcaYrStrtDate.setValue(event);
-    this.picker.close();
-  }
+  // monthSelected(event : any) {
+  //   this.studentDetailsForm.studntAcaYrStrtDate.setValue(event);
+  //   this.picker.close();
+  // }
 
   setMemberDetails(memberDetailsData: any): FormArray {
     const formArray = new FormArray([]);
