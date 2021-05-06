@@ -1,17 +1,37 @@
 import { HttpClient } from '@angular/common/http';
-import { getInterpolationArgsLength } from '@angular/compiler/src/render3/view/util';
+import { ViewChild } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { uiCommonUtils } from 'src/app/common/uiCommonUtils';
 import { ComponentCanDeactivate } from 'src/app/component-can-deactivate';
 import { ApiService } from 'src/app/services/api.service';
 
+import { Moment } from 'moment';
+import * as _moment from 'moment';
+import { default as _rollupMoment } from 'moment';
+import { DateAdapter, NativeDateAdapter } from '@angular/material/core';
+
+const moment = _rollupMoment || _moment;
+
+
+class CustomDateAdapter extends NativeDateAdapter {
+  format(date: Date, displayFormat: Object): string {
+    var formatString = 'MMMM YYYY';
+    return moment(date).format(formatString);
+  }
+}
+
 @Component({
   selector: 'app-my-profile',
   templateUrl: './my-profile.component.html',
-  styleUrls: ['./my-profile.component.css']
+  styleUrls: ['./my-profile.component.css'],
+  providers: [
+    {
+      provide: DateAdapter, useClass: CustomDateAdapter
+    }
+  ]
 })
 export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
   selectedUserRole: any;
@@ -30,6 +50,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
   }
 
   myprofileform: any;
+  studentDetailsForm:any;
   members: any;
   isDirty: boolean = false;
   hasAddMemPerm: boolean = false;
@@ -38,6 +59,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
   alluserdata: any;
   userId: any;
   isFamilyHead: any;
+  isStudentvar!: boolean;
   orgId: any;
   parishList!: any[];
   memberDetailsData!: any[];
@@ -77,13 +99,67 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       aboutYourself: new FormControl('', Validators.required),
       userId: new FormControl(''),
       isFamilyHead: new FormControl(''),
-      orgId: new FormControl('')
+      orgId: new FormControl(''),
+      isStudent:new FormControl('')
     });
 
 
 
     this.alluserdata = this.uiCommonUtils.getUserMetaDataJson();
-    this.isApprovedUserLoggedIn = this.alluserdata.isApproved
+    this.isApprovedUserLoggedIn = this.alluserdata.isApproved;
+
+    this.studentDetailsForm = this.formBuilder.group({
+      studentAcaDtlId: new FormControl('', Validators.required),
+      studentId: new FormControl('', Validators.required),
+      schoolName: new FormControl('', Validators.required),
+      schoolGrade: new FormControl('', Validators.required),
+      studntAcaYrStrtDate: new FormControl('', Validators.required),
+      studntAcaYrEndDate: new FormControl('', Validators.required),
+      schoolAddrLine1: new FormControl('', Validators.required),
+      schoolAddrLine2: new FormControl('', Validators.required),
+      schoolAddrLine3: new FormControl('', Validators.required),
+      schoolCountry: new FormControl('', Validators.required),
+      schoolState: new FormControl('', Validators.required),
+      schoolCity: new FormControl('', Validators.required),
+      schoolPostalCode: new FormControl('', Validators.required),
+      sunSchoolStudentAcaDtlId: new FormControl('', Validators.required),
+      sunSchoolStudentId: new FormControl('', Validators.required),
+      sunSchoolId: new FormControl('', Validators.required),
+      sunSchoolGrade:  new FormControl('', Validators.required),
+      sunSchoolAcaYrStrtDate: new FormControl('', Validators.required),
+      sunSchoolAcaYrEndDate: new FormControl('', Validators.required)
+    });
+
+
+    console.log("this.alluserdata.studentAcademicdetails[0].schoolAddressline1", this.alluserdata.studentAcademicdetails[0].schoolAddressline1);
+
+    this.studentDetailsForm.patchValue({
+      studentAcaDtlId: this.alluserdata.studentAcademicdetails[0].studentAcademicDetailId,
+      studentId: this.alluserdata.studentAcademicdetails[0].studentId,
+
+      schoolName: this.alluserdata.studentAcademicdetails[0].schoolName,
+      schoolGrade: this.alluserdata.studentAcademicdetails[0].schoolGrade,
+      studntAcaYrStrtDate: this.alluserdata.studentAcademicdetails[0].academicYearStartDate,
+      studntAcaYrEndDate: this.alluserdata.studentAcademicdetails[0].academicYearEndDate,
+      schoolAddrLine1: this.alluserdata.studentAcademicdetails[0].schoolAddressline1,
+      schoolAddrLine2: this.alluserdata.studentAcademicdetails[0].schoolAddressline2,
+      schoolAddrLine3: this.alluserdata.studentAcademicdetails[0].schoolAddressline3,
+      schoolCountry: this.alluserdata.studentAcademicdetails[0].schoolCity,
+      schoolState: this.alluserdata.studentAcademicdetails[0].schoolState,
+      schoolCity: this.alluserdata.studentAcademicdetails[0].schoolPostalCode,
+      schoolPostalCode: this.alluserdata.studentAcademicdetails[0].schoolCountry,
+      //sunday school
+      sunSchoolStudentAcaDtlId: this.alluserdata.sundaySchoolDetails[0].studentSundaySchooldtlId,
+      sunSchoolStudentId: this.alluserdata.sundaySchoolDetails[0].studentId,
+      sunSchoolId: this.alluserdata.sundaySchoolDetails[0].schoolId,
+      sunSchoolGrade: this.alluserdata.sundaySchoolDetails[0].schoolGrade,
+      sunSchoolAcaYrStrtDate: this.alluserdata.sundaySchoolDetails[0].schoolYearStartDate,
+      sunSchoolAcaYrEndDate: this.alluserdata.sundaySchoolDetails[0].schoolYearEndDate,
+    });
+
+
+
+
 
     if (this.isApprovedUserLoggedIn == true) {
 
@@ -188,6 +264,23 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
     }
   }
 
+  isStudentFn(event:any){
+    if(event.value == "true"){
+      this.isStudentvar = true;
+    }
+    if(event.value == "false"){
+      this.isStudentvar = false;
+    }
+    //this.isStudentvar = !this.isStudentvar;
+  }
+
+  @ViewChild(MatDatepicker) picker:any;
+
+  monthSelected(event : any) {
+    this.studentDetailsForm.studntAcaYrStrtDate.setValue(event);
+    this.picker.close();
+  }
+
   setMemberDetails(memberDetailsData: any): FormArray {
     const formArray = new FormArray([]);
     memberDetailsData.forEach((e: any) => {
@@ -254,7 +347,7 @@ export class MyProfileComponent implements OnInit, ComponentCanDeactivate {
       else if (currFHValue === '')
         this.myprofileform.value.isFamilyHead = this.alluserdata.isFamilyHead
 
-      this.apiService.updateUserProfile({ data: this.myprofileform.value }).subscribe((res: any) => {
+      this.apiService.updateUserProfile({data:{ ...this.myprofileform.value, ...this.studentDetailsForm.value }}).subscribe((res: any) => {
         if (res.data.status == "success") {
           this.uiCommonUtils.showSnackBar("Profile updated successfully!", "success", 3000);
           this.getAndSetMetdata(this.userId)

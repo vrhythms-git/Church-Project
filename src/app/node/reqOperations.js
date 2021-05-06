@@ -335,6 +335,56 @@ async function processGetUserMetaDataRequest(uid) {
                 }
 
                 metaData.memberDetails = memberDetails;
+
+                //////////////////////// t_student_academic_dtl //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                let studentAcademicdetails = [];
+                let studentAcademicdtls = {};
+
+                const getStdntAcaDtl = `SELECT * FROM t_student_academic_dtl where student_id = ${metaData.userId} 
+                                and student_academic_dtl_id = (select max(student_academic_dtl_id) from t_student_academic_dtl where student_id = ${metaData.userId});`
+                let result = await client.query(getStdntAcaDtl);
+
+                for (let row of result.rows) {
+                    studentAcademicdtls.studentAcademicDetailId = row.student_academic_dtl_id;
+                    studentAcademicdtls.studentId = row.student_id;
+                    studentAcademicdtls.schoolName = row.school_name;
+                    studentAcademicdtls.schoolGrade = row.school_grade;
+                    studentAcademicdtls.academicYearStartDate = row.academic_year_start_date;
+                    studentAcademicdtls.academicYearEndDate = row.academic_year_end_date;
+                    studentAcademicdtls.schoolAddressline1 = row.school_address_line1;
+                    studentAcademicdtls.schoolAddressline2 = row.school_address_line2;
+                    studentAcademicdtls.schoolAddressline3 = row.school_address_line3;
+                    studentAcademicdtls.schoolCity = row.school_city;
+                    studentAcademicdtls.schoolState = row.school_state;
+                    studentAcademicdtls.schoolPostalCode = row.school_postal_code;
+                    studentAcademicdtls.schoolCountry = row.school_country;
+                }
+                studentAcademicdetails.push(studentAcademicdtls);
+                metaData.studentAcademicdetails = studentAcademicdetails;
+
+
+                /////////////////// t_student_sundayschool_dtl ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                let sundaySchoolDetails = [];
+                let sundaySchoolDtls = {};
+
+                const getSundaySchoolDtls = `SELECT * FROM t_student_sundayschool_dtl where student_id = ${metaData.userId}
+                                and student_sundayschool_dtl_id = (select max(student_sundayschool_dtl_id) from t_student_sundayschool_dtl where student_id = ${metaData.userId});`
+                let result1 = await client.query(getSundaySchoolDtls);
+
+                for (let row of result1.rows) {
+                    sundaySchoolDtls.studentSundaySchooldtlId = row.student_sundayschool_dtl_id;
+                    sundaySchoolDtls.studentId = row.student_id;
+                    sundaySchoolDtls.schoolId = row.school_id;
+                    sundaySchoolDtls.schoolGrade = row.school_grade;
+                    sundaySchoolDtls.schoolYearStartDate = row.school_year_start_date;
+                    sundaySchoolDtls.schoolYearEndDate = row.school_year_end_date;
+                }
+
+                sundaySchoolDetails.push(sundaySchoolDtls);
+                metaData.sundaySchoolDetails = sundaySchoolDetails;
+
             }
 
             return ({
@@ -741,7 +791,7 @@ async function getEventData(userId, eventType) {
         console.log(`Fetching event data for ${userId} user.`)
         if (eventType === 'for_judgement') {
 
-             getEventData = ` select distinct   event_id,
+            getEventData = ` select distinct   event_id,
                                                 event_name "name",
                                                 event_type, 
                                                 to_char(event_start_date, 'DD-MM-YYYY') start_date,
@@ -802,7 +852,7 @@ async function getEventData(userId, eventType) {
                         from v_event ve 
                         where proctor_id = ${userId} 
                         and event_cat_map_id is not null;`
-                        // and event_start_date >= current_date
+            // and event_start_date >= current_date
 
         }
 
@@ -976,7 +1026,123 @@ async function processUpdateUserRoles(userData) {
             userData.userId
         ];
 
-        await client.query(updatePersonTbl, updatePersonTblValues)
+        await client.query(updatePersonTbl, updatePersonTblValues);
+
+        ////////////////// t_student_academic_dtl , t_student_sundayschool_dtl /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        if (userData.schoolGrade && userData.userId) {
+            const updateStdntAcaDtl = `UPDATE t_student_academic_dtl
+                        SET  school_name=$1, 
+                            school_grade=$2, 
+                            academic_year_start_date=$3,
+                            academic_year_end_date=$4,
+                            school_address_line1=$5,
+                            school_address_line2=$6,
+                            school_address_line3=$7, 
+                            school_city=$8,
+                            school_state=$9,
+                            school_postal_code=$10,
+                            school_country =$11
+                        WHERE student_id=$12 and school_grade=$2;`
+
+            const updateStdntAcaDtlValues = [
+                userData.schoolName,
+                userData.schoolGrade,
+                userData.studntAcaYrStrtDate,
+                userData.studntAcaYrEndDate,
+                userData.schoolAddrLine1,
+                userData.schoolAddrLine2,
+                userData.schoolAddrLine3,
+                userData.schoolCity,
+                userData.schoolState,
+                userData.schoolPostalCode,
+                userData.schoolCountry,
+                userData.userId
+            ];
+
+            let result = await client.query(updateStdntAcaDtl, updateStdntAcaDtlValues);
+            console.log("result", result.rowCount);
+
+            if (result.rowCount == 0) {
+                const insertStdntAcaDtl = `INSERT INTO t_student_academic_dtl 
+            (student_id,
+            school_name, 
+            school_grade,
+            academic_year_start_date,
+            academic_year_end_date,
+            school_address_line1,
+            school_address_line2,
+            school_address_line3,
+            school_city,
+            school_state,
+            school_postal_code,
+            school_country) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`
+
+                const insertStdntAcaDtlValues = [
+                    userData.userId,
+                    userData.schoolName,
+                    userData.schoolGrade,
+                    userData.studntAcaYrStrtDate,
+                    userData.studntAcaYrEndDate,
+                    userData.schoolAddrLine1,
+                    userData.schoolAddrLine2,
+                    userData.schoolAddrLine3,
+                    userData.schoolCity,
+                    userData.schoolState,
+                    userData.schoolPostalCode,
+                    userData.schoolCountry,
+                ];
+                await client.query(insertStdntAcaDtl, insertStdntAcaDtlValues);
+            }
+            console.log("111");
+        }
+
+
+        if (userData.sunSchoolGrade && userData.userId) {
+
+            const updateSundaySchoolDtls = `UPDATE t_student_sundayschool_dtl 
+            SET school_id =$1,
+            school_grade= $2,
+            school_year_start_date= $3,
+            school_year_end_date= $4
+            WHERE student_id=$5 and school_grade= $2;`
+
+            const updateSundaySchoolDtlsValues = [
+                userData.sunSchoolId,
+                userData.sunSchoolGrade,
+                userData.sunSchoolAcaYrStrtDate,
+                userData.sunSchoolAcaYrEndDate,
+                userData.userId
+            ];
+
+
+            let result1 = await client.query(updateSundaySchoolDtls, updateSundaySchoolDtlsValues);
+            console.log("result1.rowCount", result1.rowCount);
+
+            if (result1.rowCount == 0) {
+                const insertSundaySchoolDtls = `INSERT INTO t_student_sundayschool_dtl 
+                 (student_id, 
+                 school_id,
+                 school_grade, 
+                 school_year_start_date, 
+                 school_year_end_date)
+            VALUES($1, $2, $3, $4, $5);`
+
+
+                const insertSundaySchoolDtlsValues = [
+                    userData.userId,
+                    userData.sunSchoolId,
+                    userData.sunSchoolGrade,
+                    userData.sunSchoolAcaYrStrtDate,
+                    userData.sunSchoolAcaYrEndDate
+                ];
+
+
+                await client.query(insertSundaySchoolDtls, insertSundaySchoolDtlsValues);
+            }
+
+        }
 
         /***************************** Family Member Data Insertion**************************************************** */
 

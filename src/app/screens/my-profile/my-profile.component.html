@@ -189,17 +189,36 @@
       </div>
 -->
 <div *ngIf="showFamilyHeadQuestion" class="row" >
-    <label id="example-radio-group-label" class="ml-3">Are you Family Head? </label>
-    <mat-radio-group  aria-label="Select an option" formControlName="isFamilyHead" id="isFamilyHead ">
-            <mat-radio-button class="ml-1" [checked]=isFamilyHead value=true  >Yes</mat-radio-button>
-            <mat-radio-button class="ml-1" [checked]=!isFamilyHead value=false>No</mat-radio-button>
-          </mat-radio-group>
+  <div class="col-md-3">
+    <h3>Are you a family head ?</h3>
+  </div>
+  <div class="col-md-9" style="padding-top: 0.4%;margin-left: -4%;">
+    <mat-radio-group formControlName="isFamilyHead" aria-label="Select an option">
+      <mat-radio-button [checked]=isFamilyHead value=true>Yes</mat-radio-button>&nbsp;
+      <mat-radio-button [checked]=!isFamilyHead value=false>No</mat-radio-button>
+    </mat-radio-group>
+  </div>  
+</div>
+
+<div class="row" *ngIf ="!isFamilyHead">
+<div class="col-md-3">
+  <h3>Are you a student ? &nbsp;</h3>
+</div>
+
+<div class="col-md-9" style="padding-top: 0.4%;margin-left: -4%;">
+  <mat-radio-group formControlName="isStudent" (change)= "isStudentFn($event)" aria-label="Select an option">
+    <mat-radio-button value=true>Yes</mat-radio-button>&nbsp;
+    <mat-radio-button value=false>No</mat-radio-button>
+  </mat-radio-group>
+</div>
+
 </div>
 
 
-      <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
-      </mat-divider>
+     
       <div *ngIf="hasAddMemPerm">
+        <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+        </mat-divider>
         <div class="row" style="padding-top: 1%;">
           <div class="col-md-6">
             <h2>Family Member Assignment</h2>
@@ -329,14 +348,200 @@
 
       </div>
 
-      <div class="row" style="padding-top: 1%;">
-        <div class="col text-center">
-          <button mat-button type="submit" mat-button class="mbutton" (change)="isDirty = false"
-            (click)="updateUserProfile()">
-            Update</button>
-        </div>
-      </div>
+     
     </form>
+
+    <div *ngIf="!isFamilyHead">
+      <form [formGroup]="studentDetailsForm">
+        <div *ngIf = "isStudentvar" >
+    
+          <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+          </mat-divider>
+  
+          <div class="row" style="padding-top: 1%;">
+            <div class="col-md-12">
+            *If student please fill in following details (K-12) :
+            </div>
+          </div>
+    
+          <div class="row" style="padding-top: 1%;">
+            <div class="col-md-6">
+              <h2>Academic Details</h2>
+            </div>
+          </div>
+    
+          <!-- <div class="row">
+  
+            <mat-form-field class= "col-md-6">
+              <mat-label>Student Academic Details Id</mat-label>
+              <input required id="studentAcaDtlId" formControlName ="studentAcaDtlId" matInput placeholder="Enter Student Academic Details Id" />
+            </mat-form-field>
+    
+            <mat-form-field class= "col-md-12">
+              <mat-label>Student Id</mat-label>
+              <input required id="studentId" formControlName ="studentId" matInput placeholder="Student Id" />
+            </mat-form-field>
+    
+          </div> -->
+          
+        
+    
+          <div class="row">
+           
+            <mat-form-field class= "col-md-6">
+              <mat-label>School Name</mat-label>
+              <input required id="schoolName" formControlName ="schoolName" matInput placeholder="Enter School Name" />
+            </mat-form-field>
+    
+            <mat-form-field class= "col-md-6">
+              <mat-label>School Grade</mat-label>
+              <input required id="schoolGrade" formControlName ="schoolGrade" matInput placeholder="Enter School Grade" />
+            </mat-form-field>
+    
+          </div>
+    
+          <div class="row">
+  
+            <mat-form-field class= "col-md-6">
+              <mat-label>Academic Year Start Date</mat-label>
+              <input matInput [matDatepicker]="pickerstartdate"  id="studntAcaYrStrtDate" formControlName ="studntAcaYrStrtDate" placeholder="Enter Academic Year Start Date">
+              <mat-datepicker-toggle matSuffix [for]="pickerstartdate"></mat-datepicker-toggle>
+              <mat-datepicker (monthSelected)="monthSelected($event)" startView="multi-year" #pickerstartdate></mat-datepicker>
+            </mat-form-field>
+
+            
+  
+            <mat-form-field class= "col-md-6">
+              <mat-label>Academic Year End Date</mat-label>
+              <input matInput [matDatepicker]="pickerenddate"  id="studntAcaYrEndDate" formControlName ="studntAcaYrEndDate" placeholder="Enter Academic Year End Date">
+              <mat-datepicker-toggle matSuffix [for]="pickerenddate"></mat-datepicker-toggle>
+              <mat-datepicker startView="multi-year" #pickerenddate></mat-datepicker>
+            </mat-form-field>
+          
+          </div>
+    
+          <div class="row">
+    
+            <mat-form-field class= "col-md-4">
+              <mat-label>Address Line 1</mat-label>
+              <input id="schoolAddressLine1" formControlName ="schoolAddrLine1" matInput placeholder="Enter Address Line 1" />
+            </mat-form-field>
+    
+            <mat-form-field class= "col-md-4">
+              <mat-label>Address Line 2</mat-label>
+              <input id="schoolAddressLine2" formControlName ="schoolAddrLine2" matInput placeholder="Enter Address Line 2" />
+            </mat-form-field>
+    
+            <mat-form-field class= "col-md-4">
+              <mat-label>Address Line 3</mat-label>
+              <input id="schoolAddressLine3" formControlName ="schoolAddrLine3" matInput placeholder="Enter Address Line 3" />
+            </mat-form-field>
+          
+          </div>
+    
+          <div class="row">
+    
+    
+            <mat-form-field class= "col-md-6">
+              <mat-label>School Country</mat-label>
+              <input required id="schoolCountry" formControlName ="schoolCountry" matInput placeholder="Enter School Country" />
+            </mat-form-field>
+    
+            <mat-form-field class= "col-md-6">
+              <mat-label>School State</mat-label>
+              <input required id="schoolState" formControlName ="schoolState" matInput placeholder="Enter School State" />
+            </mat-form-field>
+    
+          </div>
+    
+          <div class="row">
+            
+            <mat-form-field class= "col-md-6">
+              <mat-label>School City</mat-label>
+              <input required id="schoolCity" formControlName ="schoolCity" matInput placeholder="Enter School City" />
+            </mat-form-field>
+    
+            <mat-form-field class= "col-md-6">
+              <mat-label>School Postal Code</mat-label>
+              <input required id="schoolPostalCode" formControlName ="schoolPostalCode" matInput placeholder="Enter School Postal Code" />
+            </mat-form-field>
+  
+          </div>
+    
+        </div>
+    
+        <div *ngIf = "isStudentvar" >
+        <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+        </mat-divider>
+    
+        <div class="row" style="padding-top: 1%;">
+          <div class="col-md-6">
+            <h2>Student's Sunday School Details</h2>
+          </div>
+        </div>
+    
+        <!-- <div class="row">
+    
+          <mat-form-field class= "col-md-6">
+            <mat-label>Student Sunday School Academic Details Id</mat-label>
+            <input required id="sunSchoolStudentAcaDtlId" formControlName ="sunSchoolStudentAcaDtlId" matInput placeholder="Enter Student Sunday School Academic Details Id" />
+          </mat-form-field> 
+  
+          <mat-form-field class= "col-md-12">
+            <mat-label>Student Id</mat-label>
+            <input required id="sunSchoolStudentId" formControlName ="sunSchoolStudentId" matInput placeholder="Enter Student Id" />
+          </mat-form-field>
+  
+    
+        </div> -->
+  
+        <div class="row">
+  
+        <mat-form-field class= "col-md-6">
+          <mat-label>School Id</mat-label>
+          <input required id="sunSchoolId" formControlName ="sunSchoolId" matInput placeholder="Enter School Id" />
+        </mat-form-field>
+  
+        <mat-form-field class= "col-md-6">
+          <mat-label>School Grade</mat-label>
+          <input required id="sunSchoolGrade" formControlName ="sunSchoolGrade" matInput placeholder="Enter School Grade"/>
+        </mat-form-field>
+      </div>
+  
+    
+        <div class="row">
+  
+          <mat-form-field class= "col-md-6">
+            <mat-label>Academic Year Start Date</mat-label>
+            <input matInput [matDatepicker]="sunSchoolAcaYrStrtDatepicker" id="sunSchoolAcaYrStrtDate"  formControlName ="sunSchoolAcaYrStrtDate" placeholder="Enter Academic Year Start Date">
+            <mat-datepicker-toggle matSuffix [for]="sunSchoolAcaYrStrtDatepicker"></mat-datepicker-toggle>
+            <mat-datepicker startView="multi-year" #sunSchoolAcaYrStrtDatepicker></mat-datepicker>
+          </mat-form-field>
+  
+  
+          <mat-form-field class= "col-md-6">
+            <mat-label>Academic Year End Date</mat-label>
+            <input matInput [matDatepicker]="sunSchoolAcaYrEndDatepicker" id="sunSchoolAcaYrEndDate" formControlName ="sunSchoolAcaYrEndDate" placeholder="Enter Academic Year End Date">
+            <mat-datepicker-toggle  matSuffix [for]="sunSchoolAcaYrEndDatepicker"></mat-datepicker-toggle>
+            <mat-datepicker startView="multi-year" #sunSchoolAcaYrEndDatepicker></mat-datepicker>
+          </mat-form-field>
+    
+        </div>
+    
+        </div>
+      </form>
+    </div>
+
+    <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 12px;">
+    </mat-divider>
+
+    <div class="row" style="padding-top: 1%;">
+      <div class="col text-center">
+        <button mat-button type="submit" mat-button class="mbutton" (change)="isDirty = false"
+          (click)="updateUserProfile()">
+          Update</button>
+      </div>
+    </div>
 
     <!-- ****************************************  Basic edit profile Sign up form Code ****************************************** -->
 
