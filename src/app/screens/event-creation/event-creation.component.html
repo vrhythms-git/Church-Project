@@ -24,21 +24,34 @@
                          
 
                             <div class="row" style="margin-top: 3%;">
-                                <mat-form-field class="col-md-6">
+                                <mat-form-field class="col-md-12">
 
                                     <input required id="eventName" matInput formControlName="name"
                                         placeholder="Event Name" />
                                 </mat-form-field>
-
-                                <mat-form-field class="col-md-6">
-                                    <mat-select required id="eventType" formControlName="eventType"
-                                        placeholder="Event Type">
-                                        <mat-option [disabled]= "evntTypedisabled" *ngFor="let event of eventList" [value]="event.eventType">
-                                            {{event.eventType}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-
                             </div>
+
+                            <div class="row">
+
+                            <mat-form-field class="col-md-6">
+                                <mat-select required id="eventType" (selectionChange)="eventTypeSelChange()" formControlName="eventType"
+                                    placeholder="Event Type">
+                                    <mat-option [disabled]= "evntTypedisabled" *ngFor="let event of eventList" [value]="event.eventType">
+                                        {{event.eventType}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field class="col-md-6">
+                                <mat-select required multiple id="eventCoordinator" formControlName="eventCoordinator"
+                                    placeholder="Event Co-ordinator">
+                                    <mat-option *ngFor="let proctor of proctorData"
+                                    [value]="proctor.userId">{{proctor.name}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+
+                        </div>
+
 
 
                             <div class="row">

@@ -23,7 +23,7 @@ async function deleteEvents(eventsData) {
                     //t_event
                     const deleteTblEvent = `UPDATE t_event SET is_deleted = true WHERE event_id = ${event.event_Id};`
                     await client.query(deleteTblEvent);
-                   
+
                     //t_event_venue
                     let deleteTblEventVenue = `UPDATE t_event_venue SET is_deleted = true where event_id = ${event.event_Id};`
                     await client.query(deleteTblEventVenue);
@@ -39,7 +39,7 @@ async function deleteEvents(eventsData) {
 
                 console.log("Before commit");
                 await client.query("COMMIT");
-        
+
                 return ({
                     data: {
                         status: 'success'
@@ -53,10 +53,10 @@ async function deleteEvents(eventsData) {
             console.log("Transaction ROLLBACK called");
             return (errorHandling.handleDBError('transactionError'));
         }
-    }catch (error) {
+    } catch (error) {
         console.error(`reqOperations.js::deleteEvents() --> error : ${JSON.stringify(err)}`);
         return (errorHandling.handleDBError('transactionError'));
-    }finally{
+    } finally {
         client.release();
     }
 
@@ -64,7 +64,7 @@ async function deleteEvents(eventsData) {
 
 async function updateEvent(eventsData) {
 
-    let client =  await dbConnections.getConnection();
+    let client = await dbConnections.getConnection();
     try {
         await client.query("BEGIN");
         /********************** t_event*******************************************************************************************/
@@ -107,6 +107,22 @@ async function updateEvent(eventsData) {
             }
         }
 
+        ////////////////////////////////////////////  t_event_coordinator  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        const deleteEventCoordinator = `DELETE FROM t_event_coordinator where event_id = ${eventsData.eventId};`
+        await client.query(deleteEventCoordinator);
+
+        if(eventsData.eventCoordinator){
+            for(let coordinator of eventsData.eventCoordinator){
+                const insertEventCoordinator = `INSERT INTO t_event_coordinator (event_id, user_id, updated_date) VALUES($1, $2, $3);`
+                insertEventCoordinatorValues = [
+                    eventsData.eventId,
+                    coordinator,
+                    new Date().toISOString()
+                ];
+                await client.query(insertEventCoordinator, insertEventCoordinatorValues);
+            }
+        }
 
         ////////////////////////////////////////////  t_event_venue  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -290,7 +306,7 @@ async function updateEvent(eventsData) {
         console.error(`eventReqOperations.js::UpdateEvent() --> error : ${err}`)
         console.log("Transaction ROLLBACK called");
         return (errorHandling.handleDBError('transactionError'));
-    }finally{
+    } finally {
         client.release()
     }
 }
@@ -339,7 +355,7 @@ async function getVenues(venueData) {
     } catch (error) {
         console.error(`eventReqOperations.js::getVenues() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    }finally{
+    } finally {
         client.release();
     }
 
@@ -389,7 +405,17 @@ async function insertEvents(eventsData) {
                     }
                 }
 
-
+                if(eventsData.eventCoordinator){
+                    for(let coordinator of eventsData.eventCoordinator){
+                        const insertEventCoordinator = `INSERT INTO t_event_coordinator (event_id, user_id, created_date) VALUES($1, $2, $3);`
+                        insertEventCoordinatorValues = [
+                            this.eventId,
+                            coordinator,
+                            new Date().toISOString()
+                        ];
+                        await client.query(insertEventCoordinator, insertEventCoordinatorValues);
+                    }
+                }
 
 
                 /********************** t_event_venue************************************************************************************/
@@ -419,7 +445,7 @@ async function insertEvents(eventsData) {
                 /********************** t_event_category_map,   t_event_cat_staff_map*******************************************************************************/
                 console.log("3");
 
-                if (eventsData.categories != null) {
+                if (eventsData.categories) {
                     for (let category of eventsData.categories) {
 
                         console.log("4");
@@ -440,32 +466,37 @@ async function insertEvents(eventsData) {
 
                         console.log("5");
 
-                        for (let venue of category.venueId) {
-                            console.log("venue", venue);
-                            const eventCatVenueMap = `INSERT INTO t_event_category_venue_map(event_cat_map_id, event_venue_id) VALUES ($1, $2);`
-                            eventCatVenueMapValues = [
-                                this.eventCategoryID,
-                                venue
-                            ]
-                            await client.query(eventCatVenueMap, eventCatVenueMapValues);
+                        if (category.venueId) {
+                            for (let venue of category.venueId) {
+                                console.log("venue", venue);
+                                const eventCatVenueMap = `INSERT INTO t_event_category_venue_map(event_cat_map_id, event_venue_id) VALUES ($1, $2);`
+                                eventCatVenueMapValues = [
+                                    this.eventCategoryID,
+                                    venue
+                                ]
+                                await client.query(eventCatVenueMap, eventCatVenueMapValues);
+                            }
                         }
 
-
-                        for (let judge of category.judges) {
-
-                            const insertCatUserMap = `INSERT INTO  t_event_cat_staff_map(event_id, event_category_map_id, role_type, user_id)
+                        if (category.judges) {
+                            for (let judge of category.judges) {
+                                if (judge) {
+                                    const insertCatUserMap = `INSERT INTO  t_event_cat_staff_map(event_id, event_category_map_id, role_type, user_id)
                                                        VALUES ($1, $2, $3, $4);`
 
-                            insertCatUserMap_values = [
-                                this.eventId,
-                                this.eventCategoryID,
-                                'Judge',
-                                judge
-                            ]
+                                    insertCatUserMap_values = [
+                                        this.eventId,
+                                        this.eventCategoryID,
+                                        'Judge',
+                                        judge
+                                    ]
 
-                            console.log("insertCatUserMap_values", insertCatUserMap_values);
-                            await client.query(insertCatUserMap, insertCatUserMap_values);
+                                    console.log("insertCatUserMap_values", insertCatUserMap_values);
+                                    await client.query(insertCatUserMap, insertCatUserMap_values);
 
+                                }
+
+                            }
                         }
 
                     }
@@ -504,15 +535,15 @@ async function insertEvents(eventsData) {
         }
         catch (err) {
             await client.query("ROLLBACK");
-            console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`)
+            console.error(`reqOperations.js::insertevents() --> error : }`, err);
             console.log("Transaction ROLLBACK called");
             return (errorHandling.handleDBError('transactionError'));
         }
     }
     catch (error) {
-        console.error(`reqOperations.js::insertevents() --> error : ${JSON.stringify(err)}`);
+        console.error(`reqOperations.js::insertevents() --> error : }`, err);
         return (errorHandling.handleDBError('transactionError'));
-    }finally{
+    } finally {
         client.release();
     }
 }
@@ -585,7 +616,7 @@ async function getRegionAndParish() {
     } catch (error) {
         console.error(`reqOperations.js::getProctorData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    }finally{
+    } finally {
         client.release();
     }
 }
@@ -653,7 +684,7 @@ async function getEventType() {
     } catch (error) {
         console.error(`reqOperations.js::getEventType() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    }finally{
+    } finally {
         client.release();
     }
 }
@@ -695,7 +726,7 @@ async function getProctorData(userData) {
     } catch (error) {
         console.error(`reqOperations.js::getProctorData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    }finally{
+    } finally {
         client.release();
     }
 }
@@ -735,7 +766,7 @@ async function getEventQuestionnaireData() {
     } catch (error) {
         console.log(`reqOperations.js::getEventQuestionnaireData() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    }finally{
+    } finally {
         client.release();
     }
 }
@@ -784,7 +815,7 @@ async function getEventForRegistration() {
     } catch (error) {
         console.log(`reqOperations.js::getEventForRegistration() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));
-    }finally{
+    } finally {
         client.release();
     }
 

@@ -34,7 +34,7 @@ async function getEventById(eventId, isParticipant, userId) {
                                     event_venue_id, venue_id, event_venue_name, proctor_id, event_cat_map_id,
                                     event_category_id, category_name, category_type, school_grade_from, school_grade_to,
                                     event_category_id, event_cat_staff_map_id, judge_id,
-                                    question_id, question, answer_type  
+                                    question_id, question, answer_type, coordinator_id
                                     from v_event  where is_deleted = false and event_id = ${eventId}
                                     order by event_category_id,venue_id;`
 
@@ -56,11 +56,13 @@ async function getEventById(eventId, isParticipant, userId) {
             event.eventUrl = result.rows[0].event_url;
 
 
+
             let category = {};
             let venue = {};
             let judges = [];
             let venueId = [];
             let question = {};
+            let eventCoordinator = [];   
 
 
             for (let row of result.rows) {
@@ -73,6 +75,11 @@ async function getEventById(eventId, isParticipant, userId) {
                         orgIds.push(row.org_id)
                 }
 
+
+                if (row.coordinator_id != null) {
+                    if (eventCoordinator.indexOf(row.coordinator_id) < 0)
+                        eventCoordinator.push(row.coordinator_id)
+                }
 
                 //Get list of venues
                 if (row.venue_id != null) {
@@ -195,6 +202,7 @@ async function getEventById(eventId, isParticipant, userId) {
             event.venues = venues;
             event.categories = categories;
             event.questionnaire = questionnaire;
+            event.eventCoordinator = eventCoordinator;
 
 
             // console.log("12");

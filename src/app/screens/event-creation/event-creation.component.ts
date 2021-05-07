@@ -123,6 +123,7 @@ export class EventCreationComponent implements OnInit {
       registrationEndDate: new FormControl('', Validators.required),
       eventUrl: new FormControl('', [Validators.required, Validators.pattern(this.myreg)]),
       description: new FormControl('', Validators.required),
+      eventCoordinator: new FormControl('', Validators.required)
     });//{validator: this.checkDates}); //to compare event registration dates
 
     this.venuesDataFormGroup = this.formBuilder.group({
@@ -134,7 +135,9 @@ export class EventCreationComponent implements OnInit {
       console.log("event Id data : " + res.data.eventData);
       this.eventsDataUpdate = res.data.eventData;
       this.getData();
-
+      this.eventsDataFormGroup.value.eventType = res.data.eventData.eventType;
+      this.eventTypeSelChange();
+     
       // For binding data on update screen
       if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
         console.log("Patch Values event_Id = " + this.selectedRowJson.event_Id);
@@ -151,6 +154,7 @@ export class EventCreationComponent implements OnInit {
           registrationEndDate: this.eventsDataUpdate.registrationEndDate,
           eventUrl: this.eventsDataUpdate.eventUrl,
           description: this.eventsDataUpdate.description,
+          eventCoordinator: this.eventsDataUpdate.eventCoordinator // array
         });
 
         if (this.eventsDataUpdate.venues != null) {
@@ -191,42 +195,9 @@ export class EventCreationComponent implements OnInit {
         this.evntTypedisabled = false;
       }
 
-    
-      // let abc = {value: "Parish"};
-      // this.onOrgSelectBinding(abc);
-
-      // abc = {value: "Parish"};
-      // this.onOrgSelect(abc);
     });
 
   }
-
-
-
-  // onOrgSelectBinding(event: any) {
-  //   console.log(event);
-  //   this.selectedOrg = event.value;
-  //   let orgIndex = event.id;
-  //   if (orgIndex == undefined)
-  //     orgIndex = 0;
-  //   else
-  //     orgIndex = parseInt(orgIndex)
-  //   console.log("Dropdown Index:", orgIndex);
-
-  //   for (let i = 0; i < this.orgs.length; i++) {
-  //     if (this.orgs[i].orgtype == this.selectedOrg) {
-  //       this.orgDetails = this.orgs[i].details;
-  //     }
-  //   }
-
-  //   // this.eventsDataFormGroup.patchValue({
-  //   //   orgType: this.eventsDataUpdate.orgType,
-  //   //   orgId: this.eventsDataUpdate.orgId
-  //   // });
-  // } 
-
-
-
 
 
   // For relational dropdown ie. orgId and orgType
@@ -264,8 +235,54 @@ export class EventCreationComponent implements OnInit {
     return null;
   }
 
+  eventTypeSelChange(){
 
+    //for getting event co ordinator as per event type
+    if (this.eventsDataFormGroup.value.eventType == 'CWC') {
+      this.rolesData = ['CWC Coordinator'];
+      let roleData =
+      {
+        "data": {
+          "rolesData": this.rolesData
+        }
+      }
+      this.apiService.getProctorData(roleData).subscribe(res => {
+        this.proctorData = res.data.metaData.proctorData;
+        console.log("this.proctorData", this.proctorData);
+      });
+    }
 
+    if (this.eventsDataFormGroup.value.eventType == 'TTC') {
+      this.rolesData = ['TTC Exam Coordinator'];
+      let roleData =
+      {
+        "data": {
+          "rolesData": this.rolesData
+        }
+      }
+      this.apiService.getProctorData(roleData).subscribe(res => {
+        this.proctorData = res.data.metaData.proctorData;
+        console.log("this.proctorData", this.proctorData);
+      });
+    }
+
+    if (this.eventsDataFormGroup.value.eventType == 'OVBS') {
+      this.rolesData = ['OVBS Coordinator'];
+      let roleData =
+      {
+        "data": {
+          "rolesData": this.rolesData
+        }
+      }
+      this.apiService.getProctorData(roleData).subscribe(res => {
+        this.proctorData = res.data.metaData.proctorData;
+        console.log("this.proctorData", this.proctorData);
+      });
+    }
+
+  }
+
+ 
 
   onEventsNextBtnClick() {
 
