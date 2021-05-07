@@ -1234,8 +1234,8 @@ async function processUpdateUserRoles(userData) {
                 // console.log("emailResults", emailResults);
 
                 const insertPerson = `INSERT INTO public.t_person
-                (user_id, dob,  mobile_no, created_by, created_date, membership_type, baptismal_name )
-                VALUES($1 , $2, $3, $4, $5, $6, $7);`;
+                (user_id, dob,  mobile_no, created_by, created_date, baptismal_name )
+                VALUES($1 , $2, $3, $4, $5, $6);`;
 
                 let insertPersonRelationship = `INSERT INTO t_person_relationship(
                     family_head_id, family_member_id, relationship, updated_by, updated_date)
@@ -1290,7 +1290,6 @@ async function processUpdateUserRoles(userData) {
                                 details.mobileNo,
                                 userData.updatedBy,
                                 new Date().toISOString(),
-                                'member',
                                 details.baptismalName
                             ]
                         await client.query(insertPerson, insertPersonValues);
@@ -1402,7 +1401,6 @@ async function processUpdateUserRoles(userData) {
                                 details.mobileNo,
                                 userData.updatedBy,
                                 new Date().toISOString(),
-                                'member',
                                 details.baptismalName
                             ]
 
