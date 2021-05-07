@@ -31,10 +31,9 @@
                                 </mat-form-field>
 
                                 <mat-form-field class="col-md-6">
-
                                     <mat-select required id="eventType" formControlName="eventType"
                                         placeholder="Event Type">
-                                        <mat-option *ngFor="let event of eventList" [value]="event.eventType">
+                                        <mat-option [disabled]= "evntTypedisabled" *ngFor="let event of eventList" [value]="event.eventType">
                                             {{event.eventType}}</mat-option>
                                     </mat-select>
                                 </mat-form-field>

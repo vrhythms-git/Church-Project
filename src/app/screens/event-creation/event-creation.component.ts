@@ -37,6 +37,7 @@ export class EventCreationComponent implements OnInit {
   orgs!: any[];
   isLinear!: boolean;
   eventFormLabel!: boolean;
+  evntTypedisabled!: boolean;
   venuesdataOfdata!: any[];
   venuesList!: any[];
   eventList!: any[];
@@ -173,12 +174,21 @@ this.apiService.getUserRoleData().subscribe(res => {
 
       // For Label And button Show update
       if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
-        this.eventFormLabel = true;
+        this.eventFormLabel = true; // update screen
       }
       else{
-        this.eventFormLabel = false;
+        this.eventFormLabel = false; // insert screen
       }
       this.selectedRowJson.event_Id = null;
+
+
+      if(this.eventFormLabel == true){
+        this.evntTypedisabled = true;
+      }
+      else{
+        this.evntTypedisabled = false;
+      }
+
     
       // let abc = {value: "Parish"};
       // this.onOrgSelectBinding(abc);
