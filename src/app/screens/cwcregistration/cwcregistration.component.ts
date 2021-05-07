@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { EventRegistrationDataService } from '../event-registration/event.registrationDataService';
 import { Router } from '@angular/router';
+import { stringify } from '@angular/compiler/src/util';
 
 
 
@@ -28,52 +29,85 @@ export class CwcregistrationComponent implements OnInit {
 
   event: any;
   item: any;
-  
-  startDate:any;
-  endDate:any;
-  registrationStartDate:any;
-  registrationEndDate:any;
 
+  startDate: any;
+  endDate: any;
+  registrationStartDate: any;
+  registrationEndDate: any;
+  //isParticipant:boolean = false;
+  enrollmentId: any;
+  showHideEnrollmentId: boolean = false;
+  eventCatMapId:any;
 
   constructor(private router: Router, private apiService: ApiService, private formBuilder: FormBuilder,
     private uiCommonUtils: uiCommonUtils, private eventRegistrationDataService: EventRegistrationDataService) { }
 
   selected!: { startDate: Moment; endDate: Moment; };
   selectedRowJson: any = {};
+  selectedEventType : any = {};
+  currentURL='';
+  venuesList!: any[];
   ngOnInit(): void {
 
-    if (this.eventRegistrationDataService.getSelectedRowData() != undefined)
+    this.currentURL = window.location.href; 
+    let splitedURL = this.currentURL.split('/');
+    this.selectedEventType = splitedURL[splitedURL.length - 1]; 
+    console.log("currentURL is last value: " + this.selectedEventType);
+    
+    
+    if (this.eventRegistrationDataService.getSelectedRowData() != undefined){
       this.selectedRowJson = this.eventRegistrationDataService.getSelectedRowData();
+      //this.selectedEventType = this.eventRegistrationDataService.getselectedEventData();
     console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson));
+    }
+
 
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
     this.loggedInUser = this.userMetaData.userId;
 
-    
-    
+
+
     this.startDate = new Date(this.selectedRowJson.startDate).toLocaleDateString("en-us");
     this.endDate = new Date(this.selectedRowJson.endDate).toLocaleDateString("en-us");
 
     this.registrationStartDate = new Date(this.selectedRowJson.registrationStartDate).toLocaleDateString("en-us");
     this.registrationEndDate = new Date(this.selectedRowJson.registrationEndDate).toLocaleDateString("en-us");
+    let addQParam :boolean = false;
+    console.log("selectedEvent Type :: " + JSON.stringify(this.selectedEventType));
+    if(this.selectedEventType === 'registered_events' || this.selectedEventType === 'completed_events')
+      addQParam = true;
+    
+    this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}&isParticipant=`+addQParam.toString()).subscribe((res) => {
 
-    console.log("Event Id is mamamamam : " + this.selectedRowJson.event_Id);
+      this.venuesList = res.data.eventData.venues;
 
-    this.apiService.callGetService(`getEvent?id=${this.selectedRowJson.event_Id}`).subscribe((res) => {
-
-      this.eventcategorydata = res.data.eventData.categories
+      this.enrollmentId = res.data.eventData.enrollmentId;
+      console.log("this.enrollmentId : " + this.enrollmentId);
+      
+      if (this.enrollmentId && (this.selectedEventType == 'registered_events' || this.selectedEventType=='completed_events')) {
+        this.enrollmentId = res.data.eventData.enrollmentId;
+       
+        this.showHideEnrollmentId = true;
+      } else {
+        this.showHideEnrollmentId = false;
+      }
+      
+      this.eventCatMapId = res.data.eventData.categories.eventCatMapId;
+      console.log(this.eventCatMapId);
+     
+      
+      this.eventcategorydata = res.data.eventData.categories;
 
       this.eventQuestionnaireData = res.data.eventData.questionnaire;
-
-      console.log("eventcategorydata is : " + this.eventcategorydata);
-
 
       this.categoriesDataFormGroup.setControl('categories', this.setDataForCategories(this.eventcategorydata));
       this.questionnaireDataFormGroup.setControl('questionnaire', this.setQuestionnairesData(this.eventQuestionnaireData))
 
-      
 
-
+      for (let i = 0; i < this.eventcategorydata.length; i++) {
+          this.eventCatMapId = this.eventcategorydata[i].eventCatMapId;
+          console.log("eventCatMapId : " + this.eventCatMapId)
+        }
 
     });
 
@@ -84,7 +118,6 @@ export class CwcregistrationComponent implements OnInit {
     this.questionnaireDataFormGroup = this.formBuilder.group({
       questionnaire: this.formBuilder.array([this.addeventquestionnaire()])
     });
-
 
   }
   addeventCategory(): FormGroup {
@@ -100,6 +133,12 @@ export class CwcregistrationComponent implements OnInit {
       answer: '',
       question: '',
       responseType: ''
+    });
+  }
+
+  addenrollmentId(): FormGroup {
+    return this.formBuilder.group({
+      enrollmentId: ''
     });
   }
 
@@ -127,8 +166,10 @@ export class CwcregistrationComponent implements OnInit {
     });
     return formArray;
   }
+
   onCancelRegistrationClick() {
     this.router.navigate(['/dashboard/eventRegistration/']);
+    
   }
 
   /*

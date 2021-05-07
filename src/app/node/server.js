@@ -150,8 +150,9 @@ app.get('/api/getEventCategory', function (req, res) {
 
 app.get('/api/getEventData', function (req, res) {
   console.log("getEventData called with : " + req.query.user);
+  let loggedInUser =  decodeUser(req)
   try {
-    processRequest.getEventData(req.query.user, req.query.eventType)
+    processRequest.getEventData(loggedInUser, req.query.eventType)
       .then((data) => {
         //     console.log(`Returning with response : ${JSON.stringify(data)}`)
         res.send(data);
@@ -519,8 +520,9 @@ app.get('/api/logout', function (req, res) {
 
 app.get('/api/getEvent', function (req, res) {
   console.log("getEvent called...");
+  let loggedInUser = decodeUser(req)
   try {
-    processEventTemp.getEventById(req.query.id)
+    processEventTemp.getEventById(req.query.id, req.query.isParticipant, loggedInUser)
       .then((data) => {
         res.send(data);
         res.end();

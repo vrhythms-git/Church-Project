@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 var thisData = {};
-
+var eventType:any;
 
 @Injectable({
   providedIn: 'root',
@@ -23,5 +23,14 @@ export class EventRegistrationDataService {
     getDataService(): EventRegistrationDataService {
         return this;
     }
+
+    getselectedEventData():any {
+        return eventType;
+    }
+
+    setselectedEventData(data: any){
+        return eventType = data;
+    }
+
 }
 

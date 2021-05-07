@@ -145,6 +145,15 @@
                             </mat-form-field>
                         </div>
 
+                        <div class="row col-md-12" style="justify-content: space-between;">
+                            <label for="file">Upload Flyer/Poster:</label>
+                            <input style="margin-bottom: 15px!important;"
+                                   type="file"
+                                   placeholder="Upload Flyer/Poster" 
+                                   id="file"
+                                   (change)="handleEventFlyerFileInput($event)" multiple>
+                        </div>
+
                             <div class="row">
                                 <mat-form-field class="col-md-12">
 

@@ -139,7 +139,8 @@ async function calculateScore(client, eventId, eventCategoryMapId) {
                                     total_judges as (select tecm.event_cat_map_id , count(tecsm.event_cat_staff_map_id) total
                                     from t_event_category_map tecm, t_event_cat_staff_map tecsm
                                     where tecsm.event_id = tecm.event_id 
-                                    and tecsm.event_category_map_id = tecm.event_cat_map_id 	
+                                    and tecsm.event_category_map_id = tecm.event_cat_map_id 
+                                    and tecsm.role_type = 'Judge'	
                                     group by tecm.event_cat_map_id
                                     )
                                     select tecm.event_id, tecm.event_cat_map_id, approved.approved approved_count , total_judges.total total_judges_count
@@ -177,6 +178,7 @@ async function calculateScore(client, eventId, eventCategoryMapId) {
                                     from t_participant_event_score tpes, t_event_cat_staff_map tecsm, t_participant_event_reg_cat tperc,
                                         t_event_participant_registration tepr 
                                     where  tpes.event_cat_staff_map_id = tecsm.event_cat_staff_map_id 
+                                    and tecsm.role_type = 'Judge'
                                     and tperc.participant_event_reg_cat_id = tpes.participant_event_reg_cat_id 
                                     and tepr.event_participant_registration_id = tperc.event_participant_registration_id 
                                     group by tperc.event_participant_registration_id, tecsm.event_category_map_id,tperc.participant_event_reg_cat_id 

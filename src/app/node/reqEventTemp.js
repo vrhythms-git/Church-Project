@@ -8,7 +8,7 @@ const { json } = require('express');
 const dbConnections = require(`${__dirname}/dbConnection`);
 
 
-async function getEventById(eventId) {
+async function getEventById(eventId, isParticipant, userId) {
 
     console.log('getEventById called, Fetching event data for : ' + eventId);
 
@@ -203,6 +203,15 @@ async function getEventById(eventId) {
 
 
 
+        }
+
+
+        if (isParticipant === 'true') {
+            let query = ` select enrollment_id from t_event_participant_registration 
+                            where user_id = ${userId} and event_id = ${eventId};`
+
+            let result = await client.query(query);
+            event.enrollmentId = result.rows[0].enrollment_id
         }
 
         return ({

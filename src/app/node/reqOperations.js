@@ -784,10 +784,31 @@ async function getParishData() {
 
 /* .............get events Data from database.................. */
 async function getEventData(userId, eventType) {
+    console.log(`getEventData(userId, eventType) : ${userId} , ${eventType}`)
     let client = await dbConnections.getConnection();
     try {
         let metadata = {};
         let getEventData = `select * from t_event where is_deleted = false`;
+
+        let condition = ' ';
+        let condition2 = ' ';
+
+
+        if (eventType === 'upcoming_events') {
+            condition = ' not in '
+            condition2 = ` and  ve.registration_start_date <= current_date
+            and  ve.registration_end_date >= current_date `
+            //console.log("111")
+        } else if (eventType === 'registered_events') {
+            condition = ' in '
+            condition2 = ` and  ve.registration_start_date <= current_date
+            and  ve.registration_end_date >= current_date `
+            //console.log("222")
+        }else if(eventType === 'completed_events'){
+            condition = ' in '
+            condition2 =  ` and  ve.event_start_date <= current_date `
+            //console.log("333")
+        }
         console.log(`Fetching event data for ${userId} user.`)
         if (eventType === 'for_judgement') {
 
@@ -855,6 +876,22 @@ async function getEventData(userId, eventType) {
             // and event_start_date >= current_date
 
         }
+        
+        
+         if (eventType === 'upcoming_events' || eventType === 'registered_events' || eventType === 'completed_events'){
+            getEventData = 
+                            `select distinct event_id, event_name "name", event_type, 
+                            event_desciption description, event_start_date start_date, event_end_date end_date, 
+                            registration_start_date, registration_end_date
+                            from v_event ve
+                            where
+                            ve.event_id ${condition} (select event_id 
+                                    from t_event_participant_registration tepr 
+                                    where tepr.user_id = ${userId}
+                                )
+                            ${condition2}
+                            and  ve.is_deleted = false;`;    
+         }
 
 
         let res = await client.query(getEventData);

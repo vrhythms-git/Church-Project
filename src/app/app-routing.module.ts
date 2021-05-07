@@ -33,7 +33,7 @@ const routes: Routes = [
     { path: 'requests', component:ApprovalRequestsComponent},
     {path : 'myprofile', component:MyProfileComponent, canDeactivate:[DirtycheckGuard]},
     { path : 'createevent', component: EventCreationComponent },
-    { path : 'cwcregistration', component :CwcregistrationComponent},
+    { path : 'cwcregistration/:selectedEventType', component :CwcregistrationComponent},
     { path : 'eventRegistration', component:EventRegistrationComponent},
     { path : 'score', component:ScoreComponent},
     { path : 'scoreReview', component:ScoreReviewComponent},

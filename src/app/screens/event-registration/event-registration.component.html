@@ -1,19 +1,25 @@
 <div class="container mt-3" style="overflow: hidden;">
 
-    <div class="form-group form-inline row m-0 p-0">
-
-        <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
-        
+    <div class="row ml-1 mt-2 d-flex" style="justify-content: center;margin: 5px;">
+        <mat-radio-group (change)='onFilteringRadioButtonChange($event)' aria-label="Select User Types to filter">
+            <mat-radio-button  value="upcoming_events" >Upcoming Events</mat-radio-button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <mat-radio-button  value="registered_events">Registered Events</mat-radio-button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <mat-radio-button  value="completed_events">Completed Events</mat-radio-button>
+        </mat-radio-group>
     </div>
     
+    <!--
+    <div class="form-group form-inline row m-0 p-0">
+        <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
+    </div>
+    -->
     <ag-grid-angular style="width: auto; height: 500px;" class="ag-theme-alpine mt-3" 
-                    [rowData]="rowData|filter:term" [columnDefs]="columnDefs"
+                    [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
                     (gridReady)="onGridReady($event)" (rowClicked)='onRowClicked($event)'
             [pagination]="true" rowSelection='multiple' [checkboxSelection]="true" [gridOptions]="gridOptions">
-            
-            <!--<app-child [childToMaster]=rowData.name (childToParent)="onRowClicked($event)"></app-child> -->
     </ag-grid-angular>
-    
+
+
     <!-- <app-event-creation #child [parentValue]='parentValue' (childValue)='childValue = $event'></app-event-creation> -->
     <!--<app-event-creation #child [childPosts]='parentPosts' (childValue)='childValue = $event'></app-event-creation> -->
     

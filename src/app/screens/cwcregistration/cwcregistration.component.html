@@ -1,31 +1,37 @@
 <div class="container mt-4">
     <mat-card class="shadow">
         <div class="row">
-            <h2 class="col-md-11" style="text-align: center; "><label>{{selectedRowJson.name}}</label> Event Registration</h2>
+            <h2 class="col-md-9" style="text-align: center; "><label>{{selectedRowJson.name}}</label> Event Registration</h2>
+           
+            <button mat-button class="col-md-1" class="ml-auto" data-dismiss="modal" (click)="onCancelRegistrationClick()">
+                <mat-icon>clear</mat-icon>
+            </button>
+        <!--
             <button mat-button class="ml-auto" data-dismiss="modal" (click)="onCancelRegistrationClick()">
                 <mat-icon>clear</mat-icon>
-        </button>
+            </button>
+            -->
         </div>
         <div>
             <div class="row">
                 <div class="col-md-2" style="text-align: right;">
                     Name : 
                 </div>
-                <div class="col-md-10" style="text-align: left;">
+                <div class="col-md-4" style="text-align: left;">
                     <label>{{userMetaData.title}}.&nbsp;</label>
                     <label> {{userMetaData.firstName}}&nbsp;</label>
-                    <label>{{userMetaData.middleName}}</label>
+                    <label *ngIf="userMetaData.middleName"> {{userMetaData.middleName}}&nbsp;</label>
                     <label>{{userMetaData.lastName}}</label>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-2" style="text-align: right;">
+                <div class="col-md-2" *ngIf="userMetaData.emailId"  style="text-align: right;">
                     Email : 
                 </div>
-                <div class="col-md-10" style="text-align: left;">
+                <div class="col-md-4" style="text-align: left;">
                         <label>{{userMetaData.emailId}}</label>
                 </div>
+                
             </div>
+            
             <div class="row">
                 <div class="col-md-2" style="text-align: right;">
                         Event Name : 
@@ -70,6 +76,15 @@
                         <label>{{registrationEndDate}}</label>
                     </div>
                 </div>
+                <div class="row">
+               
+                    <div class="col-md-2" *ngIf="enrollmentId"  style="text-align: right;">
+                        EnrollmentId : 
+                    </div>
+                    <div class="col-md-4" style="text-align: left;">
+                        <label>{{enrollmentId}}</label>
+                </div>
+                </div>
            
         </div>
         
@@ -81,7 +96,8 @@
                 <div class="col-md-12">
                     
                         <fieldset>
-                            <div  *ngFor="let category of eventcategorydata" 
+                            <!--
+                                <div  *ngFor="let category of eventcategorydata" 
                                 class=" example-margin text-black-50">
                                 <mat-checkbox  
                                 (change)="onChange({ 
@@ -91,6 +107,19 @@
                                          class="example-margin">
                                         {{category.name}} </mat-checkbox>
                             </div>
+                                -->
+                                <div  *ngFor="let category of eventcategorydata" 
+                                class=" example-margin text-black-50">
+                                    <div *ngIf="category.eventCatMapId">
+                                        <mat-checkbox  
+                                        (change)="onChange({ 
+                                            'event' : $event,
+                                            'item' : category
+                                        })"
+                                                 class="example-margin">
+                                                {{category.name}} </mat-checkbox>
+                                    </div>
+                                </div>
                             
                             
                         </fieldset>
@@ -161,7 +190,7 @@
                             (click)="onCancelRegistrationClick()">
                             Cancel
                         </button>&nbsp;
-                        <button style="float: center;" (click)="registerEvent()"  mat-button type="submit" mat-button class="mbutton">
+                        <button style="float: center;" *ngIf="selectedEventType" (click)="registerEvent()"  mat-button type="submit" mat-button class="mbutton">
                             Register
                           </button>
                     </div>

@@ -104,8 +104,8 @@ export class EventsComponent implements OnInit {
 
   }
 
-  getAllEventsData() {
-    this.apiService.getEventsData().subscribe((res) => {
+  getAllEventsData(){  
+    this.apiService.callGetService('getEventData').subscribe((res) => {
       console.log('These are all the events from database : ');
       console.log(res.data.metaData);
       this.rowData = res.data.metaData.eventData;

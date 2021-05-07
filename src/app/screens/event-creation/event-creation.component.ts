@@ -61,27 +61,29 @@ export class EventCreationComponent implements OnInit {
 
 
   constructor(private apiService: ApiService,
-    private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils, 
-    private eventDataService: EventDataService, private router : Router) { }
+    private formBuilder: FormBuilder, private uiCommonUtils: uiCommonUtils,
+    private eventDataService: EventDataService, private router: Router) { }
 
- getData() {
+  getData() {
 
- this.apiService.getRegionAndParish().subscribe((res: any) => {
-    this.regionList = res.data.metaData.regions;
-  });
+    this.apiService.getRegionAndParish().subscribe((res: any) => {
+      this.regionList = res.data.metaData.regions;
+    });
 
- this.apiService.getEventType().subscribe((res: any) => {
-    this.eventList = res.data.metaData.eventType;
-    this.eventcategorydata = res.data.metaData.eventType;
-  });
+    this.apiService.getEventType().subscribe((res: any) => {
+      this.eventList = res.data.metaData.eventType;
+      this.eventcategorydata = res.data.metaData.eventType;
+    });
 
-this.apiService.getUserRoleData().subscribe(res => {
-    this.orgs = res.data.metadata.orgs;
-    let temp = {value: this.eventsDataUpdate.orgType, id: this.eventsDataUpdate.orgId[0]};
-    this.onOrgSelect(temp);
-  });
+    this.apiService.getUserRoleData().subscribe(res => {
+      this.orgs = res.data.metadata.orgs;
+      try {
+        let temp = { value: this.eventsDataUpdate.orgType, id: this.eventsDataUpdate.orgId[0] };
+        this.onOrgSelect(temp);
+      } catch (err) { }
+    });
 
-}
+  }
 
 
   ngOnInit(): void {
@@ -96,17 +98,17 @@ this.apiService.getUserRoleData().subscribe(res => {
     this.categoriesDataFormGroup = this.formBuilder.group({
       categories: this.formBuilder.array([this.addeventCategory()])
     });
-  
+
     this.questionnaireDataFormGroup = this.formBuilder.group({
       questionnaire: this.formBuilder.array([this.adduserquestionary()])
     });
-  
-  
+
+
 
     this.alluserdata = this.uiCommonUtils.getUserMetaDataJson();
     this.orgId = this.alluserdata.orgId;
     this.userId = this.alluserdata.userId;
-   
+
 
     this.eventsDataFormGroup = this.formBuilder.group({
       eventId: '',
@@ -123,7 +125,7 @@ this.apiService.getUserRoleData().subscribe(res => {
     });//{validator: this.checkDates}); //to compare event registration dates
 
     this.venuesDataFormGroup = this.formBuilder.group({
-        venues: this.formBuilder.array([this.adduserVenuAndProcter()])
+      venues: this.formBuilder.array([this.adduserVenuAndProcter()])
     });
 
     // For getting event data by event id 
@@ -131,11 +133,11 @@ this.apiService.getUserRoleData().subscribe(res => {
       console.log("event Id data : " + res.data.eventData);
       this.eventsDataUpdate = res.data.eventData;
       this.getData();
-     
+
       // For binding data on update screen
       if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
         console.log("Patch Values event_Id = " + this.selectedRowJson.event_Id);
-      
+
         this.eventsDataFormGroup.patchValue({
           eventId: this.eventsDataUpdate.eventId,
           name: this.eventsDataUpdate.name,
@@ -149,44 +151,44 @@ this.apiService.getUserRoleData().subscribe(res => {
           eventUrl: this.eventsDataUpdate.eventUrl,
           description: this.eventsDataUpdate.description,
         });
-  
-        if(this.eventsDataUpdate.venues != null){
-        this.venuesDataFormGroup.patchValue({
-          venues: this.eventsDataUpdate.venues // array
-        });
-      }
-  
-      if(this.eventsDataUpdate.categories != null){
-        this.categoriesDataFormGroup.patchValue({
-          categories: this.eventsDataUpdate.categories // array
-        });
-      }
+
+        if (this.eventsDataUpdate.venues != null) {
+          this.venuesDataFormGroup.patchValue({
+            venues: this.eventsDataUpdate.venues // array
+          });
+        }
+
+        if (this.eventsDataUpdate.categories != null) {
+          this.categoriesDataFormGroup.patchValue({
+            categories: this.eventsDataUpdate.categories // array
+          });
+        }
 
 
-      if(this.eventsDataUpdate.questionnaire != null){
-        this.questionnaireDataFormGroup.patchValue({
-          questionnaire: this.eventsDataUpdate.questionnaire // array
-        });
-      }
-  
+        if (this.eventsDataUpdate.questionnaire != null) {
+          this.questionnaireDataFormGroup.patchValue({
+            questionnaire: this.eventsDataUpdate.questionnaire // array
+          });
+        }
+
       }
 
       // For Label And button Show update
       if (this.selectedRowJson.event_Id != undefined || this.selectedRowJson.event_Id != null) {
         this.eventFormLabel = true;
       }
-      else{
+      else {
         this.eventFormLabel = false;
       }
       this.selectedRowJson.event_Id = null;
-    
+
       // let abc = {value: "Parish"};
       // this.onOrgSelectBinding(abc);
-      
+
       // abc = {value: "Parish"};
       // this.onOrgSelect(abc);
     });
- 
+
   }
 
 
@@ -233,7 +235,7 @@ this.apiService.getUserRoleData().subscribe(res => {
         this.orgDetails = this.orgs[i].details;
       }
     }
-  } 
+  }
 
   //Function to validate event dates
   checkDates(group: FormGroup) {
@@ -251,9 +253,9 @@ this.apiService.getUserRoleData().subscribe(res => {
     }
     return null;
   }
-  
 
- 
+
+
 
   onEventsNextBtnClick() {
 
@@ -315,31 +317,31 @@ this.apiService.getUserRoleData().subscribe(res => {
       });
 
       // For binding categories section as per eventType on create event screen
-      if(this.eventFormLabel == false){
-      for (let i = 0; i < this.eventList.length; i++) {
-        if (this.eventsDataFormGroup.value.eventType == this.eventList[i].eventType) {
-          this.categoriesDataFormGroup.setControl('categories', this.setEventCategory(this.eventcategorydata[i].eventName));
+      if (this.eventFormLabel == false) {
+        for (let i = 0; i < this.eventList.length; i++) {
+          if (this.eventsDataFormGroup.value.eventType == this.eventList[i].eventType) {
+            this.categoriesDataFormGroup.setControl('categories', this.setEventCategory(this.eventcategorydata[i].eventName));
+          }
         }
       }
-     }
 
-     // For binding categories section as per eventType on update event screen
-     if(this.eventFormLabel == true){
-     let updatedCategories : any = [];
+      // For binding categories section as per eventType on update event screen
+      if (this.eventFormLabel == true) {
+        let updatedCategories: any = [];
 
-     for(let category of this.eventsDataUpdate.categories){
-      if(category.eventCatMapId != null){
-       updatedCategories.push(category);
-      }
-     }
-      for (let i = 0; i < this.eventList.length; i++) {
-        if (this.eventsDataFormGroup.value.eventType == this.eventList[i].eventType) {
-          this.categoriesDataFormGroup.setControl('categories', this.setEventCategory(updatedCategories));
-          this.venuesDataFormGroup.setControl('venues', this.setuserVenuAndProcter(this.eventsDataUpdate.venues));
-          this.questionnaireDataFormGroup.setControl('questionnaire', this.setQuestionaireData(this.eventsDataUpdate.questionnaire));
+        for (let category of this.eventsDataUpdate.categories) {
+          if (category.eventCatMapId != null) {
+            updatedCategories.push(category);
+          }
+        }
+        for (let i = 0; i < this.eventList.length; i++) {
+          if (this.eventsDataFormGroup.value.eventType == this.eventList[i].eventType) {
+            this.categoriesDataFormGroup.setControl('categories', this.setEventCategory(updatedCategories));
+            this.venuesDataFormGroup.setControl('venues', this.setuserVenuAndProcter(this.eventsDataUpdate.venues));
+            this.questionnaireDataFormGroup.setControl('questionnaire', this.setQuestionaireData(this.eventsDataUpdate.questionnaire));
+          }
         }
       }
-     }
 
 
       // For showing and hiding different sections and fields as per eventType
@@ -407,7 +409,7 @@ this.apiService.getUserRoleData().subscribe(res => {
     (<FormArray>this.categoriesDataFormGroup.get('categories').removeAt(index));
   }
 
-  onCloseBtnClick(){
+  onCloseBtnClick() {
     this.router.navigate(['/dashboard/events/']);
   }
 
@@ -439,7 +441,7 @@ this.apiService.getUserRoleData().subscribe(res => {
       schoolGradeTo: '',
       judges: '',
       venueId: '',
-      eventCatMapId:''
+      eventCatMapId: ''
     });
   }
 
@@ -449,8 +451,8 @@ this.apiService.getUserRoleData().subscribe(res => {
       formArray.push(this.formBuilder.group({
         eventCategoryID: e.id,
         name: e.name,
-        schoolGradeFrom: e.schoolGradeFrom, 
-        schoolGradeTo: e.schoolGradeTo, 
+        schoolGradeFrom: e.schoolGradeFrom,
+        schoolGradeTo: e.schoolGradeTo,
         judges: [e.judges],
         venueId: [e.venueId],
         eventCatMapId: e.eventCatMapId
@@ -465,7 +467,7 @@ this.apiService.getUserRoleData().subscribe(res => {
       formArray.push(this.formBuilder.group({
         venueId: e.venueId,
         proctorId: e.proctorId,
-        eventVenueId : e.eventVenueId
+        eventVenueId: e.eventVenueId
       }));
     });
     return formArray;
@@ -523,12 +525,12 @@ this.apiService.getUserRoleData().subscribe(res => {
         });
       }
     }
-    
+
 
 
   }
 
-  updateEvent(){
+  updateEvent() {
     if (this.eventsDataFormGroup.value.eventType == 'TTC' || this.eventsDataFormGroup.value.eventType == 'OBVS' || this.eventsDataFormGroup.value.eventType == 'CWC') {
       if (this.categoriesDataFormGroup.value.categories.length == 0) {
         this.uiCommonUtils.showSnackBar("Event should atleast have one category!", "error", 3000);
@@ -563,7 +565,12 @@ this.apiService.getUserRoleData().subscribe(res => {
         });
       }
     }
-  
+
     this.onCloseBtnClick();
+  }
+
+  handleEventFlyerFileInput(event: any) {
+console.log('file uploaded');
+
   }
 }
