@@ -406,7 +406,7 @@ async function processGetUserMetaDataRequest(uid) {
 }
 
 
-async function getuserRecords(userType, loggedInUser) {
+async function getuserRecords(userType, loggedInUser, eventId) {
 
     let client = await dbConnections.getConnection();
     try {
@@ -419,6 +419,22 @@ async function getuserRecords(userType, loggedInUser) {
             condition = ' vu.is_approved = true AND '
         }
 
+        let hierarchicalQry = ` ( WITH recursive child_orgs 
+            AS (
+                SELECT org_id
+                FROM   t_organization parent_org 
+                WHERE  org_id IN
+                        (
+                                SELECT a.org_id
+                                FROM   t_user_role_context a, t_user b
+                                WHERE  b.user_id = ${loggedInUser}
+                                AND    a.user_id = b.user_id)                                                        
+                UNION
+                SELECT     child_org.org_id child_id
+                FROM       t_organization child_org
+                INNER JOIN child_orgs c
+                ON         c.org_id = child_org.parent_org_id ) SELECT *
+                    FROM   child_orgs ) `;
 
 
         let getuserRecords =
@@ -450,21 +466,7 @@ async function getuserRecords(userType, loggedInUser) {
                         membership_type,
                         vu.user_org parish_name
                     FROM  v_user vu
-                    WHERE ${condition} vu.user_org_id IN ( WITH recursive child_orgs 
-                                 AS (
-                                    SELECT org_id
-                                    FROM   t_organization parent_org 
-                                    WHERE  org_id IN
-                                            (
-                                                    SELECT a.org_id
-                                                    FROM   t_user_role_context a,                                                                            t_user b
-                                                    WHERE  b.user_id = ${loggedInUser}        
-                                                    AND    a.user_id = b.user_id)                                                        UNION
-                                    SELECT     child_org.org_id child_id
-                                    FROM       t_organization child_org
-                                    INNER JOIN child_orgs c
-                                    ON         c.org_id = child_org.parent_org_id ) SELECT *
-                                        FROM   child_orgs ) order by user_id desc;`
+                    WHERE ${condition} vu.user_org_id IN ${hierarchicalQry} order by user_id desc;`
 
         //console.log('Executing query : ' + getuserRecords)
 
@@ -479,22 +481,33 @@ async function getuserRecords(userType, loggedInUser) {
                                 (select "name" from t_organization to2 where org_id = th.org_id) parish_name,
                                 th.member_type  
                                 from t_user_history th inner join t_user_operation_log tol 
-                                on th.user_id = tol.user_id and operation_type = 'Request Rejected' WHERE th.org_id IN ( WITH recursive child_orgs 
-                                            AS (
-                                                SELECT org_id
-                                                FROM   t_organization parent_org 
-                                                WHERE  org_id IN
-                                                        (
-                                                                SELECT a.org_id
-                                                                FROM   t_user_role_context a, t_user b
-                                                                WHERE  b.user_id = ${loggedInUser}
-                                                                AND    a.user_id = b.user_id)                                                        
-                                                UNION
-                                                SELECT     child_org.org_id child_id
-                                                FROM       t_organization child_org
-                                                INNER JOIN child_orgs c
-                                                ON         c.org_id = child_org.parent_org_id ) SELECT *
-                                                    FROM   child_orgs );`;
+                                on th.user_id = tol.user_id and operation_type = 'Request Rejected' WHERE th.org_id IN ${hierarchicalQry};`;
+        }
+
+        //Get users(Teachers/Principal and members) for TTC event registration by event_id and logged in user_id
+        
+        if(userType == 'ttc_reg_add_participants'){
+
+            getuserRecords = `select distinct vu.user_id,
+                                    vu.email_id, vu.title, vu.first_name, vu.middle_name, vu.last_name, vu.nick_name, vu.dob,
+                                    vu.mobile_no, vu.address_line1, vu.address_line2, vu.address_line3, vu.city, vu.state, 
+                                    vu.postal_code, vu.country , vu.home_phone_no, vu.baptismal_name, vu.about_yourself, 
+                                    vu.role_id, vu.user_org_type org_type, membership_type, vu.user_org parish_name
+                                from v_user vu 
+                                left join t_event_participant_registration tepr on vu.user_id = tepr.user_id 
+                                where vu.role_name = 'Teacher' or vu.role_name = 'Principal'
+                                and tepr.event_id != ${eventId}
+                                and vu.is_approved = true 
+                                and vu.org_id in  ${hierarchicalQry}
+                                        union  	
+                                select vu.user_id, vu.email_id, vu.title, vu.first_name, vu.middle_name, vu.last_name, vu.nick_name, vu.dob,
+                                    vu.mobile_no, vu.address_line1, vu.address_line2, vu.address_line3, vu.city, vu.state, 
+                                    vu.postal_code, vu.country , vu.home_phone_no, vu.baptismal_name, vu.about_yourself, 
+                                    vu.role_id, vu.user_org_type org_type, membership_type, vu.user_org parish_name 
+                                from v_user vu
+                                where vu.user_id 
+                                in (select tpr.family_member_id 
+                                    from t_person_relationship tpr where tpr.family_head_id = ${eventId});`
         }
 
         let res = await client.query(getuserRecords);
@@ -505,12 +518,9 @@ async function getuserRecords(userType, loggedInUser) {
         let userid = 0;
 
         if (res && res.rowCount > 0) {
-
-            // console.log("In response" + res);
-
-
+            // console.log("res.rowCount :" + res.rowCount);
             for (let row of res.rows) {
-                // console.log("Datbase User id" + row.user_id);
+                 console.log("Datbase User id" + row.user_id);
                 // console.log("User id" + userid);
                 if (userid != row.user_id && userid != 0) {
                     // console.log("In Pushing user to users" + row.user_id);
@@ -575,20 +585,20 @@ async function getuserRecords(userType, loggedInUser) {
             }
             user.roles = roles;
             users.push(user);
-            return ({
-                data: {
-                    status: 'success',
-                    metaData: users
-                }
-            })
-        } else {
-            return ({
-                data: {
-                    status: 'success',
-                    metaData: users
-                }
-            })
+            // return ({
+            //     data: {
+            //         status: 'success',
+            //         metaData: users
+            //     }
+            // })
         }
+            return ({
+                data: {
+                    status: 'success',
+                    metaData: users
+                }
+            })
+        
     } catch (error) {
         console.error(`reqOperations.js::getuserRecords() --> error executing query as : ${error}`);
         return (errorHandling.handleDBError('connectionError'));

@@ -63,11 +63,13 @@ app.post('/api/signUp', function (req, res) {
 });
 
 app.get('/api/getuserRecords', function (req, res) {
-  console.log("getuserRecords called with : " + req.query.type + ' loggedInUser : ' + req.query.loggedInUser);
-
-  //console.log(`Header info : ${JSON.stringify(req.header('user-agent'))}`)
+  console.log("getuserRecords called with : " + req.query.type +
+                            ' loggedInUser : ' + req.query.loggedInUser +
+                            ' EventId : '+ req.query.eventId);
+                                               
   try {
-    processRequest.getuserRecords(req.query.type, req.query.loggedInUser)
+    let loggedInUser =  decodeUser(req);  
+    processRequest.getuserRecords(req.query.type, loggedInUser, req.query.eventId)
       .then((data) => {
        // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
