@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { uiCommonUtils } from '../common/uiCommonUtils'
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,12 @@ export class ApiService {
     })
   }
 
-  constructor(private http: HttpClient, private uiCommonUtils:uiCommonUtils) { }
+  constructor(private http: HttpClient, private uiCommonUtils: uiCommonUtils) {
+
+    console.log('Application url set to : ' + environment.apiUrl);
+  }
   // private _baseUrl = 'https://cormentis.herokuapp.com';
-  private _baseUrl = 'http://localhost:8081/api';
+  private _baseUrl = environment.apiUrl;
 
   signUpNewUser(userData: any): Observable<any> {
     console.log(`signUpNewUser called..`)
@@ -39,15 +43,15 @@ export class ApiService {
     return this.http.get(`${this._baseUrl}/${endPoint}`, { headers: headerObj });
   }
 
-  callPostService(endPoint: string, payload:any): Observable<any> {
+  callPostService(endPoint: string, payload: any): Observable<any> {
     console.log(`postService called`)
     let headerObj = new HttpHeaders({
       'Authorization': localStorage.getItem('chUserToken')!,
       'Content-Type': 'application/json',
       'User': btoa(this.uiCommonUtils.getUserMetaDataJson().userId)
     });
-    
-    return this.http.post(`${this._baseUrl}/${endPoint}`,{data:payload},{ headers: headerObj });
+
+    return this.http.post(`${this._baseUrl}/${endPoint}`, { data: payload }, { headers: headerObj });
   }
 
 
@@ -215,7 +219,7 @@ export class ApiService {
     return this.http.get(`${this._baseUrl}/getEventForRegistration`);
   }
 
-  
+
   updateEvent(eventsData: any) {
     console.log("updateEvent api Called..")
     let headerObj = new HttpHeaders({
