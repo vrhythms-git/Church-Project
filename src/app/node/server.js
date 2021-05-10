@@ -24,22 +24,23 @@ var corsOptions = {
   "Access-Control-Allow-Origin": '*',
 }
 
-// process.on('SIGTERM', () => {
-//   console.log('SIGTERM signal received: closing HTTP server')
-//   server.close(() => {
-//     console.log('HTTP server closed')
-//   })
-// })
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server')
+  // server.close(() => {
+  //   console.log('HTTP server closed')
+  // })
+})
 
 app.use(express.json());
 app.use('*', cors())
 
-let basePath = __dirname.split('\\src\\app\\node')[0];
-console.log(`Final path is ${path.join(basePath + "/dist/church/index.html")}`)
-app.use(express.static(path.join(basePath + "/dist/church")));
+//let basePath = __dirname.split('\\src\\app\\node')[0];
+//console.log(`Final path is ${path.join(basePath + "/dist/church/index.html")}`)
+app.use(express.static("../../../dist/church"));
 
 app.get('/', function (req, res) {
-  res.sendFile(path.join(basePath + "/dist/church/index.html"));
+  // res.sendFile(path.join(basePath + "/dist/church/index.html"));
+  res.sendFile('../../../dist/church/index.html');
 });
 
 app.post('/api/signUp', function (req, res) {
@@ -49,11 +50,11 @@ app.post('/api/signUp', function (req, res) {
   try {
     processRequest.processSignInRequest(req.body)
       .then((data) => {
-       // console.log(`Returning with resonse : ${data}`)
+        // console.log(`Returning with resonse : ${data}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-       // console.log(`Returning with resonse : ${error}`)
+        // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -64,18 +65,18 @@ app.post('/api/signUp', function (req, res) {
 
 app.get('/api/getuserRecords', function (req, res) {
   console.log("getuserRecords called with : " + req.query.type +
-                            ' loggedInUser : ' + req.query.loggedInUser +
-                            ' EventId : '+ req.query.eventId);
-                                               
+    ' loggedInUser : ' + req.query.loggedInUser +
+    ' EventId : ' + req.query.eventId);
+
   try {
-    let loggedInUser =  decodeUser(req);  
+    let loggedInUser = decodeUser(req);
     processRequest.getuserRecords(req.query.type, loggedInUser, req.query.eventId)
       .then((data) => {
-       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-      //  console.log(`Returning with resonse : ${error}`)
+        //  console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -91,11 +92,11 @@ app.get('/api/getRoleMetadata', function (req, res) {
   try {
     processRequest.getRoleMetadata()
       .then((data) => {
-       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-       // console.log(`Returning with resonse : ${error}`)
+        // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -118,11 +119,11 @@ app.get('/api/getUserMetaData', function (req, res) {
   try {
     processRequest.processGetUserMetaDataRequest(req.query.uid)
       .then((data) => {
-      //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-       // console.log(`Returning with resonse : ${error}`)
+        // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -136,11 +137,11 @@ app.get('/api/getEventCategory', function (req, res) {
   try {
     processRequest.getEventCategory()
       .then((data) => {
-      //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-       // console.log(`Returning with resonse : ${error}`)
+        // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -152,7 +153,7 @@ app.get('/api/getEventCategory', function (req, res) {
 
 app.get('/api/getEventData', function (req, res) {
   console.log("getEventData called with : " + req.query.user);
-  let loggedInUser =  decodeUser(req)
+  let loggedInUser = decodeUser(req)
   try {
     processRequest.getEventData(loggedInUser, req.query.eventType)
       .then((data) => {
@@ -174,11 +175,11 @@ app.get('/api/getParishData', function (req, res) {
   try {
     processRequest.getParishData()
       .then((data) => {
-       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-      //  console.log(`Returning with resonse : ${error}`)
+        //  console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -194,11 +195,11 @@ app.post('/api/insertEvents', function (req, res) {
   try {
     processEventRequest.insertEvents(req.body.data)
       .then((data) => {
-       // console.log(`Returning with resonse : ${data}`)
+        // console.log(`Returning with resonse : ${data}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-       // console.log(`Returning with resonse : ${error}`)
+        // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -214,7 +215,7 @@ app.post('/api/updateUserRoles', function (req, res) {
   try {
     processRequest.processUpdateUserRoles(req.body.data)
       .then((data) => {
-       /// console.log(`Returning with resonse : ${data}`)
+        /// console.log(`Returning with resonse : ${data}`)
         res.send(data);
         res.end();
       }).catch((error) => {
@@ -232,11 +233,11 @@ app.get('/api/getParishData', function (req, res) {
   try {
     processRequest.getParishData()
       .then((data) => {
-      //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        //  console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
-       // console.log(`Returning with resonse : ${error}`)
+        // console.log(`Returning with resonse : ${error}`)
         res.send(error);
         res.end();
       })
@@ -252,7 +253,7 @@ app.post('/api/deleteUsers', function (req, res) {
   try {
     processRequest.deleteUsers(req.body.data)
       .then((data) => {
-       // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
+        // console.log(`Returning with resonse : ${JSON.stringify(data)}`)
         res.send(data);
         res.end();
       }).catch((error) => {
@@ -539,13 +540,14 @@ app.get('/api/getEvent', function (req, res) {
 
 app.post('/api/registerEvent', function (req, res) {
   console.log("registerEvent called...");
+  let loggedInUser = decodeUser(req)
   try {
-    processEventTemp.eventRegistration(req.body.data)
+    processEventTemp.eventRegistration(req.body.data, loggedInUser)
       .then((data) => {
         res.send(data);
         res.end();
       }).catch((error) => {
-        
+
         res.send(error);
         res.end();
       })
@@ -556,14 +558,14 @@ app.post('/api/registerEvent', function (req, res) {
 
 app.get('/api/getParticipants', function (req, res) {
   console.log("getParticipants called...");
-  let loggedInUser =  decodeUser(req)
+  let loggedInUser = decodeUser(req)
   try {
     processEventTemp.getParticipant(req.query.event,
-                                   loggedInUser,
-                                   req.query.to,
-                                   req.query.judge,
-                                   req.query.category
-                                   )
+      loggedInUser,
+      req.query.to,
+      req.query.judge,
+      req.query.category
+    )
       .then((data) => {
         res.send(data);
         res.end();
@@ -579,7 +581,7 @@ app.get('/api/getParticipants', function (req, res) {
 
 app.post('/api/postScore', function (req, res) {
   console.log("postScore called...");
-  let loggedInUser =  decodeUser(req)
+  let loggedInUser = decodeUser(req)
   try {
     processScoreRequest.persistParticipantScore(req.body.data, loggedInUser)
       .then((data) => {
@@ -600,7 +602,7 @@ app.post('/api/postScore', function (req, res) {
 
 app.get('/api/getEventCatsAndStaffById', function (req, res) {
   console.log("getEventCatsAndStaffById called... with  event ID:" + req.query.id);
- // let loggedInUser =  decodeUser(req)
+  // let loggedInUser =  decodeUser(req)
   try {
     processEventTemp.getEventCatsAndStaffById(req.query.id)
       .then((data) => {
@@ -638,7 +640,7 @@ app.post('/api/deleteEvents', function (req, res) {
 
 app.post('/api/postAttendance', function (req, res) {
   console.log("postAttendance called...");
-  let loggedInUser =  decodeUser(req)
+  let loggedInUser = decodeUser(req)
   try {
     processAttendaceRequest.persistParticipantAttendance(req.body.data, loggedInUser)
       .then((data) => {

@@ -5,6 +5,7 @@ const firebaseConfig = require('./firebase/firebaseAdminUtils');
 const errorHandling = require('./ErrorHandling/commonDBError');
 const { result } = require('underscore');
 const { json } = require('express');
+
 const dbConnections = require(`${__dirname}/dbConnection`);
 
 
@@ -55,112 +56,115 @@ async function getEventById(eventId, isParticipant, userId) {
             event.orgType = result.rows[0].org_type;
             event.eventUrl = result.rows[0].event_url;
 
-                let category = {};
-                let venue = {};
-                let judges = [];
-                let venueId = [];
-                let question = {};
+            let category = {};
+            let venue = {};
+            let judges = [];
+            let venueId = [];
+            let question = {};
+            let eventCoordinator = [];   
 
+            for (let row of result.rows) {
 
-                for (let row of result.rows) {
-
-                    // Get list of org ids
-                    if (row.org_id != null) {
-                        if (orgIds.indexOf(row.org_id) < 0)
-                            orgIds.push(row.org_id)
-                    }
-
-                    //Get list of venues
-                    if (row.venue_id != null) {
-
-                        if (eventVenueId == 0) {
-                            eventVenueId = row.event_venue_id;
-                        } else if (row.event_venue_id != eventVenueId) {
-
-                            if (_.findWhere(venues, venue) == null) {
-                                venues.push(venue);
-                            }
-                            venue = {};
-                        }
-
-                        venue.venueId = row.venue_id;
-                        venue.eventVenueId = row.event_venue_id;
-                        venue.event_venue_id = row.event_venue_id;
-                        venue.proctorId = row.proctor_id;
-                    }
-                    // Get categories
-                    if (eventCategoryId == 0) {
-                        eventCategoryId = row.event_category_id;
-                        //console.log("6 " , eventCategoryId);                    
-
-                    } else if (row.event_category_id != eventCategoryId) {
-                        eventCategoryId = row.event_category_id;
-
-                        // Add Venue and judges to category and add categry to categories array
-                        category.venueId = venueId;
-                        category.judges = judges;
-
-                        if (_.findWhere(categories, category) == null) {
-                            categories.push(category);
-                        }
-
-                        category = {};
-                        venueId = [];
-                        judges = [];
-                    }
-
-                    category.eventCategoryID = eventCategoryId;
-                    category.eventCatMapId = row.event_cat_map_id;
-                    category.name = row.category_name;
-                    category.schoolGradeFrom = row.school_grade_from;
-                    category.schoolGradeTo = row.school_grade_to;
-
-                    if (row.venue_id != null) {
-                        // console.log("6.2", row.venue_id);
-                        if (venueId.indexOf(row.venue_id) < 0)
-                            venueId.push(row.venue_id)
-                    }
-                    if (row.judge_id != null) {
-                        if (judges.indexOf(row.judge_id) < 0)
-                            judges.push(row.judge_id)
-                    }
-
-                    //Get list of questions
-                    if (row.question_id != null) {
-                        question = {};
-                        question.questionId = row.question_id;
-                        question.question = row.question;
-                        question.responseType = row.answer_type;
-                        if (_.findWhere(questionnaire, question) == null) {
-                            questionnaire.push(question);
-                        }
-                    }
-
-                } // End of for loop
-
-                // Processing for the last row
-                if (_.findWhere(venues, venue) == null) {
-                    venues.push(venue);
+                // Get list of org ids
+                if (row.org_id != null) {
+                    if (orgIds.indexOf(row.org_id) < 0)
+                        orgIds.push(row.org_id)
                 }
 
-                if (_.findWhere(questionnaire, question) == null) {
-                    questionnaire.push(question);
+                if (row.coordinator_id != null) {
+                    if (eventCoordinator.indexOf(row.coordinator_id) < 0)
+                        eventCoordinator.push(row.coordinator_id)
+                }                //Get list of venues
+                if (row.venue_id != null) {
+
+                    if (eventVenueId == 0) {
+                        eventVenueId = row.event_venue_id;
+                    } else if (row.event_venue_id != eventVenueId) {
+
+                        if (_.findWhere(venues, venue) == null) {
+                            venues.push(venue);
+                        }
+                        venue = {};
+                    }
+
+                    venue.venueId = row.venue_id;
+                    venue.eventVenueId = row.event_venue_id;
+                    venue.event_venue_id = row.event_venue_id;
+                    venue.proctorId = row.proctor_id;
+                }
+                // Get categories
+                if (eventCategoryId == 0) {
+                    eventCategoryId = row.event_category_id;
+                    //console.log("6 " , eventCategoryId);                    
+
+                } else if (row.event_category_id != eventCategoryId) {
+                    eventCategoryId = row.event_category_id;
+
+                    // Add Venue and judges to category and add categry to categories array
+                    category.venueId = venueId;
+                    category.judges = judges;
+
+                    if (_.findWhere(categories, category) == null) {
+                        categories.push(category);
+                    }
+
+                    category = {};
+                    venueId = [];
+                    judges = [];
                 }
 
-                category.venueId = venueId;
-                category.judges = judges;
+                category.eventCategoryID = eventCategoryId;
+                category.eventCatMapId = row.event_cat_map_id;
+                category.name = row.category_name;
+                category.schoolGradeFrom = row.school_grade_from;
+                category.schoolGradeTo = row.school_grade_to;
 
-                if (_.findWhere(categories, category) == null) {
-                    categories.push(category);
+                if (row.venue_id != null) {
+                    // console.log("6.2", row.venue_id);
+                    if (venueId.indexOf(row.venue_id) < 0)
+                        venueId.push(row.venue_id)
+                }
+                if (row.judge_id != null) {
+                    if (judges.indexOf(row.judge_id) < 0)
+                        judges.push(row.judge_id)
                 }
 
-                event.orgId = orgIds;
-                event.venues = venues;
-                event.categories = categories;
-                event.questionnaire = questionnaire;
+                //Get list of questions
+                if (row.question_id != null) {
+                    question = {};
+                    question.questionId = row.question_id;
+                    question.question = row.question;
+                    question.responseType = row.answer_type;
+                    if (_.findWhere(questionnaire, question) == null) {
+                        questionnaire.push(question);
+                    }
+                }
 
-                console.log(`Stringified JSON is : ` + JSON.stringify(event))
+            } // End of for loop
+
+            // Processing for the last row
+            if (_.findWhere(venues, venue) == null) {
+                venues.push(venue);
             }
+
+            if (_.findWhere(questionnaire, question) == null) {
+                questionnaire.push(question);
+            }
+
+            category.venueId = venueId;
+            category.judges = judges;
+
+            if (_.findWhere(categories, category) == null) {
+                categories.push(category);
+            }
+
+            event.orgId = orgIds;
+            event.venues = venues;
+            event.categories = categories;
+            event.questionnaire = questionnaire;
+            event.eventCoordinator = eventCoordinator;
+            console.log(`Stringified JSON is : ` + JSON.stringify(event))
+        }
 
         if (isParticipant === 'true') {
             let query = ` select enrollment_id from t_event_participant_registration 
@@ -201,85 +205,116 @@ async function getEventById(eventId, isParticipant, userId) {
 }
 
 
-async function eventRegistration(eventData) {
+async function eventRegistration(eventData, loggedInUser) {
 
     let client = await dbConnections.getConnection();
     try {
-
         await client.query('begin;');
 
         // Populating t_event_participant_registration table.
 
-        // logic to get unique random number.
-        let enrollmentId;
-        for (; ;) {
-            let randomNo = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
-            let isRandomNoExists = `select case when count(enrollment_id) = 0 then false
-                                    else true end ran_no from t_event_participant_registration 
-                                    where enrollment_id ='${randomNo}';`;
+        let eventType = await client.query(`select event_type from t_event te where event_id = ${eventData.eventId};`)
+        eventType = eventType.rows[0].event_type;
+        console.log(`Event type for ${eventData.eventId} is ${eventType}`);
 
-            let ranNoResult = await client.query(isRandomNoExists);
-            if (ranNoResult.rows[0].ran_no == false) {
-                enrollmentId = randomNo;
-                break;
-            }
-        }
+        //query to insert into t_event_participant_registration table
         const registerQuery = `INSERT INTO t_event_participant_registration
-                            (event_id, user_id, school_grade, is_deleted, created_by, created_date, enrollment_id)
-                            VALUES($1, $2, $3, $4, $5, $6, $7) returning event_participant_registration_id;`
+        (event_id, user_id, school_grade, is_deleted, created_by, created_date, enrollment_id)
+        VALUES($1, $2, $3, $4, $5, $6, $7) returning event_participant_registration_id;`
 
-        let registerQueryValues = [
-            eventData.eventId,
-            eventData.participantId,
-            eventData.schoolGrade,
-            false,
-            eventData.participantId,
-            new Date().toUTCString(),
-            enrollmentId
-        ];
+            if (eventType === 'CWC') {
+    
+                const registerQuery = `INSERT INTO t_event_participant_registration
+                                (event_id, user_id, school_grade, is_deleted, created_by, created_date, enrollment_id)
+                                VALUES($1, $2, $3, $4, $5, $6, $7) returning event_participant_registration_id;`
+                let registerQueryValues = [
+                eventData.eventId,
+                eventData.participantId,
+                eventData.schoolGrade,
+                false,
+                loggedInUser,
+                new Date().toUTCString(),
+                enrollmentId
+            ];
 
-        let result = await client.query(registerQuery, registerQueryValues)
-        let participantRegId = result.rows[0].event_participant_registration_id;
-        console.log('inserted into t_event_participant_registration!, for event_participant_registration_id : ' + participantRegId +
-            ' and with enrollment Id: ' + enrollmentId);
-
-        // Populating t_participant_event_reg_cat table.
-        const registerEvtCatQuery = `INSERT INTO t_participant_event_reg_cat
+            let result = await client.query(registerQuery, registerQueryValues)
+            let participantRegId = result.rows[0].event_participant_registration_id;
+            console.log('inserted into t_event_participant_registration!, for event_participant_registration_id : ' + participantRegId +
+                ' and with enrollment Id: ' + enrollmentId + ' by ' + loggedInUser);
+                
+            // Populating t_participant_event_reg_cat table.
+            const registerEvtCatQuery = `INSERT INTO t_participant_event_reg_cat
         (event_participant_registration_id, event_category_id, user_id, is_deleted, created_by, created_date)
         VALUES($1, $2, $3, $4, $5, $6);`
 
-        for (const catId of eventData.categories) {
+            for (const catId of eventData.categories) {
 
-            let registerEvtCatQueryValues = [
-                participantRegId,
-                catId,
-                eventData.participantId,
-                false,
-                eventData.participantId,
-                new Date().toUTCString()
-            ];
-            await client.query(registerEvtCatQuery, registerEvtCatQueryValues)
-            console.log('inserted into t_participant_event_reg_cat!, for category : ' + catId + ' and registration_id is : ' + participantRegId);
-        }
+                let registerEvtCatQueryValues = [
+                    participantRegId,
+                    catId,
+                    eventData.participantId,
+                    false,
+                    eventData.participantId,
+                    new Date().toUTCString()
+                ];
+                await client.query(registerEvtCatQuery, registerEvtCatQueryValues)
+                console.log('inserted into t_participant_event_reg_cat!, for category : ' + catId + ' and registration_id is : ' + participantRegId);
+            }
 
-        // Populating t_event_question_response table.
-        const insertQueRespQry = `INSERT INTO t_event_question_response
+            // Populating t_event_question_response table.
+            const insertQueRespQry = `INSERT INTO t_event_question_response
                                 (event_participant_registration_id, question_id, answer, created_by, created_date)
                                 VALUES($1, $2, $3, $4, $5 );`;
 
-        for (const question of eventData.questionnaire) {
+            for (const question of eventData.questionnaire) {
 
-            let insertQueRespValues = [
-                participantRegId,
-                question.questionId,
-                question.answer,
-                eventData.participantId,
-                new Date().toUTCString()
-            ];
-            await client.query(insertQueRespQry, insertQueRespValues)
-            console.log('inserted into t_event_question_response!, for question : ' + question.questionId + ' and registration_id is : ' + participantRegId);
+                let insertQueRespValues = [
+                    participantRegId,
+                    question.questionId,
+                    question.answer,
+                    eventData.participantId,
+                    new Date().toUTCString()
+                ];
+                await client.query(insertQueRespQry, insertQueRespValues)
+                console.log('inserted into t_event_question_response!, for question : ' + question.questionId + ' and registration_id is : ' + participantRegId);
+            }
+            await client.query('commit;')
+        } else if (eventType === 'TTC') {
+
+            for (ttcParticipant of participants) {
+
+                let enrollmentId;
+                for (; ;) {
+                    let randomNo = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
+                    let isRandomNoExists = `select case when count(enrollment_id) = 0 then false
+                                    else true end ran_no from t_event_participant_registration 
+                                    where enrollment_id ='${randomNo}';`;
+
+                    let ranNoResult = await client.query(isRandomNoExists);
+                    if (ranNoResult.rows[0].ran_no == false) {
+                        enrollmentId = randomNo;
+                        break;
+                    }
+                }
+
+                let registerQueryValues = [
+                    eventData.eventId,
+                    eventData.ttcParticipant,
+                   '',
+                    false,
+                    loggedInUser,
+                    new Date().toUTCString(),
+                    enrollmentId
+                ];
+
+                let result = await client.query(registerQuery, registerQueryValues)
+                let participantRegId = result.rows[0].event_participant_registration_id;
+                console.log('inserted into t_event_participant_registration!, for event_participant_registration_id : ' + participantRegId +
+                    ' and with enrollment Id: ' + enrollmentId);
+
+            }
+
         }
-        await client.query('commit;')
         return {
             "data": {
                 status: 'success'
