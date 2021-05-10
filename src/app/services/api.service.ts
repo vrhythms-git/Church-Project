@@ -18,7 +18,6 @@ export class ApiService {
 
     console.log('Application url set to : ' + environment.apiUrl);
   }
-  // private _baseUrl = 'https://cormentis.herokuapp.com';
   private _baseUrl = environment.apiUrl;
 
   signUpNewUser(userData: any): Observable<any> {
