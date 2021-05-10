@@ -88,8 +88,8 @@ export class ApprovalRequestsComponent implements OnInit {
 
   }
   getUnapprovedUserData(usertype:string) {
-    this.apiService.getUnapprovedUserData(this.loggedInUser, usertype).subscribe((res) => {
-      // console.log('These are unapproved users from database : ');
+    this.apiService.callGetService('getuserRecords?type='+usertype).subscribe((res) => {
+
 
       if(usertype == 'approval_requests'){
         this.columnDefs = [
