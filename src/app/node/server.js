@@ -31,16 +31,16 @@ process.on('SIGTERM', () => {
   })
 })
 
-// app.use(express.static(__dirname + '/dist/insurancekarma/'));
-
 app.use(express.json());
 app.use('*', cors())
 
+let basePath = __dirname.split('\\src\\app\\node')[0];
+console.log(`Final path is ${path.join(basePath + "/dist/church/index.html")}`)
+app.use(express.static(path.join(basePath + "/dist/church")));
 
-// app.get('/', function (req, res) {
-
-//     res.sendFile(path.join(__dirname + "/dist/insurancekarma/index.html"));
-// });
+app.get('/', function (req, res) {
+  res.sendFile(path.join(basePath + "/dist/church/index.html"));
+});
 
 app.post('/api/signUp', function (req, res) {
   console.log("signUp called with : " + JSON.stringify(req.body));
