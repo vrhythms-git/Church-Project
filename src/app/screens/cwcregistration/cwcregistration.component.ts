@@ -259,46 +259,7 @@ export class CwcregistrationComponent implements OnInit {
 
 
   registerEvent() {
-    let eventRegistrationForm: any = {};
-    eventRegistrationForm = { ...this.questionnaireDataFormGroup.value }
-    console.log("this.registration form", eventRegistrationForm);
-
-    //this.cwcRegistrationForm.value.eventId = this.eventId;
-    /*
-        let catArray : any = []
-        eventRegistrationForm.categories.filter((item:any) => {
-          catArray.push(item.eventCategoryID)
-        });
-        */
-    eventRegistrationForm.categories = this.catArray;
-
-    let payLoad = {
-      categories: this.catArray,
-      questionnaire: this.questionnaireDataFormGroup.value.questionnaire,
-      eventId: this.selectedRowJson.event_Id,
-      participantId: this.loggedInUser,
-      schoolGrade: '',
-    }
-    console.log("Payload : " + JSON.stringify(payLoad));
-    //console.log("eventRegistrationForm : " + eventRegistrationForm);
-
-
-    //console.log("this.categoriesDataFormGroup.value.categories.length" + this.categoriesDataFormGroup.value.categories.length);
-    if (this.categoriesDataFormGroup.value.categories.length == 0) {
-      this.uiCommonUtils.showSnackBar('You should select atleast one category', 'Dismiss', 3000);
-    }
-
-    
-    this.apiService.callPostService('registerEvent',payLoad ).subscribe((res: any) => {
-      if (res.data.status == "success") {
-        this.uiCommonUtils.showSnackBar("Registered for event successfully!", "success", 3000);
-      }
-      else
-        this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
-    });
-
-
-
+   
     if(this.isTtcEvent = true){
 
       let payLoadNew = {
@@ -306,7 +267,49 @@ export class CwcregistrationComponent implements OnInit {
           "participants": this.selectedUserIds
       }
 
+      console.log("payLoadNew : " + JSON.stringify(payLoadNew));
+
       this.apiService.callPostService('registerEvent',payLoadNew ).subscribe((res: any) => {
+        if (res.data.status == "success") {
+          this.uiCommonUtils.showSnackBar("Registered for event successfully!", "success", 3000);
+        }
+        else
+          this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
+      });
+    }
+    else{
+
+      let eventRegistrationForm: any = {};
+      eventRegistrationForm = { ...this.questionnaireDataFormGroup.value }
+      console.log("this.registration form", eventRegistrationForm);
+  
+      //this.cwcRegistrationForm.value.eventId = this.eventId;
+      /*
+          let catArray : any = []
+          eventRegistrationForm.categories.filter((item:any) => {
+            catArray.push(item.eventCategoryID)
+          });
+          */
+      eventRegistrationForm.categories = this.catArray;
+  
+      let payLoad = {
+        categories: this.catArray,
+        questionnaire: this.questionnaireDataFormGroup.value.questionnaire,
+        eventId: this.selectedRowJson.event_Id,
+        participantId: this.loggedInUser,
+        schoolGrade: '',
+      }
+      console.log("Payload : " + JSON.stringify(payLoad));
+      //console.log("eventRegistrationForm : " + eventRegistrationForm);
+  
+  
+      //console.log("this.categoriesDataFormGroup.value.categories.length" + this.categoriesDataFormGroup.value.categories.length);
+      if (this.categoriesDataFormGroup.value.categories.length == 0) {
+        this.uiCommonUtils.showSnackBar('You should select atleast one category', 'Dismiss', 3000);
+      }
+  
+      
+      this.apiService.callPostService('registerEvent',payLoad ).subscribe((res: any) => {
         if (res.data.status == "success") {
           this.uiCommonUtils.showSnackBar("Registered for event successfully!", "success", 3000);
         }

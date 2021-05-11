@@ -295,8 +295,8 @@ async function eventRegistration(eventData, loggedInUser) {
             }
             await client.query('commit;')
         } else if (eventType === 'TTC') {
-
-            for (ttcParticipant of participants) {
+            console.log("999");
+            for (let ttcParticipant of eventData.participants) {
 
                 let enrollmentId;
                 for (; ;) {
@@ -312,10 +312,14 @@ async function eventRegistration(eventData, loggedInUser) {
                     }
                 }
 
+                const registerQueryTtc = `INSERT INTO t_event_participant_registration
+                (event_id, user_id, school_grade, is_deleted, created_by, created_date, enrollment_id)
+                VALUES($1, $2, $3, $4, $5, $6, $7) returning event_participant_registration_id;`
 
-                let registerQueryValues = [
+
+                let registerQueryValuesTtc = [
                     eventData.eventId,
-                    eventData.ttcParticipant,
+                    ttcParticipant,
                    '',
                     false,
                     loggedInUser,
@@ -323,10 +327,14 @@ async function eventRegistration(eventData, loggedInUser) {
                     enrollmentId
                 ];
 
-                let result = await client.query(registerQuery, registerQueryValues)
+                let result = await client.query(registerQueryTtc, registerQueryValuesTtc);
                 let participantRegId = result.rows[0].event_participant_registration_id;
+
                 console.log('inserted into t_event_participant_registration!, for event_participant_registration_id : ' + participantRegId +
                     ' and with enrollment Id: ' + enrollmentId);
+
+
+                await client.query("COMMIT");
 
             }
 
