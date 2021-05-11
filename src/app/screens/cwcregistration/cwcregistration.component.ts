@@ -34,6 +34,8 @@ export class CwcregistrationComponent implements OnInit {
   rowData: any = [];
   rowDataBinding: any = [];
   isTtcEvent!: boolean;
+  eventId: any;
+  selectedUserIds: any;
   term: any;
   gridOptions: any;
   startDate: any;
@@ -77,6 +79,7 @@ export class CwcregistrationComponent implements OnInit {
 
     this.userMetaData = this.uiCommonUtils.getUserMetaDataJson();
     this.loggedInUser = this.userMetaData.userId;
+    this.eventId = this.selectedRowJson.event_Id;
 
 
 
@@ -145,28 +148,15 @@ export class CwcregistrationComponent implements OnInit {
       { headerName: 'PostalCode', field: 'postalCode', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
       { headerName: 'Parish Name', field: 'parish_name', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
     ];
-
-    
-    // this.gridOptions = {
-    //   columnDefs: this.columnDefs,
-    //   //rowData: this.rowData,
-    //   treeData: true,
-    //   enableFilter: true,
-    //   enableColResize: true,
-    //   defaultColDef: {
-    //     editable: false,
-    //     filter: 'agTextColumnFilter'
-    //   }
-    // };
     
   }
 
   addMemOnChange(event : any){
 
     this.rowData = [];     
-    let selectedUserIds = event.value;
+    this.selectedUserIds = event.value;
 
-    for(let row of selectedUserIds){
+    for(let row of this.selectedUserIds){
       let index = this.rowDataBinding.findIndex((item: any) => item.userId == row) 
       if(index >= 0){
         this.rowData.push(this.rowDataBinding[index]);
@@ -306,6 +296,24 @@ export class CwcregistrationComponent implements OnInit {
       else
         this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
     });
+
+
+
+    if(this.isTtcEvent = true){
+
+      let payLoadNew = {
+          "eventId": this.eventId,
+          "participants": this.selectedUserIds
+      }
+
+      this.apiService.callPostService('registerEvent',payLoadNew ).subscribe((res: any) => {
+        if (res.data.status == "success") {
+          this.uiCommonUtils.showSnackBar("Registered for event successfully!", "success", 3000);
+        }
+        else
+          this.uiCommonUtils.showSnackBar("Something went wrong!", "error", 3000);
+      });
+    }
     
   }
 

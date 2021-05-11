@@ -312,6 +312,7 @@ async function eventRegistration(eventData, loggedInUser) {
                     }
                 }
 
+
                 let registerQueryValues = [
                     eventData.eventId,
                     eventData.ttcParticipant,
