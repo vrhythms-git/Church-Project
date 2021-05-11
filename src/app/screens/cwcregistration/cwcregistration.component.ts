@@ -26,10 +26,16 @@ export class CwcregistrationComponent implements OnInit {
   eventcategorydata!: any[];
   eventQuestionnaireData!: any[];
   answer: any;
-
+  ttcFormGroup: any;
   event: any;
   item: any;
-
+  columnDefs!: any[];
+  partIds!: any[];
+  rowData: any = [];
+  rowDataBinding: any = [];
+  isTtcEvent!: boolean;
+  term: any;
+  gridOptions: any;
   startDate: any;
   endDate: any;
   registrationStartDate: any;
@@ -59,6 +65,13 @@ export class CwcregistrationComponent implements OnInit {
       this.selectedRowJson = this.eventRegistrationDataService.getSelectedRowData();
       //this.selectedEventType = this.eventRegistrationDataService.getselectedEventData();
     console.log('selected row data is :: ' + JSON.stringify(this.selectedRowJson));
+    }
+
+    if(this.selectedRowJson.event_type == "TTC"){
+      this.isTtcEvent = true;
+    }
+    else{
+      this.isTtcEvent = false;
     }
 
 
@@ -113,18 +126,76 @@ export class CwcregistrationComponent implements OnInit {
 
     this.categoriesDataFormGroup = this.formBuilder.group({
       categories: this.formBuilder.array([this.addeventCategory()]),
-
     });
     this.questionnaireDataFormGroup = this.formBuilder.group({
       questionnaire: this.formBuilder.array([this.addeventquestionnaire()])
     });
 
+    this.apiService.callGetService(`getuserRecords?eventId=${this.selectedRowJson.event_Id}&type=ttc_reg_add_participants`).subscribe((res) => {
+      this.partIds = res.data.metaData;
+      this.rowDataBinding = res.data.metaData;
+    });
+
+    this.columnDefs = [
+      { headerName: 'Name', field: 'firstName', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true },
+      { headerName: 'BaptismalName', field: 'baptismalName', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true },
+      { headerName: 'Country', field: 'country', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
+      { headerName: 'State', field: 'state', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true,  },
+      { headerName: 'City', field: 'city', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
+      { headerName: 'PostalCode', field: 'postalCode', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
+      { headerName: 'Parish Name', field: 'parish_name', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
+    ];
+
+    
+    // this.gridOptions = {
+    //   columnDefs: this.columnDefs,
+    //   //rowData: this.rowData,
+    //   treeData: true,
+    //   enableFilter: true,
+    //   enableColResize: true,
+    //   defaultColDef: {
+    //     editable: false,
+    //     filter: 'agTextColumnFilter'
+    //   }
+    // };
+    
   }
+
+  addMemOnChange(event : any){
+
+    this.rowData = [];     
+    let selectedUserIds = event.value;
+
+    for(let row of selectedUserIds){
+      let index = this.rowDataBinding.findIndex((item: any) => item.userId == row) 
+      if(index >= 0){
+        this.rowData.push(this.rowDataBinding[index]);
+      }
+    }
+
+    this.gridOptions = {
+      columnDefs: this.columnDefs,
+      rowData: this.rowData,
+      treeData: true,
+      enableFilter: true,
+      enableColResize: true,
+      defaultColDef: {
+        editable: false,
+        filter: 'agTextColumnFilter'
+      }
+    };
+
+  }
+
+  
+
+ 
+
+
   addeventCategory(): FormGroup {
     return this.formBuilder.group({
       eventCategoryID: '',
       name: '',
-
     });
   }
   addeventquestionnaire(): FormGroup {
@@ -195,6 +266,8 @@ export class CwcregistrationComponent implements OnInit {
     }
     console.log("catArray : " + this.catArray);
   }
+
+
   registerEvent() {
     let eventRegistrationForm: any = {};
     eventRegistrationForm = { ...this.questionnaireDataFormGroup.value }
@@ -235,6 +308,8 @@ export class CwcregistrationComponent implements OnInit {
     });
     
   }
+
+  
 
 
 

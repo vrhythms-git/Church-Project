@@ -1,12 +1,14 @@
 <div class="container mt-4">
     <mat-card class="shadow">
         <div class="row">
-            <h2 class="col-md-9" style="text-align: center; "><label>{{selectedRowJson.name}}</label> Event Registration</h2>
-           
-            <button mat-button class="col-md-1" class="ml-auto" data-dismiss="modal" (click)="onCancelRegistrationClick()">
+            <h2 class="col-md-9" style="text-align: center; "><label>{{selectedRowJson.name}}</label> Event Registration
+            </h2>
+
+            <button mat-button class="col-md-1" class="ml-auto" data-dismiss="modal"
+                (click)="onCancelRegistrationClick()">
                 <mat-icon>clear</mat-icon>
             </button>
-        <!--
+            <!--
             <button mat-button class="ml-auto" data-dismiss="modal" (click)="onCancelRegistrationClick()">
                 <mat-icon>clear</mat-icon>
             </button>
@@ -15,7 +17,7 @@
         <div>
             <div class="row">
                 <div class="col-md-2" style="text-align: right;">
-                    Name : 
+                    Name :
                 </div>
                 <div class="col-md-4" style="text-align: left;">
                     <label>{{userMetaData.title}}.&nbsp;</label>
@@ -23,80 +25,80 @@
                     <label *ngIf="userMetaData.middleName"> {{userMetaData.middleName}}&nbsp;</label>
                     <label>{{userMetaData.lastName}}</label>
                 </div>
-                <div class="col-md-2" *ngIf="userMetaData.emailId"  style="text-align: right;">
-                    Email : 
+                <div class="col-md-2" *ngIf="userMetaData.emailId" style="text-align: right;">
+                    Email :
                 </div>
                 <div class="col-md-4" style="text-align: left;">
-                        <label>{{userMetaData.emailId}}</label>
-                </div>
-                
-            </div>
-            
-            <div class="row">
-                <div class="col-md-2" style="text-align: right;">
-                        Event Name : 
-                </div>
-                <div class="col-md-4" style="text-align: left;">
-                      <label>{{selectedRowJson.name}}</label>
-                </div>
-                <div class="col-md-2" style="text-align: right;">
-                    Event Type : 
-            </div>
-            <div class="col-md-4" style="text-align: left;">
-                  <label>{{selectedRowJson.event_type}}</label>
-            </div>
-            </div>
-            
-                <div class="row">
-                    <div class="col-md-2" style="text-align: right;">
-                            Event Start Date : 
-                    </div>
-                    <div class="col-md-4" style="text-align: left;">
-                          <label>{{startDate}}</label>
-                    </div>
-                    <div class="col-md-2" style="text-align: right;">
-                        Event End Date : 
-                    </div>
-                    <div class="col-md-4" style="text-align: left;">
-                        <label>{{endDate}}</label>
-                    </div>
+                    <label>{{userMetaData.emailId}}</label>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-2" style="text-align: right;">
-                            Registration Start Date : 
-                    </div>
-                    <div class="col-md-4" style="text-align: left;">
-                          <label>{{registrationStartDate}}</label>
-                    </div>
-                    <div class="col-md-2" style="text-align: right;">
-                        Registration End Date : 
-                    </div>
-                    <div class="col-md-4" style="text-align: left;">
-                        <label>{{registrationEndDate}}</label>
-                    </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2" style="text-align: right;">
+                    Event Name :
                 </div>
-                <div class="row">
-               
-                    <div class="col-md-2" *ngIf="enrollmentId"  style="text-align: right;">
-                        EnrollmentId : 
-                    </div>
-                    <div class="col-md-4" style="text-align: left;">
-                        <label>{{enrollmentId}}</label>
+                <div class="col-md-4" style="text-align: left;">
+                    <label>{{selectedRowJson.name}}</label>
                 </div>
+                <div class="col-md-2" style="text-align: right;">
+                    Event Type :
                 </div>
-           
+                <div class="col-md-4" style="text-align: left;">
+                    <label>{{selectedRowJson.event_type}}</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2" style="text-align: right;">
+                    Event Start Date :
+                </div>
+                <div class="col-md-4" style="text-align: left;">
+                    <label>{{startDate}}</label>
+                </div>
+                <div class="col-md-2" style="text-align: right;">
+                    Event End Date :
+                </div>
+                <div class="col-md-4" style="text-align: left;">
+                    <label>{{endDate}}</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2" style="text-align: right;">
+                    Registration Start Date :
+                </div>
+                <div class="col-md-4" style="text-align: left;">
+                    <label>{{registrationStartDate}}</label>
+                </div>
+                <div class="col-md-2" style="text-align: right;">
+                    Registration End Date :
+                </div>
+                <div class="col-md-4" style="text-align: left;">
+                    <label>{{registrationEndDate}}</label>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-2" *ngIf="enrollmentId" style="text-align: right;">
+                    EnrollmentId :
+                </div>
+                <div class="col-md-4" style="text-align: left;">
+                    <label>{{enrollmentId}}</label>
+                </div>
+            </div>
+
         </div>
-        
+
         <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top:1%;">
         </mat-divider>
         <form [formGroup]="categoriesDataFormGroup">
             <h2>Categories</h2>
             <fieldset>
                 <div class="col-md-12">
-                    
-                        <fieldset>
-                            <!--
+
+                    <fieldset>
+                        <!--
                                 <div  *ngFor="let category of eventcategorydata" 
                                 class=" example-margin text-black-50">
                                 <mat-checkbox  
@@ -108,29 +110,26 @@
                                         {{category.name}} </mat-checkbox>
                             </div>
                                 -->
-                                <div  *ngFor="let category of eventcategorydata" 
-                                class=" example-margin text-black-50">
-                                    <div *ngIf="category.eventCatMapId">
-                                        <mat-checkbox  
-                                        (change)="onChange({ 
+                        <div *ngFor="let category of eventcategorydata" class=" example-margin text-black-50">
+                            <div *ngIf="category.eventCatMapId">
+                                <mat-checkbox (change)="onChange({ 
                                             'event' : $event,
                                             'item' : category
-                                        })"
-                                                 class="example-margin">
-                                                {{category.name}} </mat-checkbox>
-                                    </div>
-                                </div>
-                            
-                            
-                        </fieldset>
-                    
+                                        })" class="example-margin">
+                                    {{category.name}} </mat-checkbox>
+                            </div>
+                        </div>
+
+
+                    </fieldset>
+
 
                 </div>
             </fieldset>
         </form>
         <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top:1%;">
         </mat-divider>
-        
+
         <form [formGroup]="questionnaireDataFormGroup">
             <h2>Questionnaire </h2>
             <fieldset>
@@ -138,7 +137,7 @@
                     *ngFor="let item of questionnaireDataFormGroup.get('questionnaire')['controls']; let i = index;">
 
                     <div class="container" [formGroupName]="i">
-                        
+
                         <div class="row">
 
                             <mat-form-field class="col-md-12">
@@ -157,8 +156,7 @@
                             <div class="row" class="col-md-12" *ngIf="responseType.value == 'Text'">
                                 <mat-form-field class="col-md-12">
                                     <mat-label>Please enter your answer </mat-label>
-                                    <input matInput formControlName="answer"
-                                        placeholder="Enter your answer" required>
+                                    <input matInput formControlName="answer" placeholder="Enter your answer" required>
                                 </mat-form-field>
                             </div>
 
@@ -168,34 +166,70 @@
                                     <mat-radio-button [checked]=!answer value="false">No</mat-radio-button>
                                 </mat-radio-group>
                             </div>
-                           <div class="row" class="col-md-12" *ngIf="responseType.value == 'Date Range'">
-                            <mat-form-field class="col-md-12">
-                                <input matInput formControlName="answer" ngxDaterangepickerMd 
-                                    [(ngModel)]="selected" class="form-control"
-                                    placeholder="Select Date Range" />
-                            </mat-form-field>
-                           </div>
+                            <div class="row" class="col-md-12" *ngIf="responseType.value == 'Date Range'">
+                                <mat-form-field class="col-md-12">
+                                    <input matInput formControlName="answer" ngxDaterangepickerMd [(ngModel)]="selected"
+                                        class="form-control" placeholder="Select Date Range" />
+                                </mat-form-field>
+                            </div>
 
                         </div>
 
-                        
-                        <mat-divider
-                            style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top: 2%;">
-                        </mat-divider>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col text-center">
-                        <button style="float: center;" type="submit" mat-button class="mbutton"
-                            (click)="onCancelRegistrationClick()">
-                            Cancel
-                        </button>&nbsp;
-                        <button style="float: center;" *ngIf="selectedEventType" (click)="registerEvent()"  mat-button type="submit" mat-button class="mbutton">
-                            Register
-                          </button>
-                    </div>
-                </div>
+
             </fieldset>
         </form>
-        </mat-card>
+
+        <!-- *ngIf="isTtcEvent" -->
+
+        <form [formGroup]="ttcFormGroup">
+
+            <mat-divider style="position: relative;background-color:rgb(136, 88, 25);height: 2px;margin-top:1%;">
+            </mat-divider>
+
+            <h2 style="padding-top: 1%;">Teacher's Registration</h2>
+
+
+
+        <div class="row">
+            <mat-form-field class="col-md-12">
+                <mat-select required multiple id="partId" formControlName="partId"
+                    placeholder="Add Members (Teacher's/Principal)" (selectionChange)="addMemOnChange($event)">
+                    <mat-option *ngFor="let partId of partIds" [value]="partId.userId">
+                        {{partId.title}}.&nbsp;{{partId.firstName}}&nbsp;{{partId.middleNmae}}&nbsp;{{partId.lastName}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+
+            <ag-grid-angular style="width: auto; height: 500px;" class="ag-theme-alpine mt-3"
+            [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
+             [pagination]="true" rowSelection='multiple'
+             [gridOptions]="gridOptions">
+            </ag-grid-angular>
+
+
+        <!-- [checkboxSelection]="true" -->
+        <!-- (gridReady)="onGridReady($event)" -->
+        <!-- (rowClicked)='onRowClicked($event)' -->
+        </form>
+
+        <div class="row" style="padding-top: 2%;">
+            <div class="col text-center">
+                <button style="float: center;" type="submit" mat-button class="mbutton"
+                    (click)="onCancelRegistrationClick()">
+                    Cancel
+                </button>&nbsp;
+                <button style="float: center;" *ngIf="selectedEventType" (click)="registerEvent()" mat-button
+                    type="submit" mat-button class="mbutton">
+                    Register
+                </button>
+            </div>
+        </div>
+
+
+
+    </mat-card>
 </div>
