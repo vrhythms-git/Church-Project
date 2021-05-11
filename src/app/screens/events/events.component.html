@@ -6,7 +6,7 @@
                                  [routerLink]="'/dashboard/users'">
                                  <mat-icon>supervised_user_circle</mat-icon>
                                  {{userMetaData.menus[1]}}</a> -->
-            <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
+            <input type="text" class="form-control col-9 search" (ngModelChange)="onSearchChange($event)" placeholder="Search Here" [(ngModel)]="term">
             <button mat-button class="ml-auto border" (click)="onAddEventClick()">
                     <mat-icon>add_circle</mat-icon> Add
                 
@@ -18,7 +18,7 @@
         </div>
         
         <ag-grid-angular style="width: auto; height: 500px;" class="ag-theme-alpine mt-3" 
-                        [rowData]="rowData|filter:term" [columnDefs]="columnDefs"
+                        [rowData]="rowData" [columnDefs]="columnDefs"
                          (gridReady)="onGridReady($event)" (rowClicked)='onRowClicked($event)'
                 [pagination]="true" rowSelection='multiple' [checkboxSelection]="true" [gridOptions]="gridOptions">
                 

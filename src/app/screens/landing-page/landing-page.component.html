@@ -1,14 +1,14 @@
 <div class="container mt-3" style="overflow: hidden;">
 
         <div class="form-group form-inline row m-0 p-0">
-                <input type="text" class="form-control col-9 search" placeholder="Search Here" [(ngModel)]="term">
+                <input type="text" class="form-control col-9 search" (ngModelChange)="onSearchChange($event)" placeholder="Search Here" [(ngModel)]="term">
                 <button *ngIf = "hasDeletePermission" mat-button class="col-2 ml-auto border" (click)="onDelete()">
                         <mat-icon>delete</mat-icon>
                         <span>Delete</span>
                 </button>
         </div>
 
-        <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" [rowData]="rowData | filter:term " [columnDefs]="columnDefs"
+        <ag-grid-angular style="width: auto; height: 480px;" class="ag-theme-alpine mt-3" [rowData]="rowData " [columnDefs]="columnDefs"
                 [pagination]="true" rowSelection='multiple' (selectionChanged)="onSelectionChanged($event)" (gridReady)="onGridReady($event)"
                 [checkboxSelection]="true" [gridOptions]="gridOptions" (rowClicked)='onRowClicked($event)'>
         </ag-grid-angular>

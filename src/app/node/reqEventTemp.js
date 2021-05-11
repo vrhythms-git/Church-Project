@@ -223,6 +223,21 @@ async function eventRegistration(eventData, loggedInUser) {
         VALUES($1, $2, $3, $4, $5, $6, $7) returning event_participant_registration_id;`
 
             if (eventType === 'CWC') {
+
+                let enrollmentId;
+                for (; ;) {
+                    let randomNo = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
+                    let isRandomNoExists = `select case when count(enrollment_id) = 0 then false
+                                    else true end ran_no from t_event_participant_registration 
+                                    where enrollment_id ='${randomNo}';`;
+
+                    let ranNoResult = await client.query(isRandomNoExists);
+                    if (ranNoResult.rows[0].ran_no == false) {
+                        enrollmentId = randomNo;
+                        break;
+                    }
+                }
+                
     
                 const registerQuery = `INSERT INTO t_event_participant_registration
                                 (event_id, user_id, school_grade, is_deleted, created_by, created_date, enrollment_id)

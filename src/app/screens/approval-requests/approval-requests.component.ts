@@ -30,6 +30,7 @@ export class ApprovalRequestsComponent implements OnInit {
   countries!: any[];
   states!: any[];
   selectedCountry: any;
+  gridApi: any;
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder,
     private uiCommonUtils: uiCommonUtils, private router: Router) { }
@@ -198,6 +199,14 @@ export class ApprovalRequestsComponent implements OnInit {
 
   resetForm() {
     this.approveReqForm.reset();
+  }
+
+  onSearchChange(event: any) {
+    this.gridApi.setQuickFilter(this.term);
+  }
+
+  onGridReady(params: any) {
+    this.gridApi = params.api;
   }
 
   // refreshGrid(){

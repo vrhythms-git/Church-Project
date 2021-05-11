@@ -104,7 +104,11 @@ export class EventsComponent implements OnInit {
 
   }
 
-  getAllEventsData(){  
+  onSearchChange(event: any) {
+    this.gridApi.setQuickFilter(this.term);
+  }
+
+  getAllEventsData() {
     this.apiService.callGetService('getEventData').subscribe((res) => {
       console.log('These are all the events from database : ');
       console.log(res.data.metaData);

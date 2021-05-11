@@ -520,7 +520,7 @@ async function getuserRecords(userType, loggedInUser, eventId) {
         if (res && res.rowCount > 0) {
             // console.log("res.rowCount :" + res.rowCount);
             for (let row of res.rows) {
-                 console.log("Datbase User id" + row.user_id);
+                //  console.log("Datbase User id" + row.user_id);
                 // console.log("User id" + userid);
                 if (userid != row.user_id && userid != 0) {
                     // console.log("In Pushing user to users" + row.user_id);

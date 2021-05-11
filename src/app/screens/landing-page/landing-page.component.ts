@@ -129,7 +129,7 @@ export class LandingPageComponent implements OnInit {
     //   this.hasDeletePermission = false;
     // }
 
-    this.apiService.getUserRoleData().subscribe(res => {
+    this.apiService.callGetService('getRoleMetaData').subscribe(res => {
       console.log("User Role Data : ", res.data.metadata);
       this.roledata = res.data.metadata.roles;
       this.orgs = res.data.metadata.orgs;
@@ -137,15 +137,12 @@ export class LandingPageComponent implements OnInit {
     })
 
 
-    this.apiService.getUsersData({ data: this.userRecords }).subscribe((res) => {
-      console.log('These are users from database : ');
-     console.log(res.data.metaData);
-   this.alluserdata = res.data.metaData;
-   });
+  //   this.apiService.callGetService('getuserRecords?type=approved').subscribe((res) => {
+  //  this.alluserdata = res.data.metaData;
+  //  });
 
-    this.apiService.getCountryStates().subscribe((res: any) => {
+    this.apiService.callGetService('getCountryStates').subscribe((res: any) => {
       this.countries = res.data.countryState;
-      console.log("Countries", this.countries);
     })
 
     this.gridOptions = {
@@ -174,6 +171,10 @@ export class LandingPageComponent implements OnInit {
         console.log("keyCode == 13");
       }
     }
+  }
+
+  onSearchChange(event: any) {
+    this.gridApi.setQuickFilter(this.term);
   }
 
   getMobileNumber(event: any) {
@@ -347,9 +348,7 @@ export class LandingPageComponent implements OnInit {
   getUserData() {
 
     //this.userRecords.loggedInUser = this.loggedInUser;
-    this.apiService.getUsersData(this.loggedInUser).subscribe((res) => {
-      console.log('These are users from database : ');
-      console.log(res.data.metaData);
+    this.apiService.callGetService('getuserRecords?type=approved').subscribe((res) => {
       this.rowData = res.data.metaData;
     });
   }
