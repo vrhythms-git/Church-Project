@@ -141,11 +141,11 @@ export class CwcregistrationComponent implements OnInit {
 
     this.columnDefs = [
       { headerName: 'Name', field: 'firstName', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true },
-      { headerName: 'BaptismalName', field: 'baptismalName', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true },
+      { headerName: 'Baptismal Name', field: 'baptismalName', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true },
       { headerName: 'Country', field: 'country', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
       { headerName: 'State', field: 'state', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true,  },
       { headerName: 'City', field: 'city', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
-      { headerName: 'PostalCode', field: 'postalCode', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
+      { headerName: 'Postal Code', field: 'postalCode', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
       { headerName: 'Parish Name', field: 'parish_name', suppressSizeToFit: true, flex:1,resizable: true,sortable: true, filter: true},
     ];
     
